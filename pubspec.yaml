@@ -1,0 +1,34 @@
+name: kobermart_client
+version: 1.0.0+1
+publish_to: none
+description: A new Flutter project.
+environment:
+  sdk: ">=2.17.3 <3.0.0"
+
+dependencies:
+  badges: ^2.0.3
+  cached_network_image: ^3.2.1
+  connectivity_plus: ^2.3.5
+  cupertino_icons: ^1.0.2
+  dropdown_search: ^5.0.2
+  flutter:
+    sdk: flutter
+  flutter_svg: ^1.1.1+1
+  get: 4.6.5
+  get_cli: ^1.8.1
+  get_storage: ^2.0.3
+  intl: ^0.17.0
+  qr_flutter: ^4.0.0
+  username_gen: ^1.0.4
+
+dev_dependencies:
+  flutter_lints: ^2.0.0
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  assets:
+    - assets/images/
+    - assets/logo/
+    - assets/icons/
+  uses-material-design: true
