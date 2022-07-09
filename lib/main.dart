@@ -27,6 +27,7 @@ class MyApp extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.done) {
           return Obx(() => GetMaterialApp(
                 debugShowCheckedModeBanner: false,
+                defaultTransition: Transition.noTransition,
                 title: "Kobermart Client App",
                 initialRoute:
                     authC.isAuth.value ? AppPages.INITIAL : Routes.LOGIN,

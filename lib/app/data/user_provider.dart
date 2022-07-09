@@ -5,6 +5,7 @@ import 'package:kobermart_client/config.dart';
 
 class UserProvider extends GetConnect {
   Future<Response> login(String email, String password) {
+    print("login");
     final body =
         json.encode({"email": email, "password": password, "type": "1"});
     return post(

@@ -32,15 +32,15 @@ class AuthController extends GetxController {
 
   Future<void> login(String email, String password) async {
     UserProvider().login(email, password).then((value) {
+      print(value.status);
       if (value.body["token"] != null) {
         box.write("token", value.body["token"]);
         print(box.read("token"));
         isAuth.value = true;
         Get.offAllNamed(Routes.HOME);
       } else {
-        Get.defaultDialog(title: "Error", content: Text(value.body["message"]));
+        Get.defaultDialog(title: "Error", content: Text(value.body));
         print(value.body["message"]);
-        print(box.read('token'));
       }
     });
   }

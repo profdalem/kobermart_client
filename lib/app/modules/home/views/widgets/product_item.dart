@@ -34,7 +34,7 @@ class ProductItem extends StatelessWidget {
                       topLeft: Radius.circular(5),
                       topRight: Radius.circular(5)),
                   child: CachedNetworkImage(
-                    imageUrl: "assets/images/coffee.jpeg",
+                    imageUrl: "https://picsum.photos/250?image=9",
                     fit: BoxFit.cover,
                     height: constraints.maxWidth,
                     width: double.infinity,
