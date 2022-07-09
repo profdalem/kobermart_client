@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -217,7 +218,7 @@ class PanelKedalaman extends StatelessWidget {
                                     children: [
                                       CircleAvatar(
                                         radius: 30.0,
-                                        backgroundImage: NetworkImage(
+                                        backgroundImage: CachedNetworkImageProvider(
                                             "https://i.pravatar.cc/150?img=${memberC.kd.indexOf(item) + index + 10}"),
                                         backgroundColor: Colors.transparent,
                                       ),

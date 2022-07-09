@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -61,7 +62,7 @@ class BalancetransferView extends GetView<BalancetransferController> {
                           child: ListTile(
                             onTap: todo,
                             leading: CircleAvatar(
-                                backgroundImage: NetworkImage(
+                                backgroundImage: CachedNetworkImageProvider(
                                     "https://i.pravatar.cc/150?img=${index + 5}")),
                             title:
                                 PanelTitle(title: UsernameGen.generateWith()),
@@ -92,7 +93,7 @@ class BalancetransferView extends GetView<BalancetransferController> {
                               print("klik");
                             },
                             leading: CircleAvatar(
-                                backgroundImage: NetworkImage(
+                                backgroundImage: CachedNetworkImageProvider(
                                     "https://i.pravatar.cc/150?img=${index + 10}")),
                             title:
                                 PanelTitle(title: UsernameGen.generateWith()),

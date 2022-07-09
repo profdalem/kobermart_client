@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -41,8 +42,8 @@ class TransfernominalView extends GetView<TransfernominalController> {
                 decoration: Shadow1(),
                 child: ListTile(
                   leading: CircleAvatar(
-                      backgroundImage:
-                          NetworkImage("https://i.pravatar.cc/150?img=1")),
+                      backgroundImage: CachedNetworkImageProvider(
+                          "https://i.pravatar.cc/150?img=1")),
                   title: PanelTitle(title: "Margot Robbie"),
                   subtitle: Text("Upline: Kennedy Monroe"),
                 ),

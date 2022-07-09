@@ -1,4 +1,5 @@
 import 'package:badges/badges.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -113,7 +114,7 @@ class TokenlistView extends GetView<TokenlistController> {
                               showBadge: false,
                               padding: EdgeInsets.all(8),
                               child: CircleAvatar(
-                                backgroundImage: NetworkImage(
+                                backgroundImage: CachedNetworkImageProvider(
                                     "https://i.pravatar.cc/150?img=${index + 10}"),
                               ),
                             ),

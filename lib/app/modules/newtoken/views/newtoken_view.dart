@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -72,8 +73,8 @@ class NewtokenView extends GetView<NewtokenController> {
                     child: ListTile(
                       onTap: todo,
                       leading: CircleAvatar(
-                          backgroundImage:
-                              NetworkImage("https://i.pravatar.cc/150?img=1")),
+                          backgroundImage: CachedNetworkImageProvider(
+                              "https://i.pravatar.cc/150?img=1")),
                       title: PanelTitle(title: "Username 1"),
                       subtitle: Text("Upline: Margor Robbie"),
                       trailing: Chip(
@@ -101,7 +102,7 @@ class NewtokenView extends GetView<NewtokenController> {
                           child: ListTile(
                             onTap: todo,
                             leading: CircleAvatar(
-                                backgroundImage: NetworkImage(
+                                backgroundImage: CachedNetworkImageProvider(
                                     "https://i.pravatar.cc/150?img=${index + 5}")),
                             title:
                                 PanelTitle(title: UsernameGen.generateWith()),
@@ -136,7 +137,7 @@ class NewtokenView extends GetView<NewtokenController> {
                               print("klik");
                             },
                             leading: CircleAvatar(
-                                backgroundImage: NetworkImage(
+                                backgroundImage: CachedNetworkImageProvider(
                                     "https://i.pravatar.cc/150?img=${index + 10}")),
                             title:
                                 PanelTitle(title: UsernameGen.generateWith()),

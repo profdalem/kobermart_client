@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 
@@ -158,7 +159,7 @@ class CartItem extends StatelessWidget {
                             borderRadius: BorderRadius.all(Radius.circular(10)),
                             shape: BoxShape.rectangle,
                             image: DecorationImage(
-                                image: NetworkImage(
+                                image: CachedNetworkImageProvider(
                                   "https://picsum.photos/200/300",
                                 ),
                                 fit: BoxFit.cover)),

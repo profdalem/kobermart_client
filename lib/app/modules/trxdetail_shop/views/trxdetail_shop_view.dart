@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -105,7 +106,8 @@ class TrxDetailCollector extends StatelessWidget {
           ListTile(
             contentPadding: EdgeInsets.all(0),
             leading: CircleAvatar(
-              backgroundImage: NetworkImage("https://i.pravatar.cc/150?img=18"),
+              backgroundImage: CachedNetworkImageProvider(
+                  "https://i.pravatar.cc/150?img=18"),
             ),
             title: Text("Robert Xemeckis"),
             onTap: () {
@@ -307,7 +309,7 @@ class ItemListProduct extends StatelessWidget {
                           borderRadius: BorderRadius.all(Radius.circular(10)),
                           shape: BoxShape.rectangle,
                           image: DecorationImage(
-                              image: NetworkImage(
+                              image: CachedNetworkImageProvider(
                                 "https://picsum.photos/200/300",
                               ),
                               fit: BoxFit.cover)),

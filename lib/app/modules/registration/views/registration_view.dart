@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 
@@ -25,7 +26,8 @@ class RegistrationView extends GetView<RegistrationController> {
               height: Get.width * 0.2,
               width: Get.width * 0.2,
               child: CircleAvatar(
-                backgroundImage: NetworkImage("https://i.pravatar.cc/150"),
+                backgroundImage:
+                    CachedNetworkImageProvider("https://i.pravatar.cc/150"),
               ),
             ),
             TextButton(

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -40,7 +41,7 @@ class ProductView extends GetView<ProductController> {
                     decoration: BoxDecoration(
                         shape: BoxShape.rectangle,
                         image: DecorationImage(
-                            image: NetworkImage(
+                            image: CachedNetworkImageProvider(
                               "https://picsum.photos/200/300",
                             ),
                             fit: BoxFit.cover)),

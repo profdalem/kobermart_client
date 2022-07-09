@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -34,8 +35,8 @@ class MenuView extends GetView<MenuController> {
                   Get.offAndToNamed(Routes.PROFILE);
                 },
                 leading: CircleAvatar(
-                    backgroundImage:
-                        NetworkImage("https://i.pravatar.cc/150?img=1")),
+                    backgroundImage: CachedNetworkImageProvider(
+                        "https://i.pravatar.cc/150?img=1")),
                 title: PanelTitle(title: "Username 1"),
                 subtitle: Text("Referal ID: Username"),
                 trailing: IconButton(
