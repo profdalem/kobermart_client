@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'app/controllers/auth_controller.dart';
 import 'app/modules/widgets/splashscreen.dart';
@@ -27,8 +28,11 @@ class MyApp extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.done) {
           return Obx(() => GetMaterialApp(
                 debugShowCheckedModeBanner: false,
-                defaultTransition: Transition.noTransition,
+                defaultTransition: Transition.rightToLeft,
                 title: "Kobermart Client App",
+                theme: ThemeData.light().copyWith(
+                    textTheme: GoogleFonts.poppinsTextTheme(
+                        Theme.of(context).textTheme)),
                 initialRoute:
                     authC.isAuth.value ? AppPages.INITIAL : Routes.LOGIN,
                 getPages: AppPages.routes,

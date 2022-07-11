@@ -114,7 +114,7 @@ class ShopView extends GetView<ShopController> {
               GridView.builder(
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
-                    childAspectRatio: 55 / 100,
+                    childAspectRatio: 52 / 100,
                     crossAxisSpacing: 10,
                     mainAxisSpacing: 10),
                 physics: NeverScrollableScrollPhysics(),

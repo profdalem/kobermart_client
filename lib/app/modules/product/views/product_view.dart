@@ -29,7 +29,6 @@ class ProductView extends GetView<ProductController> {
         ),
         body: SingleChildScrollView(
           child: Column(children: [
-            sb15,
             Container(
               decoration: Shadow1(),
               child: Column(

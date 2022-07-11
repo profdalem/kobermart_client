@@ -17,6 +17,7 @@ dependencies:
   get: 4.6.5
   get_cli: ^1.8.1
   get_storage: ^2.0.3
+  google_fonts: ^3.0.1
   intl: ^0.17.0
   qr_flutter: ^4.0.0
   username_gen: ^1.0.4

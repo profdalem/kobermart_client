@@ -14,11 +14,11 @@ class HomeController extends GetxController {
 
   final count = 0.obs;
   @override
-  void onInit() {
+  void onInit() async {
     emailC = TextEditingController();
     passwordC = TextEditingController();
-    getBalance();
-    getCashback();
+    await getBalance();
+    await getCashback();
     super.onInit();
   }
 
@@ -32,8 +32,8 @@ class HomeController extends GetxController {
     super.onClose();
   }
 
-  void getBalance() {
-    UserProvider().getBalance(box.read("token")).then((value) {
+  Future<void> getBalance() async {
+    await UserProvider().getBalance(box.read("token")).then((value) {
       print(value.body);
       if (value.body["balance"] != null) {
         balance.value = value.body["balance"];
@@ -41,8 +41,8 @@ class HomeController extends GetxController {
     });
   }
 
-  void getCashback() {
-    UserProvider().getCashback(box.read("token")).then((value) {
+  Future<void> getCashback() async {
+    await UserProvider().getCashback(box.read("token")).then((value) {
       // print(value.body);
       if (value.body["cashback"] != null) {
         cashback.value = value.body["cashback"];

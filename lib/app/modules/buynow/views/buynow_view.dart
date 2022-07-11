@@ -240,7 +240,7 @@ class BuynowView extends GetView<BuynowController> {
         bottomNavigationBar: Container(
           decoration: Shadow1(),
           alignment: Alignment.bottomCenter,
-          height: Get.height * 0.08,
+          height: Get.height * 0.1,
           child: Padding(
             padding: const EdgeInsets.all(15),
             child: Row(

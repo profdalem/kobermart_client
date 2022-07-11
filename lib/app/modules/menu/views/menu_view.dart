@@ -31,6 +31,7 @@ class MenuView extends GetView<MenuController> {
             padding: EdgeInsets.symmetric(horizontal: 15),
             children: [
               ListTile(
+                horizontalTitleGap: 0,
                 onTap: () {
                   Get.offAndToNamed(Routes.PROFILE);
                 },
@@ -48,6 +49,7 @@ class MenuView extends GetView<MenuController> {
               ),
               Divider(),
               ListTile(
+                horizontalTitleGap: 0,
                 leading: Icon(Icons.wallet),
                 title: Text("Saldo Belanja"),
                 subtitle: Text(
@@ -59,6 +61,7 @@ class MenuView extends GetView<MenuController> {
                 ),
               ),
               ListTile(
+                horizontalTitleGap: 0,
                 leading: Icon(Icons.percent),
                 title: Text("Cashback"),
                 subtitle: Text(
@@ -70,6 +73,7 @@ class MenuView extends GetView<MenuController> {
                 ),
               ),
               ListTile(
+                horizontalTitleGap: 0,
                 onTap: () {
                   Get.offNamed(Routes.QRCODE);
                 },
@@ -77,6 +81,7 @@ class MenuView extends GetView<MenuController> {
                 title: Text("Buka QR Code"),
               ),
               ListTile(
+                horizontalTitleGap: 0,
                 onTap: () {},
                 leading: Icon(Icons.edit_note),
                 title: Text("Ubah Data Diri"),
@@ -87,6 +92,7 @@ class MenuView extends GetView<MenuController> {
                 child: PanelTitle(title: "Anggota"),
               ),
               ListTile(
+                horizontalTitleGap: 0,
                 onTap: () {
                   Get.toNamed(Routes.NEWTOKEN);
                 },
@@ -94,6 +100,7 @@ class MenuView extends GetView<MenuController> {
                 title: Text("Tambah Token"),
               ),
               ListTile(
+                horizontalTitleGap: 0,
                 onTap: () {
                   Get.offNamed(Routes.MEMBERS);
                 },
@@ -101,6 +108,7 @@ class MenuView extends GetView<MenuController> {
                 title: Text("Daftar Anggota"),
               ),
               ListTile(
+                horizontalTitleGap: 0,
                 onTap: () {
                   Get.offNamed(Routes.MEMBERHISTORY);
                 },
@@ -113,32 +121,38 @@ class MenuView extends GetView<MenuController> {
                 child: PanelTitle(title: "Belanja"),
               ),
               ListTile(
+                horizontalTitleGap: 0,
                 onTap: () {},
                 leading: Icon(Icons.list),
                 title: Text("Tagihan"),
               ),
               ListTile(
+                horizontalTitleGap: 0,
                 onTap: () {},
                 leading: Icon(Icons.history_edu),
                 title: Text("Riwayat Belanja"),
               ),
               ListTile(
+                horizontalTitleGap: 0,
                 onTap: () {},
                 leading: Icon(Icons.delivery_dining),
                 title: Text("Pesanan Aktif"),
               ),
               Divider(),
               ListTile(
+                horizontalTitleGap: 0,
                 onTap: () {},
                 leading: Icon(Icons.info),
                 title: Text("Tentang Aplikasi"),
               ),
               ListTile(
+                horizontalTitleGap: 0,
                 onTap: () {},
                 leading: Icon(Icons.help_center),
                 title: Text("Bantuan"),
               ),
               ListTile(
+                horizontalTitleGap: 0,
                 onTap: () {},
                 leading: Icon(Icons.logout_rounded),
                 title: Text("Keluar"),

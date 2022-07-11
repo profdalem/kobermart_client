@@ -60,7 +60,7 @@ class CartView extends GetView<CartController> {
         bottomNavigationBar: Container(
           decoration: Shadow1(),
           alignment: Alignment.bottomCenter,
-          height: Get.height * 0.08,
+          height: Get.height * 0.1,
           child: Padding(
             padding: const EdgeInsets.all(15),
             child: Row(
@@ -107,7 +107,7 @@ class CartItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: Get.width * 0.4,
+      height: Get.width * 0.40,
       decoration: Shadow1(),
       child: LayoutBuilder(
         builder: (context, constraints) => Container(
@@ -153,8 +153,8 @@ class CartItem extends StatelessWidget {
                     Expanded(
                       flex: 3,
                       child: Container(
-                        height: constraints.maxHeight - 65,
-                        width: constraints.maxHeight - 65,
+                        height: constraints.maxHeight - 70,
+                        width: constraints.maxHeight - 70,
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.all(Radius.circular(10)),
                             shape: BoxShape.rectangle,
@@ -171,7 +171,7 @@ class CartItem extends StatelessWidget {
                     Expanded(
                         flex: 7,
                         child: Container(
-                          height: constraints.maxHeight - 65,
+                          height: constraints.maxHeight - 70,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -179,11 +179,14 @@ class CartItem extends StatelessWidget {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("Sembako"),
+                                  Text(
+                                    "Sembako",
+                                    style: TextStyle(fontSize: 12),
+                                  ),
                                   Text(
                                     "Kopi Sachet 3in1 Instant Coffee Mocca",
                                     style: TextStyle(
-                                        fontSize: 16,
+                                        fontSize: 14,
                                         fontWeight: FontWeight.bold),
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
@@ -199,13 +202,13 @@ class CartItem extends StatelessWidget {
                                         CrossAxisAlignment.start,
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
-                                      Text("Harga"),
+                                      // Text("Harga"),
                                       Text(
                                         "12.000",
                                         style: TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold),
-                                        maxLines: 2,
+                                        maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ],
@@ -219,6 +222,7 @@ class CartItem extends StatelessWidget {
                                         child: Icon(
                                           Icons.remove_circle,
                                           color: Colors.orange.shade300,
+                                          size: 18,
                                         ),
                                       ),
                                       Obx(() => Container(
@@ -230,7 +234,7 @@ class CartItem extends StatelessWidget {
                                           width: constraints.maxWidth * 0.15,
                                           child: Text(
                                             itemC.count.value.toString(),
-                                            style: TextStyle(fontSize: 18),
+                                            style: TextStyle(fontSize: 14),
                                           ))),
                                       GestureDetector(
                                         onTap: () {
@@ -239,6 +243,7 @@ class CartItem extends StatelessWidget {
                                         child: Icon(
                                           Icons.add_circle,
                                           color: Colors.green.shade700,
+                                          size: 18,
                                         ),
                                       ),
                                     ],

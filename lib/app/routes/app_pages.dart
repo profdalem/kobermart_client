@@ -75,6 +75,7 @@ class AppPages {
       name: _Paths.HOME,
       page: () => HomeView(),
       binding: HomeBinding(),
+      transition: Transition.noTransition,
     ),
     GetPage(
       name: _Paths.LOGIN,
@@ -85,16 +86,19 @@ class AppPages {
       name: _Paths.SHOP,
       page: () => const ShopView(),
       binding: ShopBinding(),
+      transition: Transition.noTransition,
     ),
     GetPage(
       name: _Paths.MEMBERS,
       page: () => MembersView(),
       binding: MembersBinding(),
+      transition: Transition.noTransition,
     ),
     GetPage(
       name: _Paths.TRANSACTIONS,
       page: () => const TransactionsView(),
       binding: TransactionsBinding(),
+      transition: Transition.noTransition,
     ),
     GetPage(
       name: _Paths.MENU,
