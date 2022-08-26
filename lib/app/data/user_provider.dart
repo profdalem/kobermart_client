@@ -4,11 +4,11 @@ import 'dart:convert';
 import 'package:kobermart_client/config.dart';
 
 class UserProvider extends GetConnect {
-  Future<Response> login(String email, String password) {
+  Future<Response> login(String email, String password) async {
     print("login");
     final body =
         json.encode({"email": email, "password": password, "type": "1"});
-    return post(
+    return await post(
       "${mainUrl}auth/login",
       body,
     );
@@ -16,6 +16,11 @@ class UserProvider extends GetConnect {
 
   Future<Response> getMe(String token) {
     return get("${mainUrl}auth/me",
+        headers: {"Authorization": "Bearer ${token}"});
+  }
+
+  Future<Response> getInitialData(String token) {
+    return get("${mainUrl}api/client/firstlogin",
         headers: {"Authorization": "Bearer ${token}"});
   }
 

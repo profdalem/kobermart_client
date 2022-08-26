@@ -95,12 +95,16 @@ class LoginView extends GetView<LoginController> {
                       width: double.infinity,
                       child: ElevatedButton(
                         clipBehavior: Clip.antiAlias,
-                        onPressed: () {
+                        onPressed: () async {
+                          authC.loading.value = true;
                           if (controller.emailC.text.isNotEmpty &&
                               controller.passwordC.text.isNotEmpty) {
                             GetUtils.isEmail(controller.emailC.text)
-                                ? authC.login(controller.emailC.text,
-                                    controller.passwordC.text)
+                                ? await authC
+                                    .login(controller.emailC.text,
+                                        controller.passwordC.text)
+                                    .then(
+                                        (value) => authC.loading.value = false)
                                 : Get.defaultDialog(
                                     title: "Error",
                                     content: Text("Email tidak valid"));
@@ -111,8 +115,32 @@ class LoginView extends GetView<LoginController> {
                                     Text("Email dan password harus diisi"));
                           }
                         },
-                        child: Text("Masuk",
-                            style: TextStyle(color: Colors.white)),
+                        child: Obx(() => Container(
+                              height: 30,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "Masuk",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  authC.loading.value
+                                      ? SizedBox(
+                                          width: 20,
+                                        )
+                                      : SizedBox(),
+                                  authC.loading.value
+                                      ? Container(
+                                          height: 25,
+                                          width: 25,
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                      : SizedBox()
+                                ],
+                              ),
+                            )),
                         style: TextButton.styleFrom(
                             padding: EdgeInsets.all(15),
                             backgroundColor: Colors.blue),

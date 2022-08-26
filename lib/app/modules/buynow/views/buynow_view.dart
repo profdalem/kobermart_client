@@ -81,7 +81,6 @@ class BuynowView extends GetView<BuynowController> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text("Harga satuan"),
                                       Text(
                                         "Rp 12.000",
                                         style: TextStyle(

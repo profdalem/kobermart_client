@@ -2,13 +2,17 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import 'package:kobermart_client/app/controllers/product_controller.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/style.dart';
 
 import '../controllers/product_controller.dart';
 
 class ProductView extends GetView<ProductController> {
-  const ProductView({Key? key}) : super(key: key);
+  ProductView({Key? key}) : super(key: key);
+  final productC = Get.find<MainProductController>();
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -41,7 +45,7 @@ class ProductView extends GetView<ProductController> {
                         shape: BoxShape.rectangle,
                         image: DecorationImage(
                             image: CachedNetworkImageProvider(
-                              "https://picsum.photos/200/300",
+                              productData()["imgurl"].toString(),
                             ),
                             fit: BoxFit.cover)),
                   ),
@@ -51,12 +55,16 @@ class ProductView extends GetView<ProductController> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Kopi Sachet 3in1 Instant Coffee Mocca ",
+                          productData()["name"].toString(),
                           style: TextStyle(fontSize: 20),
                         ),
                         sb10,
                         Text(
-                          "Rp 10.000",
+                          NumberFormat.currency(
+                                  locale: "id_ID",
+                                  symbol: "Rp ",
+                                  decimalDigits: 0)
+                              .format(productData()["sell_price"]),
                           style: TextStyle(
                               fontSize: 22, fontWeight: FontWeight.bold),
                         ),
@@ -66,11 +74,12 @@ class ProductView extends GetView<ProductController> {
                           children: [
                             Row(
                               children: [
-                                Text("Stok: 120"),
+                                Text(
+                                    "Stok: ${productData()["stockQty"].toString()}"),
                                 SizedBox(
                                   width: 10,
                                 ),
-                                Text("Terjual: 50"),
+                                Text("Terjual: n/a"),
                               ],
                             ),
                             GestureDetector(
@@ -103,12 +112,30 @@ class ProductView extends GetView<ProductController> {
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         children: [
-                          bg_anggota(),
-                          bg_kd(kd: "1", nominal: 1),
-                          bg_kd(kd: "2", nominal: 2),
-                          bg_kd(kd: "3", nominal: 3),
-                          bg_kd(kd: "4", nominal: 4),
-                          bg_kd(kd: "5", nominal: 5),
+                          bg_anggota(
+                            number: double.parse(
+                                productData()["bagian"][0].toString()),
+                          ),
+                          bg_kd(
+                              kd: "1",
+                              nominal: double.parse(
+                                  productData()["bagian"][1].toString())),
+                          bg_kd(
+                              kd: "2",
+                              nominal: double.parse(
+                                  productData()["bagian"][2].toString())),
+                          bg_kd(
+                              kd: "3",
+                              nominal: double.parse(
+                                  productData()["bagian"][3].toString())),
+                          bg_kd(
+                              kd: "4",
+                              nominal: double.parse(
+                                  productData()["bagian"][4].toString())),
+                          bg_kd(
+                              kd: "5",
+                              nominal: double.parse(
+                                  productData()["bagian"][5].toString())),
                         ],
                       ),
                     ),
@@ -119,14 +146,14 @@ class ProductView extends GetView<ProductController> {
             sb15,
             Container(
               decoration: Shadow1(),
+              width: Get.width,
               child: Padding(
                 padding: EdgeInsets.all(15),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     PanelTitle(title: "Deskripsi"),
-                    Text(
-                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Gravida viverra tristique sapien massa eu nisl dis. Venenatis parturient malesuada volutpat massa ut vehicula pharetra velit. Lacus amet in tincidunt mattis facilisi diam.")
+                    Text(productData()["desc"].toString())
                   ],
                 ),
               ),
@@ -140,12 +167,21 @@ class ProductView extends GetView<ProductController> {
       ),
     );
   }
+
+  productData() {
+    return productC.products
+        .where((p0) => p0["id"] == Get.arguments["id"])
+        .toList()[0];
+  }
 }
 
 class bg_anggota extends StatelessWidget {
   const bg_anggota({
     Key? key,
+    required this.number,
   }) : super(key: key);
+
+  final double number;
 
   @override
   Widget build(BuildContext context) {
@@ -165,7 +201,7 @@ class bg_anggota extends StatelessWidget {
             "2%",
             style: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 18,
+                fontSize: 12,
                 color: Colors.orange.shade800),
           ),
         ]),
@@ -182,7 +218,7 @@ class bg_kd extends StatelessWidget {
   }) : super(key: key);
 
   final String kd;
-  final int nominal;
+  final double nominal;
 
   @override
   Widget build(BuildContext context) {
@@ -207,7 +243,7 @@ class bg_kd extends StatelessWidget {
               "${nominal.toString()}%",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 18,
+                fontSize: 12,
               ),
             ),
           ]),
@@ -218,9 +254,11 @@ class bg_kd extends StatelessWidget {
 }
 
 class ProductBottomBar extends StatelessWidget {
-  const ProductBottomBar({
+  ProductBottomBar({
     Key? key,
   }) : super(key: key);
+
+  final controller = Get.find<ProductController>();
 
   @override
   Widget build(BuildContext context) {
@@ -240,7 +278,12 @@ class ProductBottomBar extends StatelessWidget {
                 Row(
                   children: [
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        controller.decrement();
+                      },
+                      onLongPress: () {
+                        controller.tenDecrement();
+                      },
                       child: Icon(
                         Icons.remove_circle,
                         color: Colors.orange.shade300,
@@ -252,12 +295,17 @@ class ProductBottomBar extends StatelessWidget {
                                 Border(bottom: BorderSide(color: Colors.grey))),
                         alignment: Alignment.center,
                         width: Get.width * 0.2,
-                        child: Text(
-                          "0",
-                          style: TextStyle(fontSize: 18),
-                        )),
+                        child: Obx(() => Text(
+                              controller.count.value.toString(),
+                              style: TextStyle(fontSize: 18),
+                            ))),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        controller.increment();
+                      },
+                      onLongPress: () {
+                        controller.tenIncrement();
+                      },
                       child: Icon(
                         Icons.add_circle,
                         color: Colors.green.shade700,

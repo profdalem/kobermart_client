@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:kobermart_client/app/controllers/auth_controller.dart';
+import 'package:kobermart_client/app/controllers/product_controller.dart';
+import 'package:kobermart_client/app/modules/product/controllers/product_controller.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/style.dart';
 import '../../widgets/main_appbar.dart';
@@ -11,8 +13,10 @@ import './widgets/info_item.dart';
 import './widgets/product_item.dart';
 import '../../widgets/bottom_menu.dart';
 
-class HomeView extends GetView<HomeController> {
+class HomeView extends GetView {
   final authC = Get.find<AuthController>();
+  final controller = Get.put(HomeController());
+  final productC = Get.find<MainProductController>();
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -60,7 +64,7 @@ class HomeView extends GetView<HomeController> {
                                         text: "Halo, ",
                                         children: [
                                           TextSpan(
-                                              text: "Username",
+                                              text: "${controller.name.value}",
                                               style: TextStyle(
                                                   fontWeight: FontWeight.bold))
                                         ],
@@ -297,10 +301,14 @@ class HomeView extends GetView<HomeController> {
                         width: 15,
                       ),
                       Expanded(
-                        child: LayoutBuilder(
-                          builder: (context, constraints) => Container(),
-                        ),
-                      )
+                        child: FiturItem(
+                            imgUrl: "tagihan",
+                            text1: "Bayar",
+                            text2: "Tagihan",
+                            todo: () {
+                              Get.toNamed(Routes.PPOB);
+                            }),
+                      ),
                     ],
                   ),
                   sb15,
@@ -310,26 +318,28 @@ class HomeView extends GetView<HomeController> {
               ),
             ),
             // Produk Terkini
-            GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  childAspectRatio: 45 / 100,
-                  crossAxisSpacing: 5,
-                  mainAxisSpacing: 5),
-              physics: NeverScrollableScrollPhysics(),
-              padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-              itemCount: 10,
-              itemBuilder: (BuildContext ctx, int index) {
-                return ProductItem(
-                  name: "Barang",
-                  price: 12000,
-                  cashback: 2,
-                  stock: 1000,
-                );
-              },
-              // to disable GridView's scrolling
-              shrinkWrap: true, // You won't see infinite size error
-            ),
+            Obx(() => GridView.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      childAspectRatio: 45 / 100,
+                      crossAxisSpacing: 5,
+                      mainAxisSpacing: 5),
+                  physics: NeverScrollableScrollPhysics(),
+                  padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                  itemCount: getAllActiveProducts().length,
+                  itemBuilder: (BuildContext ctx, int index) {
+                    return ProductItem(
+                      id: getAllActiveProducts()[index]["id"],
+                      name: getAllActiveProducts()[index]["name"],
+                      price: getAllActiveProducts()[index]["sell_price"],
+                      cashback: getAllActiveProducts()[index]["bagian"][0],
+                      stock: getAllActiveProducts()[index]["stockQty"],
+                      imgurl: getAllActiveProducts()[index]["imgurl"],
+                    );
+                  },
+                  // to disable GridView's scrolling
+                  shrinkWrap: true, // You won't see infinite size error
+                )),
           ],
         ),
         bottomNavigationBar: BottomNav(
@@ -342,6 +352,9 @@ class HomeView extends GetView<HomeController> {
       ),
     );
   }
+
+  List<dynamic> getAllActiveProducts() =>
+      productC.products.where((p0) => p0["active"]).toList();
 }
 
 class InfoCepat extends StatelessWidget {
@@ -356,15 +369,15 @@ class InfoCepat extends StatelessWidget {
           children: [
             Row(
               children: [
-                Obx(() => Expanded(
-                        child: Container(
-                      child: InfoItem(
-                        imgUrl: "saldo",
-                        title: "Saldo",
-                        content:
-                            "Rp ${NumberFormat("#,##0", "id_ID").format(controller.balance.value)}",
-                      ),
-                    ))),
+                Expanded(
+                    child: Container(
+                  child: InfoItem(
+                    imgUrl: "saldo",
+                    title: "Saldo",
+                    content:
+                        "Rp ${NumberFormat("#,##0", "id_ID").format(controller.balance.value)}",
+                  ),
+                )),
                 SizedBox(
                   width: 30,
                 ),
@@ -373,7 +386,7 @@ class InfoCepat extends StatelessWidget {
                   child: InfoItem(
                     imgUrl: "anggota",
                     title: "Anggota",
-                    content: "65",
+                    content: "${controller.anggota.value.toString()}",
                   ),
                 )),
               ],
@@ -400,7 +413,7 @@ class InfoCepat extends StatelessWidget {
                   child: InfoItem(
                     imgUrl: "kd",
                     title: "Kedalaman",
-                    content: "KD3",
+                    content: "KD${controller.kd.value.toString()}",
                   ),
                 ))
               ],

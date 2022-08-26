@@ -93,7 +93,7 @@ class BottomNavItem extends StatelessWidget {
         SvgPicture.asset(
           "assets/logo/${logo}.svg",
           color: active ? Colors.blue : Colors.grey,
-          height: MediaQuery.of(context).size.width * 0.06,
+          height: MediaQuery.of(context).size.width * 0.05,
         ),
         SizedBox(
           height: 3,

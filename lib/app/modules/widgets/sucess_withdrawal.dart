@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:kobermart_client/app/modules/home/views/home_view.dart';
 import 'package:kobermart_client/style.dart';
 
+import '../../routes/app_pages.dart';
+
 class SuccessWithdrawalPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -66,7 +68,7 @@ class SuccessWithdrawalPage extends StatelessWidget {
                   height: 50,
                   child: TextButton(
                     onPressed: () {
-                      Get.off(() => HomeView());
+                      Get.offAllNamed(Routes.HOME);
                     },
                     child: Text(
                       "Beranda",

@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:kobermart_client/app/data/products_provider.dart';
+import 'package:kobermart_client/app/modules/home/views/home_view.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 import '../data/user_provider.dart';
+import 'package:kobermart_client/firebase.dart';
 
 class AuthController extends GetxController {
   final box = GetStorage();
   var isAuth = false.obs;
+  var loading = false.obs;
 
   Future<void> firstInitialized() async {
     await tokenExist().then((value) {
@@ -27,21 +33,72 @@ class AuthController extends GetxController {
 
   Future<void> logout() async {
     box.remove("token");
+    FirebaseAuth.instance.signOut();
     Get.offAllNamed(Routes.LOGIN);
   }
 
+  void test() async {}
+
   Future<void> login(String email, String password) async {
-    UserProvider().login(email, password).then((value) {
-      print(value.status);
-      if (value.body["token"] != null) {
-        box.write("token", value.body["token"]);
-        print(box.read("token"));
-        isAuth.value = true;
-        Get.offAllNamed(Routes.HOME);
+    await Members.where("email", isEqualTo: "kobermart@gmail.com").get().then(
+        (value) {
+      if (value.docs.isEmpty) {
+        Get.snackbar("result", "Member tidak ditemukan");
       } else {
-        Get.defaultDialog(title: "Error", content: Text(value.body));
-        print(value.body["message"]);
+        if (value.docs[0]["active"]) {
+          FirebaseAuth.instance
+              .signInWithEmailAndPassword(email: email, password: password)
+              .then((value) {
+            loading.value = false;
+            isAuth.value = true;
+
+            Get.defaultDialog(
+                barrierDismissible: false,
+                content: Column(
+                  children: [
+                    Icon(Icons.check),
+                    Text("Login berhasil"),
+                  ],
+                ));
+
+            Future.delayed(Duration(seconds: 1)).then((value) =>
+                Get.off(() => HomeView(), transition: Transition.zoom));
+          }).catchError((error) {
+            var message = "";
+            switch (error.code) {
+              case "user-not-found":
+                message = "Pengguna tidak ditemukan";
+                break;
+              case "wrong-password":
+                message = "Password salah";
+                break;
+              default:
+                message = error.code;
+            }
+            Get.snackbar("Error", message.toString());
+          });
+        } else {
+          Get.snackbar("result", "Member tidak aktif");
+        }
+        ;
       }
+    }, onError: (e) {
+      print(e);
     });
+
+    // await UserProvider().login(email, password).then((value) {
+    //   if (value.body != null) {
+    //     box.write("token", value.body["token"]);
+    //     print(box.read("token"));
+    //     isAuth.value = true;
+    //     Get.offAllNamed(Routes.HOME);
+    //     loading.value = false;
+    //   } else {
+    //     loading.value = false;
+    //     print(value.statusText);
+    //     Get.defaultDialog(title: "Error", content: Text("Terjadi kesalahan"));
+    //     // print(value.body["message"]);
+    //   }
+    // });
   }
 }

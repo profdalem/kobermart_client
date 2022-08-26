@@ -13,13 +13,14 @@ class LoginController extends GetxController {
   final box = GetStorage();
 
   var token = "".obs;
+  var loading = false.obs;
 
   final count = 0.obs;
   @override
   void onInit() {
     emailC = TextEditingController();
     passwordC = TextEditingController();
-    emailC.text = "agung@gmail.com";
+    emailC.text = "kobermart@gmail.com";
     passwordC.text = "123456";
     super.onInit();
   }
@@ -38,6 +39,6 @@ class LoginController extends GetxController {
   }
 
   void checkToken() {
-    print(box.read("token") == null);
+    print(box.read("token"));
   }
 }

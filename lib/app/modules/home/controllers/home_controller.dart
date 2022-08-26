@@ -7,8 +7,12 @@ class HomeController extends GetxController {
   late TextEditingController emailC;
   late TextEditingController passwordC;
 
+  var name = "".obs;
+
   var balance = 0.obs;
   var cashback = 0.obs;
+  var anggota = 0.obs;
+  var kd = 0.obs;
 
   var box = GetStorage();
 
@@ -17,8 +21,9 @@ class HomeController extends GetxController {
   void onInit() async {
     emailC = TextEditingController();
     passwordC = TextEditingController();
-    await getBalance();
-    await getCashback();
+    // await getBalance();
+    // await getCashback();
+    await getInitialData();
     super.onInit();
   }
 
@@ -48,5 +53,31 @@ class HomeController extends GetxController {
         cashback.value = value.body["cashback"];
       }
     });
+  }
+
+  Future<void> getInitialData() async {
+    if (box.read("token") != null) {
+      await UserProvider().getInitialData(box.read("token")).then((value) {
+        if (value.body["user"] != null) {
+          name.value = value.body["user"]["name"];
+        }
+
+        if (value.body["cashback"] != null) {
+          cashback.value = value.body["cashback"];
+        }
+
+        if (value.body["balance"] != null) {
+          balance.value = value.body["balance"];
+        }
+
+        if (value.body["downlines"] != null) {
+          anggota.value = value.body["downlines"]["count"];
+        }
+
+        if (value.body["downlines"] != null) {
+          kd.value = value.body["downlines"]["kd"];
+        }
+      });
+    }
   }
 }

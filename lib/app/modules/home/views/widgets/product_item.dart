@@ -5,15 +5,19 @@ import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class ProductItem extends StatelessWidget {
-  const ProductItem({
+  ProductItem({
     Key? key,
+    required this.id,
     required this.name,
     required this.price,
     required this.cashback,
     required this.stock,
+    required this.imgurl,
   }) : super(key: key);
 
+  final String id;
   final String name;
+  final String imgurl;
   final int price;
   final int cashback;
   final int stock;
@@ -25,7 +29,7 @@ class ProductItem extends StatelessWidget {
         return Card(
           elevation: 3,
           child: GestureDetector(
-            onTap: () => Get.toNamed(Routes.PRODUCT),
+            onTap: () => Get.toNamed(Routes.PRODUCT, arguments: {"id": id}),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -34,7 +38,7 @@ class ProductItem extends StatelessWidget {
                       topLeft: Radius.circular(5),
                       topRight: Radius.circular(5)),
                   child: CachedNetworkImage(
-                    imageUrl: "https://picsum.photos/250?image=9",
+                    imageUrl: imgurl,
                     fit: BoxFit.cover,
                     height: constraints.maxWidth,
                     width: double.infinity,
@@ -50,9 +54,9 @@ class ProductItem extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              "Kopi Sachet 3in1 Instant Coffee Mocca",
+                              name,
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: 12,
                               ),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
@@ -91,7 +95,8 @@ class ProductItem extends StatelessWidget {
                                         padding: const EdgeInsets.all(3.0),
                                         child: Text('+${cashback.toString()}%',
                                             style: TextStyle(
-                                                fontSize: 12,
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.bold,
                                                 color: Colors.white)),
                                       ),
                                     ),

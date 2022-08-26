@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "49021389415",
+    "project_id": "kobermart2022",
+    "storage_bucket": "kobermart2022.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:49021389415:android:28939c384f276b3e4ea2c2",
+        "android_client_info": {
+          "package_name": "com.wakesadigital.kobermart_client"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "49021389415-7otjk0ovpdb7eb40g68phpc058i4h13m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.wakesadigital.kobermart_client",
+            "certificate_hash": "6dee0948a44e650312fda72dd9b0e8b8af3c6070"
+          }
+        },
+        {
+          "client_id": "49021389415-n252b57d0cp8fvqnikl6hna5pn5iqr7a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBRdZWPmlOjenl_bIvOSw8W6ZCb2QuTOZo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "49021389415-n252b57d0cp8fvqnikl6hna5pn5iqr7a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

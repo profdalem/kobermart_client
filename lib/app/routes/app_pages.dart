@@ -24,6 +24,8 @@ import '../modules/newtoken/bindings/newtoken_binding.dart';
 import '../modules/newtoken/views/newtoken_view.dart';
 import '../modules/notification/bindings/notification_binding.dart';
 import '../modules/notification/views/notification_view.dart';
+import '../modules/ppob/bindings/ppob_binding.dart';
+import '../modules/ppob/views/ppob_view.dart';
 import '../modules/product/bindings/product_binding.dart';
 import '../modules/product/views/product_view.dart';
 import '../modules/profile/bindings/profile_binding.dart';
@@ -107,7 +109,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.CART,
-      page: () => const CartView(),
+      page: () => CartView(),
       binding: CartBinding(),
     ),
     GetPage(
@@ -182,7 +184,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.PRODUCT,
-      page: () => const ProductView(),
+      page: () => ProductView(),
       binding: ProductBinding(),
     ),
     GetPage(
@@ -229,6 +231,11 @@ class AppPages {
       name: _Paths.INVESTMENT,
       page: () => const InvestmentView(),
       binding: InvestmentBinding(),
+    ),
+    GetPage(
+      name: _Paths.PPOB,
+      page: () => const PpobView(),
+      binding: PpobBinding(),
     ),
   ];
 }

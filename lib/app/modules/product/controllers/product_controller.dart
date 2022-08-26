@@ -18,4 +18,16 @@ class ProductController extends GetxController {
   }
 
   void increment() => count.value++;
+  void decrement() {
+    if (count > 0) {
+      count.value--;
+    }
+  }
+
+  void tenIncrement() => count.value = count.value + 10;
+  void tenDecrement() {
+    if (count > 9) {
+      count.value = count.value - 10;
+    }
+  }
 }

@@ -1,7 +1,14 @@
 import 'package:get/get.dart';
+import 'package:kobermart_client/app/controllers/product_controller.dart';
 
 class CartController extends GetxController {
-  final count = 0.obs;
+  RxList carts = [].obs;
+
+  late RxList products;
+
+  var count = 0.obs;
+  var totalprice = 0.obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -17,7 +24,10 @@ class CartController extends GetxController {
     super.onClose();
   }
 
-  void increment() => count.value++;
+  void increment() {
+    count.value++;
+  }
+
   void decrement() {
     if (count.value > 0) {
       count.value--;

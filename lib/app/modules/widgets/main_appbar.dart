@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:kobermart_client/app/controllers/product_controller.dart';
 
 import '../../routes/app_pages.dart';
 import 'package:get/get.dart';
 import 'package:badges/badges.dart';
 
 class DefaultAppBar extends StatelessWidget {
-  const DefaultAppBar({Key? key, required this.pageTitle}) : super(key: key);
+  DefaultAppBar({Key? key, required this.pageTitle}) : super(key: key);
 
   final String pageTitle;
+  final productC = Get.find<MainProductController>();
 
   @override
   Widget build(BuildContext context) {
@@ -35,11 +37,13 @@ class DefaultAppBar extends StatelessWidget {
             )
           : Text(pageTitle),
       actions: [
-        // IconButton(
-        //     onPressed: () {
-        //       Get.offAllNamed(Routes.LOGIN);
-        //     },
-        //     icon: Icon(Icons.logout)),
+        IconButton(
+            onPressed: () {
+              productC.getAllProduct();
+              productC.getAllCarts();
+              print(productC.carts[0]);
+            },
+            icon: Icon(Icons.refresh)),
         IconButton(
             onPressed: () {
               Get.toNamed(Routes.NOTIFICATION);

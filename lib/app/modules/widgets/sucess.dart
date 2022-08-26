@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kobermart_client/app/modules/home/views/home_view.dart';
+import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/style.dart';
 
 class SuccessPage extends StatelessWidget {
@@ -66,7 +67,7 @@ class SuccessPage extends StatelessWidget {
                   height: 50,
                   child: TextButton(
                     onPressed: () {
-                      Get.offAll(() => HomeView());
+                      Get.offAllNamed(Routes.HOME);
                     },
                     child: Text(
                       "Beranda",
