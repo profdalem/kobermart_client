@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:kobermart_client/app/modules/widgets/trx_status.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/style.dart';
@@ -12,6 +14,13 @@ class TrxdetailCashbackView extends GetView<TrxdetailCashbackController> {
   const TrxdetailCashbackView({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
+    var createdAt = Timestamp.now();
+    Color? iconColor = Colors.blue;
+
+    if (Get.arguments != null) {
+      createdAt = Get.arguments["createdAt"];
+      iconColor = Get.arguments["iconColor"];
+    }
     return SafeArea(
       top: false,
       child: Scaffold(
@@ -47,18 +56,19 @@ class TrxdetailCashbackView extends GetView<TrxdetailCashbackController> {
                 child: SvgPicture.asset(
                   "assets/icons/icon-cashback.svg",
                   width: Get.width * 0.12,
+                  color: iconColor,
                 ),
               ),
               sb10,
               Container(
                 alignment: Alignment.center,
                 child: Text(
-                  "Dibuat 19-06-2022  12.30 WITA",
+                  "Dibuat ${DateFormat.yMMMd("id_ID").format(createdAt.toDate())} ${DateFormat.Hm().format(createdAt.toDate())} WITA",
                   style: TextStyle(color: Colors.grey),
                 ),
               ),
               sb15,
-              TrxDetailMainPanel(),
+              TrxDetailMainPanel(arguments: Get.arguments),
               Container(
                 width: Get.width,
                 child: Padding(
@@ -80,15 +90,34 @@ class TrxdetailCashbackView extends GetView<TrxdetailCashbackController> {
 }
 
 class TrxDetailMainPanel extends StatelessWidget {
-  const TrxDetailMainPanel({
+  final dynamic arguments;
+  TrxDetailMainPanel({
     Key? key,
+    required this.arguments,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     String notrx = "TRX88432389293";
-    String type = "Referral";
+    String type = arguments["type"];
     int status = 4;
+    int nominal = arguments["nominal"];
+    String message = arguments["message"];
+
+    switch (arguments["type"]) {
+      case "ref":
+        type = "Referral";
+        break;
+      case "plan-a":
+        type = "Plan A";
+        break;
+      default:
+        type = "Plan B";
+    }
+
+    if (!arguments["isCount"]) {
+      status = 5;
+    }
 
     return Container(
       decoration: Shadow1(),
@@ -118,7 +147,8 @@ class TrxDetailMainPanel extends StatelessWidget {
                     ),
                     sb15,
                     PanelTitle(title: "Nominal"),
-                    Text("Rp 40.000"),
+                    Text(
+                        "Rp ${NumberFormat("#,##0", "id_ID").format(nominal)}"),
                   ],
                 ),
                 Column(
@@ -138,19 +168,21 @@ class TrxDetailMainPanel extends StatelessWidget {
             PanelTitle(title: "Keterangan"),
             Row(
               children: [
-                Text("Generate token XXX-XXX-XXX"),
+                Text(message),
                 SizedBox(
                   width: 5,
                 ),
-                GestureDetector(
-                  onTap: () {
-                    Get.toNamed(Routes.TOKENDETAIL);
-                  },
-                  child: Text(
-                    "Lihat",
-                    style: TextStyle(color: Colors.blue),
-                  ),
-                ),
+                arguments["type"] == "ref"
+                    ? GestureDetector(
+                        onTap: () {
+                          Get.toNamed(Routes.TOKENDETAIL);
+                        },
+                        child: Text(
+                          "Lihat",
+                          style: TextStyle(color: Colors.blue),
+                        ),
+                      )
+                    : SizedBox(),
               ],
             ),
           ],

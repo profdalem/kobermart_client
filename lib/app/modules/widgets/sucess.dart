@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:kobermart_client/app/modules/home/views/home_view.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/style.dart';
@@ -7,6 +8,7 @@ import 'package:kobermart_client/style.dart';
 class SuccessPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    print(Get.arguments[0]);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -38,7 +40,7 @@ class SuccessPage extends StatelessWidget {
                   height: 20,
                 ),
                 Text(
-                  "Permintaan Top Up berhasil!",
+                  "Permintaan Top Up sebesar Rp ${NumberFormat("#,##0", "id_ID").format(int.parse(Get.arguments[0]))} berhasil!",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: Colors.white,

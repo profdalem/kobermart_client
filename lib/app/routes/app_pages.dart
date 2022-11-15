@@ -104,7 +104,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.MENU,
-      page: () => const MenuView(),
+      page: () => MenuView(),
       binding: MenuBinding(),
     ),
     GetPage(
@@ -139,7 +139,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.NEWTOKEN,
-      page: () => const NewtokenView(),
+      page: () => NewtokenView(),
       binding: NewtokenBinding(),
     ),
     GetPage(
@@ -174,7 +174,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.WITHDRAWAL,
-      page: () => const WithdrawalView(),
+      page: () => WithdrawalView(),
       binding: WithdrawalBinding(),
     ),
     GetPage(

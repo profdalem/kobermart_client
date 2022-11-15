@@ -38,12 +38,21 @@ class SuccessTokenPage extends StatelessWidget {
                   height: 20,
                 ),
                 Text(
-                  "Pembuatan Token berhasil!",
+                  "Pembuatan Tokenberhasil!",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
-                      fontSize: Get.width * 0.08),
+                      fontSize: Get.width * 0.07),
+                ),
+                sb10,
+                Text(
+                  "Kode Token ${Get.arguments["token"]}",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: Get.width * 0.06),
                 ),
                 SizedBox(
                   height: 50,
@@ -52,7 +61,9 @@ class SuccessTokenPage extends StatelessWidget {
                   width: Get.width - 30,
                   height: 50,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Get.offAllNamed(Routes.TRANSACTIONS);
+                    },
                     child: PanelTitle(title: "Lihat Transaksi"),
                     style: ButtonStyle(
                         backgroundColor:

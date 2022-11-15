@@ -1,9 +1,12 @@
+import 'dart:ffi';
+
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:kobermart_client/app/data/balance_provider.dart';
 import 'package:kobermart_client/app/modules/widgets/sucess.dart';
 import 'package:kobermart_client/style.dart';
 
@@ -86,13 +89,15 @@ class TopupView extends GetView<TopupController> {
                                 showSelectedItems: true,
                               ),
                               items: [
-                                "Cash",
-                                "Transfer",
+                                "cash",
+                                "transfer",
                               ],
                               onChanged: (value) {
-                                print(value);
+                                controller.selectedMethod = value.toString();
+                                print(controller.selectedMethod);
+                                print(controller.nominal.text);
                               },
-                              selectedItem: "Cash",
+                              selectedItem: "cash",
                             ),
                             sb20,
                             Align(
@@ -171,9 +176,24 @@ class TopupView extends GetView<TopupController> {
                 flex: 5,
                 child: ElevatedButton(
                     onPressed: () {
-                      Get.off(
-                        () => SuccessPage(),
-                      );
+                      if (controller.nominal.text.isEmpty ||
+                          controller.nominal.text == '0') {
+                        Get.snackbar("Peringatan", "Nominal wajib diisi");
+                      } else {
+                        if (int.parse(controller.nominal.text) < 100000) {
+                          Get.snackbar(
+                              "Peringatan", "Minimal topup Rp 100.000");
+                        } else {
+                          BalanceProvider()
+                              .newTopup(controller.nominal.text,
+                                  controller.selectedMethod)
+                              .then((value) {
+                            print(value.body);
+                            Get.off(() => SuccessPage(),
+                                arguments: [controller.nominal.text]);
+                          });
+                        }
+                      }
                     },
                     child: Text("Kirim"),
                     style: ButtonStyle(

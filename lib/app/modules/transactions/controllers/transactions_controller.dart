@@ -1,9 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import 'package:kobermart_client/app/data/transaction_provider.dart';
 
 class TransactionsController extends GetxController {
-  final count = 0.obs;
+  RxList transactions = [].obs;
+  var isLoading = false.obs;
+
   @override
   void onInit() {
+    getUserTransactions();
     super.onInit();
   }
 
@@ -17,5 +22,20 @@ class TransactionsController extends GetxController {
     super.onClose();
   }
 
-  void increment() => count.value++;
+  void getUserTransactions() async {
+    isLoading.value = true;
+    try {
+      await TransactionProvider().getUserTransactions().then((value) {
+        if (value.body != null) {
+          transactions.value = value.body;
+        } else {
+          print(value.body);
+          Get.snackbar("Error", "Gagal mendapatkan data transaksi");
+        }
+        isLoading.value = false;
+      });
+    } catch (e) {
+      print("getUserTransaction error: " + e.toString());
+    }
+  }
 }

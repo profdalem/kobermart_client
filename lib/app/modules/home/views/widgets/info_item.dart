@@ -32,7 +32,7 @@ class InfoItem extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: TextStyle(fontSize: 14)),
+            Text(title, style: TextStyle(fontSize: 12)),
             Text(
               content,
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),

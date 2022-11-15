@@ -1,11 +1,21 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class PpobController extends GetxController {
-  //TODO: Implement PpobController
+class PpobController extends GetxController
+    with GetSingleTickerProviderStateMixin {
+  final List<Tab> myTabs = <Tab>[
+    const Tab(text: 'Listrik'),
+    const Tab(
+      text: 'Pulsa',
+    ),
+    const Tab(text: 'Internet'),
+  ];
 
-  final count = 0.obs;
+  late TabController tabC;
+
   @override
   void onInit() {
+    tabC = TabController(length: 3, vsync: this);
     super.onInit();
   }
 
@@ -18,6 +28,4 @@ class PpobController extends GetxController {
   void onClose() {
     super.onClose();
   }
-
-  void increment() => count.value++;
 }

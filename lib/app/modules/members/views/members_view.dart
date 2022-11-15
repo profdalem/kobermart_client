@@ -1,7 +1,12 @@
+import 'dart:math';
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:kobermart_client/app/modules/tokendetail/views/tokendetail_view.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/style.dart';
 import '../../widgets/bottom_menu.dart';
@@ -23,66 +28,80 @@ class MembersView extends StatelessWidget {
             pageTitle: "Anggota",
           ),
         ),
-        body: ListView(
-          children: [
-            sb15,
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: Row(
-                children: [
-                  CariButton(),
-                ],
+        body: RefreshIndicator(
+          onRefresh: () => Future.delayed(Duration(seconds: 1)),
+          child: ListView(
+            children: [
+              sb15,
+              // Panel pencarian anggota
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: Row(
+                  children: [
+                    CariButton(),
+                  ],
+                ),
               ),
-            ),
-            sb15,
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: PanelTitle(title: "Tindakan"),
-            ),
-            sb15,
-            Container(
-              height: MediaQuery.of(context).size.width * 0.25,
-              child: ListView(
-                padding: EdgeInsets.only(left: 15, top: 3, bottom: 3),
-                scrollDirection: Axis.horizontal,
-                children: [
-                  TindakanMember(
-                      img: "tokenbaru",
-                      title: "Token Baru",
-                      todo: () {
-                        Get.toNamed(Routes.NEWTOKEN);
-                      }),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  TindakanMember(
-                      img: "daftartoken",
-                      title: "Daftar Token",
-                      todo: () {
-                        Get.toNamed(Routes.TOKENLIST);
-                      }),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  TindakanMember(
-                      img: "riwayatgabung",
-                      title: "Riwayat Gabung",
-                      todo: () {
-                        Get.toNamed(Routes.MEMBERHISTORY);
-                      }),
-                ],
+              sb15,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: PanelTitle(title: "Tindakan"),
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-              child: Container(
-                  child: PanelTitle(
-                title: "Daftar Kedalaman",
-              )),
-            ),
-            PanelKedalaman(memberC: memberC),
-            sb15
-          ],
+              sb15,
+              // Panel pilihan tindakan
+              Container(
+                height: MediaQuery.of(context).size.width * 0.25,
+                child: ListView(
+                  padding: EdgeInsets.only(left: 15, top: 3, bottom: 3),
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    TindakanMember(
+                        img: "tokenbaru",
+                        title: "Token Baru",
+                        todo: () {
+                          Get.toNamed(Routes.NEWTOKEN);
+                        }),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    TindakanMember(
+                        img: "daftartoken",
+                        title: "Daftar Token",
+                        todo: () {
+                          Get.toNamed(Routes.TOKENLIST);
+                        }),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    TindakanMember(
+                        img: "riwayatgabung",
+                        title: "Riwayat Gabung",
+                        todo: () {
+                          Get.toNamed(Routes.MEMBERHISTORY);
+                        }),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                child: Container(
+                    child: PanelTitle(
+                  title: "Daftar Kedalaman",
+                )),
+              ),
+              Obx(
+                () => memberC.homeC.downlines.isNotEmpty
+                    ? PanelKedalaman(
+                        memberC: memberC,
+                      )
+                    : Center(
+                        child: Text("Kosong"),
+                      ),
+              ),
+
+              sb15
+            ],
+          ),
         ),
         bottomNavigationBar: BottomNav(
           context: context,
@@ -93,6 +112,12 @@ class MembersView extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  List<dynamic> getFilteredDownlines(List downlines) {
+    List result = downlines;
+
+    return result;
   }
 }
 
@@ -148,7 +173,7 @@ class TindakanMember extends StatelessWidget {
 }
 
 class PanelKedalaman extends StatelessWidget {
-  const PanelKedalaman({
+  PanelKedalaman({
     Key? key,
     required this.memberC,
   }) : super(key: key);
@@ -169,6 +194,8 @@ class PanelKedalaman extends StatelessWidget {
               (DaftarKedalaman item) => ExpansionPanel(
                   canTapOnHeader: true,
                   headerBuilder: (context, isExpanded) {
+                    num slotSize = pow(10, (memberC.kd.indexOf(item) + 1));
+
                     return ListTile(
                       title: Row(children: [
                         Text(
@@ -182,7 +209,7 @@ class PanelKedalaman extends StatelessWidget {
                           visualDensity: VisualDensity.compact,
                           padding: EdgeInsets.all(0),
                           backgroundColor: Color(0xFFFF9800),
-                          label: Text('10 orang',
+                          label: Text('${item.members.length} terisi',
                               style:
                                   TextStyle(fontSize: 12, color: Colors.white)),
                         ),
@@ -193,7 +220,8 @@ class PanelKedalaman extends StatelessWidget {
                           visualDensity: VisualDensity.compact,
                           padding: EdgeInsets.all(0),
                           backgroundColor: Colors.blue,
-                          label: Text('0 slot',
+                          label: Text(
+                              '${slotSize - item.members.length} kosong',
                               style:
                                   TextStyle(fontSize: 12, color: Colors.white)),
                         ),
@@ -206,45 +234,72 @@ class PanelKedalaman extends StatelessWidget {
                     child: ListView.separated(
                         scrollDirection: Axis.horizontal,
                         itemBuilder: (context, index) {
+                          var tokenUsed = item.members[index]["tokenUsed"];
                           return Container(
                             width: 100,
                             child: Card(
                                 shadowColor: Colors.transparent,
                                 child: TextButton(
                                   onPressed: () {
-                                    openProfile(username);
+                                    if (tokenUsed) {
+                                      Get.toNamed(Routes.MEMBERPROFILE,
+                                          arguments: {
+                                            "data": item.members[index]
+                                          });
+                                    } else {
+                                      Get.toNamed(Routes.TOKENDETAIL,
+                                          arguments: {
+                                            "data": item.members[index]
+                                          });
+                                    }
                                   },
                                   child: Column(
                                     children: [
                                       CircleAvatar(
                                         radius: 30.0,
-                                        backgroundImage: CachedNetworkImageProvider(
-                                            "https://i.pravatar.cc/150?img=${memberC.kd.indexOf(item) + index + 10}"),
-                                        backgroundColor: Colors.transparent,
+                                        backgroundColor: tokenUsed
+                                            ? Colors.blue
+                                            : Colors.grey.shade200,
+                                        child: tokenUsed
+                                            ? Icon(Icons.person)
+                                            : Text("token"),
                                       ),
                                       Text(
-                                        username,
+                                        tokenUsed
+                                            ? item.members[index]["memberData"]
+                                                ["name"]
+                                            : (FirebaseAuth.instance
+                                                        .currentUser!.uid ==
+                                                    item.members[index]
+                                                            ["memberData"]
+                                                        ["tokenCreator"]
+                                                ? item.members[index]
+                                                    ["memberData"]["tokenCode"]
+                                                : "?"),
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 1,
                                         style: TextStyle(
                                             color: Colors.black, fontSize: 12),
                                       ),
-                                      RichText(
-                                        text: TextSpan(
-                                          style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 14),
-                                          children: [
-                                            WidgetSpan(
-                                              child:
-                                                  Icon(Icons.person, size: 14),
-                                            ),
-                                            TextSpan(
-                                              text: "8",
-                                            ),
-                                          ],
-                                        ),
-                                      )
+                                      if (tokenUsed)
+                                        RichText(
+                                          text: TextSpan(
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 14),
+                                            children: [
+                                              WidgetSpan(
+                                                child: Icon(Icons.person,
+                                                    size: 14),
+                                              ),
+                                              TextSpan(
+                                                text: item.members[index]
+                                                        ["kd1count"]
+                                                    .toString(),
+                                              ),
+                                            ],
+                                          ),
+                                        )
                                     ],
                                   ),
                                 )),
@@ -255,7 +310,7 @@ class PanelKedalaman extends StatelessWidget {
                             width: 5,
                           );
                         },
-                        itemCount: 10),
+                        itemCount: item.members.length),
                   ),
                   isExpanded: item.isExpanded.value),
             )

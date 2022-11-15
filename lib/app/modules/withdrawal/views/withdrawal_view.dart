@@ -4,13 +4,15 @@ import 'package:flutter/services.dart';
 
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:kobermart_client/app/modules/home/controllers/home_controller.dart';
 import 'package:kobermart_client/app/modules/widgets/sucess_withdrawal.dart';
 import 'package:kobermart_client/style.dart';
 
 import '../controllers/withdrawal_controller.dart';
 
 class WithdrawalView extends GetView<WithdrawalController> {
-  const WithdrawalView({Key? key}) : super(key: key);
+  WithdrawalView({Key? key}) : super(key: key);
+  final homeC = Get.find<HomeController>();
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -37,7 +39,7 @@ class WithdrawalView extends GetView<WithdrawalController> {
                   children: [
                     Text("Saldo anda: "),
                     Text(
-                      "Rp 2.000.000",
+                      "Rp ${NumberFormat("#,##0", "id_ID").format(homeC.balance.value)}",
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ],

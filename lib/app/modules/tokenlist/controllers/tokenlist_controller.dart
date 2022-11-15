@@ -1,9 +1,17 @@
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
+import '../../home/controllers/home_controller.dart';
+
 class TokenlistController extends GetxController {
-  final count = 0.obs;
+  var homeC = Get.find<HomeController>();
+  var keyword = "".obs;
+
+  late TextEditingController searchC;
+
   @override
   void onInit() {
+    searchC = TextEditingController();
     super.onInit();
   }
 
@@ -14,8 +22,7 @@ class TokenlistController extends GetxController {
 
   @override
   void onClose() {
+    searchC.dispose();
     super.onClose();
   }
-
-  void increment() => count.value++;
 }

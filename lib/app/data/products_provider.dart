@@ -5,6 +5,7 @@ import 'package:kobermart_client/config.dart';
 class ProductsProvider extends GetConnect {
   Future<Response> getProducts() async {
     String token = "";
+    httpClient.timeout = Duration(seconds: 30);
 
     await FirebaseAuth.instance.currentUser
         ?.getIdToken(true)
@@ -20,6 +21,7 @@ class ProductsProvider extends GetConnect {
 
   Future<Response> getCarts() async {
     String token = "";
+    httpClient.timeout = Duration(seconds: 30);
 
     await FirebaseAuth.instance.currentUser
         ?.getIdToken(true)

@@ -4,8 +4,8 @@ import 'package:get/get.dart';
 class TopupController extends GetxController {
   late TextEditingController nominal;
   var jumlah = 0.obs;
+  String selectedMethod = "cash";
 
-  final count = 0.obs;
   @override
   void onInit() {
     nominal = TextEditingController();
@@ -20,8 +20,7 @@ class TopupController extends GetxController {
 
   @override
   void onClose() {
+    nominal.dispose();
     super.onClose();
   }
-
-  void increment() => count.value++;
 }

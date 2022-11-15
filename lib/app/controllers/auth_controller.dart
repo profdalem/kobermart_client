@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:kobermart_client/app/data/products_provider.dart';
 import 'package:kobermart_client/app/modules/home/views/home_view.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-
-import '../data/user_provider.dart';
 import 'package:kobermart_client/firebase.dart';
 
 class AuthController extends GetxController {
   final box = GetStorage();
   var isAuth = false.obs;
   var loading = false.obs;
+
+  var kd1limit = 10.obs;
+  var tokenprice = 200000.obs;
 
   Future<void> firstInitialized() async {
     await tokenExist().then((value) {
@@ -37,11 +36,8 @@ class AuthController extends GetxController {
     Get.offAllNamed(Routes.LOGIN);
   }
 
-  void test() async {}
-
   Future<void> login(String email, String password) async {
-    await Members.where("email", isEqualTo: "kobermart@gmail.com").get().then(
-        (value) {
+    await Members.where("email", isEqualTo: email).get().then((value) {
       if (value.docs.isEmpty) {
         Get.snackbar("result", "Member tidak ditemukan");
       } else {
@@ -51,6 +47,9 @@ class AuthController extends GetxController {
               .then((value) {
             loading.value = false;
             isAuth.value = true;
+            FirebaseAuth.instance.currentUser!
+                .getIdToken(true)
+                .then((value) => print(value));
 
             Get.defaultDialog(
                 barrierDismissible: false,

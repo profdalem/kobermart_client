@@ -1,13 +1,23 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 import 'package:get/get.dart';
+import 'package:kobermart_client/app/data/transaction_provider.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/style.dart';
+import 'package:sticky_grouped_list/sticky_grouped_list.dart';
 import '../../widgets/bottom_menu.dart';
 import '../../widgets/main_appbar.dart';
 import '../controllers/transactions_controller.dart';
 import '../../widgets/trx_status.dart';
+
+import './widgets/trx_topup.dart';
+import './widgets/trx_withdraw.dart';
+import './widgets/trx_transfer.dart';
+import './widgets/trx_belanja.dart';
+import './widgets/trx_cashback.dart';
+import './widgets/trx_token.dart';
 
 class TransactionsView extends GetView<TransactionsController> {
   const TransactionsView({Key? key}) : super(key: key);
@@ -118,42 +128,208 @@ class TransactionsView extends GetView<TransactionsController> {
             ),
             sb15,
             Expanded(
-                child: ListView(
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(bottom: 15),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15),
-                        child: PanelTitle(title: "Hari ini"),
-                      ),
-                      sb15,
-                      ItemTransaksiBelanja(),
-                      ItemTransaksiWithdrawal(),
-                      ItemTransaksiTopup(),
-                      ItemTransaksiTransfer(),
-                    ],
-                  ),
+              child: RefreshIndicator(
+                child: Obx(
+                  () => controller.transactions.isEmpty
+                      ? controller.isLoading.value
+                          ? Center(child: CircularProgressIndicator())
+                          : ListView(
+                              children: [Text("Transaksi kosong")],
+                            )
+                      : StickyGroupedListView(
+                          elements: controller.transactions.value,
+                          itemComparator: (dynamic a, dynamic b) {
+                            return double.parse(
+                                        (a["createdAt"]["_seconds"] * 1000 +
+                                                a["createdAt"]["_nanoseconds"] /
+                                                    1000000)
+                                            .toString())
+                                    .round() -
+                                double.parse((b["createdAt"]["_seconds"] *
+                                                1000 +
+                                            b["createdAt"]["_nanoseconds"] /
+                                                1000000)
+                                        .toString())
+                                    .round();
+                          },
+                          groupBy: (dynamic element) {
+                            return Timestamp.fromMillisecondsSinceEpoch(
+                                    element['createdAt']['_seconds'] * 1000)
+                                .toDate()
+                                .toString()
+                                .substring(0, 10);
+                          },
+                          itemBuilder: (BuildContext context, dynamic element) {
+                            Widget item;
+
+                            print(Timestamp.fromMillisecondsSinceEpoch(
+                                    element["createdAt"]["_seconds"] * 1000)
+                                .toDate());
+
+                            switch (element['type']) {
+                              case 'topup':
+                                var history = element['history'];
+                                item = ItemTransaksiTopup(
+                                  nominal: element['nominal'],
+                                  method: element['method'],
+                                  code: element['history'][history.length - 1]
+                                      ['code'],
+                                  createdAt:
+                                      Timestamp.fromMillisecondsSinceEpoch(
+                                          element['createdAt']['_seconds'] *
+                                              1000),
+                                );
+                                break;
+                              case 'withdraw':
+                                var history = element['history'];
+                                item = ItemTransaksiWithdrawal(
+                                  nominal: element['nominal'],
+                                  method: element['method'],
+                                  code: element['history'][history.length - 1]
+                                      ['code'],
+                                  createdAt:
+                                      Timestamp.fromMillisecondsSinceEpoch(
+                                          element['createdAt']['_seconds'] *
+                                              1000),
+                                );
+                                break;
+                              case 'transfer-in':
+                                item = ItemTransaksiTransferIn(
+                                  nominal: element['nominal'],
+                                  sender: element['senderData']['name'],
+                                  createdAt:
+                                      Timestamp.fromMillisecondsSinceEpoch(
+                                          element['createdAt']['_seconds'] *
+                                              1000),
+                                );
+                                break;
+                              case 'transfer-out':
+                                item = ItemTransaksiTransferOut(
+                                  nominal: element['nominal'],
+                                  recipient: element['recipientData']['name'],
+                                  createdAt:
+                                      Timestamp.fromMillisecondsSinceEpoch(
+                                          element['createdAt']['_seconds'] *
+                                              1000),
+                                );
+                                break;
+                              case 'ref':
+                                item = ItemTransaksiCashback(
+                                  nominal: element['nominal'],
+                                  isCount: element['isCount'],
+                                  type: element['type'],
+                                  message: element['message'],
+                                  createdAt:
+                                      Timestamp.fromMillisecondsSinceEpoch(
+                                          element['createdAt']['_seconds'] *
+                                              1000),
+                                );
+                                break;
+                              case 'plan-a':
+                                item = ItemTransaksiCashback(
+                                  nominal: element['nominal'],
+                                  isCount: element['isCount'],
+                                  type: element['type'],
+                                  message: element['message'],
+                                  createdAt:
+                                      Timestamp.fromMillisecondsSinceEpoch(
+                                          element['createdAt']['_seconds'] *
+                                              1000),
+                                );
+                                break;
+                              case 'token':
+                                item = ItemTransaksiToken(
+                                  nominal: element["tokenPrice"],
+                                  tokenCode: element["tokenCode"],
+                                  createdAt:
+                                      Timestamp.fromMillisecondsSinceEpoch(
+                                          element['createdAt']['_seconds'] *
+                                              1000),
+                                );
+                                break;
+                              default:
+                                item = ItemTransaksiBelanja();
+                            }
+
+                            return item;
+                          },
+                          groupSeparatorBuilder: (dynamic element) {
+                            return DateTime.now().toString().substring(0, 10) ==
+                                    Timestamp.fromMillisecondsSinceEpoch(
+                                            element['createdAt']['_seconds'] *
+                                                1000)
+                                        .toDate()
+                                        .toString()
+                                        .substring(0, 10)
+                                ? const Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Text("Hari ini",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                  )
+                                : Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      Timestamp.fromMillisecondsSinceEpoch(
+                                              element['createdAt']['_seconds'] *
+                                                  1000)
+                                          .toDate()
+                                          .toString()
+                                          .substring(0, 10),
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  );
+                          },
+                          order: StickyGroupedListOrder.DESC,
+                        ),
                 ),
-                Padding(
-                  padding: EdgeInsets.only(bottom: 15),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15),
-                        child: PanelTitle(title: "Kemarin"),
-                      ),
-                      sb15,
-                      ItemTransaksiCashback(),
-                      ItemTransaksiToken(),
-                    ],
-                  ),
-                )
-              ],
-            ))
+                // child: ListView(
+                //   children: [
+                //     Padding(
+                //       padding: EdgeInsets.only(bottom: 15),
+                //       child: Column(
+                //         crossAxisAlignment: CrossAxisAlignment.start,
+                //         children: [
+                //           Padding(
+                //             padding: const EdgeInsets.only(left: 15),
+                //             child: PanelTitle(title: "Hari ini"),
+                //           ),
+                //           sb15,
+                //           ItemTransaksiBelanja(),
+                //           ItemTransaksiWithdrawal(),
+                //           // ItemTransaksiTopup(),
+                //           ItemTransaksiTransfer(),
+                //         ],
+                //       ),
+                //     ),
+                //     Padding(
+                //       padding: EdgeInsets.only(bottom: 15),
+                //       child: Column(
+                //         crossAxisAlignment: CrossAxisAlignment.start,
+                //         children: [
+                //           Padding(
+                //             padding: const EdgeInsets.only(left: 15),
+                //             child: PanelTitle(title: "Kemarin"),
+                //           ),
+                //           sb15,
+                //           ItemTransaksiCashback(),
+                //           ItemTransaksiToken(),
+                //         ],
+                //       ),
+                //     )
+                //   ],
+                // ),
+                onRefresh: () {
+                  return TransactionProvider()
+                      .getUserTransactions()
+                      .then((value) {
+                    print("refresh");
+                    controller.getUserTransactions();
+                  });
+                },
+              ),
+            )
           ],
         ),
         bottomNavigationBar: BottomNav(
@@ -162,684 +338,6 @@ class TransactionsView extends GetView<TransactionsController> {
           menu2: false,
           menu3: false,
           menu4: true,
-        ),
-      ),
-    );
-  }
-}
-
-class ItemTransaksiTopup extends StatelessWidget {
-  const ItemTransaksiTopup({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: TextButton(
-        onPressed: () {
-          Get.toNamed(Routes.TRXDETAIL_TOPUP);
-        },
-        style: ButtonStyle(
-            shadowColor: MaterialStateProperty.all(Colors.grey),
-            elevation: MaterialStateProperty.all(2),
-            backgroundColor: MaterialStateProperty.all(Colors.white)),
-        child: Padding(
-          padding: EdgeInsets.only(left: 15, right: 15),
-          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Expanded(
-              flex: 12,
-              child: Padding(
-                padding: EdgeInsets.only(top: 5),
-                child: SvgPicture.asset(
-                  "assets/icons/icon-topup.svg",
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                ),
-              ),
-            ),
-            Expanded(
-              flex: 88,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Top Up",
-                            style: TextStyle(color: Colors.black, fontSize: 16),
-                          ),
-                          Text(
-                            "12.21 - 12 Sep 2021",
-                            style: TextStyle(color: Colors.grey, fontSize: 12),
-                          ),
-                        ],
-                      ),
-                      TrxStatus(
-                        statusCode: 4,
-                      ),
-                    ],
-                  ),
-                  Divider(
-                    height: 2,
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Jumlah:",
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 14),
-                              ),
-                              Text(
-                                "Rp 450.000",
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20),
-                              ),
-                            ]),
-                      ),
-                      Expanded(
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                "Metode:",
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 14),
-                              ),
-                              Text(
-                                "Cash (COD)",
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 16),
-                              ),
-                            ]),
-                      )
-                    ],
-                  )
-                ],
-              ),
-            ),
-          ]),
-        ),
-      ),
-    );
-  }
-}
-
-class ItemTransaksiWithdrawal extends StatelessWidget {
-  const ItemTransaksiWithdrawal({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: TextButton(
-        onPressed: () {
-          Get.toNamed(Routes.TRXDETAIL_WITHDRAWAL);
-        },
-        style: ButtonStyle(
-            shadowColor: MaterialStateProperty.all(Colors.grey),
-            elevation: MaterialStateProperty.all(2),
-            backgroundColor: MaterialStateProperty.all(Colors.white)),
-        child: Padding(
-          padding: EdgeInsets.only(left: 15, right: 15),
-          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Expanded(
-              flex: 12,
-              child: Padding(
-                padding: EdgeInsets.only(top: 5),
-                child: SvgPicture.asset(
-                  "assets/icons/icon-withdrawal.svg",
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                ),
-              ),
-            ),
-            Expanded(
-              flex: 88,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Withdrawal",
-                            style: TextStyle(color: Colors.black, fontSize: 16),
-                          ),
-                          Text(
-                            "12.21 - 12 Sep 2021",
-                            style: TextStyle(color: Colors.grey, fontSize: 12),
-                          ),
-                        ],
-                      ),
-                      TrxStatus(
-                        statusCode: 4,
-                      ),
-                    ],
-                  ),
-                  Divider(
-                    height: 2,
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Jumlah:",
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 14),
-                              ),
-                              Text(
-                                "Rp 450.000",
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20),
-                              ),
-                            ]),
-                      ),
-                      Expanded(
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                "Metode:",
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 14),
-                              ),
-                              Text(
-                                "Transfer Bank",
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 16),
-                              ),
-                            ]),
-                      )
-                    ],
-                  )
-                ],
-              ),
-            ),
-          ]),
-        ),
-      ),
-    );
-  }
-}
-
-class ItemTransaksiTransfer extends StatelessWidget {
-  const ItemTransaksiTransfer({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: TextButton(
-        onPressed: () {
-          Get.toNamed(Routes.TRXDETAIL_TRANSFER);
-        },
-        style: ButtonStyle(
-            shadowColor: MaterialStateProperty.all(Colors.grey),
-            elevation: MaterialStateProperty.all(2),
-            backgroundColor: MaterialStateProperty.all(Colors.white)),
-        child: Padding(
-          padding: EdgeInsets.only(left: 15, right: 15),
-          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Expanded(
-              flex: 12,
-              child: Padding(
-                padding: EdgeInsets.only(top: 5),
-                child: SvgPicture.asset(
-                  "assets/icons/icon-transfer.svg",
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                ),
-              ),
-            ),
-            Expanded(
-              flex: 88,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Transfer",
-                            style: TextStyle(color: Colors.black, fontSize: 16),
-                          ),
-                          Text(
-                            "12.21 - 12 Sep 2021",
-                            style: TextStyle(color: Colors.grey, fontSize: 12),
-                          ),
-                        ],
-                      ),
-                      TrxStatus(
-                        statusCode: 4,
-                      ),
-                    ],
-                  ),
-                  Divider(
-                    height: 2,
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Jumlah:",
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 14),
-                              ),
-                              Text(
-                                "Rp 450.000",
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20),
-                              ),
-                            ]),
-                      ),
-                      Expanded(
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                "Tujuan:",
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 14),
-                              ),
-                              Text(
-                                "Nama User",
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 16),
-                              ),
-                            ]),
-                      )
-                    ],
-                  )
-                ],
-              ),
-            ),
-          ]),
-        ),
-      ),
-    );
-  }
-}
-
-class ItemTransaksiCashback extends StatelessWidget {
-  const ItemTransaksiCashback({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    var jenis = "Referral";
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: TextButton(
-        onPressed: () {
-          Get.toNamed(Routes.TRXDETAIL_CASHBACK);
-        },
-        style: ButtonStyle(
-            shadowColor: MaterialStateProperty.all(Colors.grey),
-            elevation: MaterialStateProperty.all(2),
-            backgroundColor: MaterialStateProperty.all(Colors.white)),
-        child: Padding(
-          padding: EdgeInsets.only(left: 15, right: 15),
-          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Expanded(
-              flex: 12,
-              child: Padding(
-                padding: EdgeInsets.only(top: 5),
-                child: SvgPicture.asset(
-                  "assets/icons/icon-cashback.svg",
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                ),
-              ),
-            ),
-            Expanded(
-              flex: 88,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Cashback (${jenis})",
-                            style: TextStyle(color: Colors.black, fontSize: 16),
-                          ),
-                          Text(
-                            "12.21 - 12 Sep 2021",
-                            style: TextStyle(color: Colors.grey, fontSize: 12),
-                          ),
-                        ],
-                      ),
-                      TrxStatus(
-                        statusCode: 4,
-                      ),
-                    ],
-                  ),
-                  Divider(
-                    height: 2,
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Jumlah:",
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 14),
-                              ),
-                              Text(
-                                "Rp 40.000",
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20),
-                              ),
-                            ]),
-                      ),
-                      Expanded(
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                "Sumber:",
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 14),
-                              ),
-                              Text(
-                                "Generate Token",
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 16),
-                              ),
-                            ]),
-                      )
-                    ],
-                  )
-                ],
-              ),
-            ),
-          ]),
-        ),
-      ),
-    );
-  }
-}
-
-class ItemTransaksiToken extends StatelessWidget {
-  const ItemTransaksiToken({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: TextButton(
-        onPressed: () {
-          Get.toNamed(Routes.TRXDETAIL_TOKEN);
-        },
-        style: ButtonStyle(
-            shadowColor: MaterialStateProperty.all(Colors.grey),
-            elevation: MaterialStateProperty.all(2),
-            backgroundColor: MaterialStateProperty.all(Colors.white)),
-        child: Padding(
-          padding: EdgeInsets.only(left: 15, right: 15),
-          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Expanded(
-              flex: 12,
-              child: Padding(
-                padding: EdgeInsets.only(top: 5),
-                child: SvgPicture.asset(
-                  "assets/icons/icon-token.svg",
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                ),
-              ),
-            ),
-            Expanded(
-              flex: 88,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Token",
-                            style: TextStyle(color: Colors.black, fontSize: 16),
-                          ),
-                          Text(
-                            "12.21 - 12 Sep 2021",
-                            style: TextStyle(color: Colors.grey, fontSize: 12),
-                          ),
-                        ],
-                      ),
-                      TrxStatus(
-                        statusCode: 4,
-                      ),
-                    ],
-                  ),
-                  Divider(
-                    height: 2,
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Jumlah:",
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 14),
-                              ),
-                              Text(
-                                "Rp 200.000",
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20),
-                              ),
-                            ]),
-                      ),
-                      Expanded(
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                "Metode:",
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 14),
-                              ),
-                              Text(
-                                "Potong saldo",
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 16),
-                              ),
-                            ]),
-                      )
-                    ],
-                  )
-                ],
-              ),
-            ),
-          ]),
-        ),
-      ),
-    );
-  }
-}
-
-class ItemTransaksiBelanja extends StatelessWidget {
-  const ItemTransaksiBelanja({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: TextButton(
-        onPressed: () {
-          Get.toNamed(Routes.TRXDETAIL_SHOP, arguments: {"nominal": 201});
-        },
-        style: ButtonStyle(
-            shadowColor: MaterialStateProperty.all(Colors.grey),
-            elevation: MaterialStateProperty.all(2),
-            backgroundColor: MaterialStateProperty.all(Colors.white)),
-        child: Padding(
-          padding: EdgeInsets.only(left: 15, right: 15),
-          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Expanded(
-              flex: 12,
-              child: Padding(
-                padding: EdgeInsets.only(top: 5),
-                child: SvgPicture.asset(
-                  "assets/icons/icon-belanja.svg",
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                ),
-              ),
-            ),
-            Expanded(
-              flex: 88,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Belanja",
-                            style: TextStyle(color: Colors.black, fontSize: 16),
-                          ),
-                          Text(
-                            "12.21 - 12 Sep 2021",
-                            style: TextStyle(color: Colors.grey, fontSize: 12),
-                          ),
-                        ],
-                      ),
-                      TrxStatus(
-                        statusCode: 4,
-                      ),
-                    ],
-                  ),
-                  Divider(
-                    height: 2,
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                    "Kopi Sachet 3in1 Instant Coffee Mocca ",
-                    style: TextStyle(color: Colors.black, fontSize: 18),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    "+2 produk lain",
-                    style: TextStyle(color: Colors.grey, fontSize: 14),
-                  ),
-                  sb15,
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Total belanja:",
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 14),
-                              ),
-                              Text(
-                                "Rp 450.000",
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20),
-                              ),
-                            ]),
-                      ),
-                      Expanded(
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                "Metode:",
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 14),
-                              ),
-                              Text(
-                                "Potong Saldo",
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 16),
-                              ),
-                            ]),
-                      )
-                    ],
-                  )
-                ],
-              ),
-            ),
-          ]),
         ),
       ),
     );
@@ -863,7 +361,7 @@ class FilterJenis extends StatelessWidget {
           children: [
             Text(
               title,
-              style: TextStyle(color: Colors.black),
+              style: TextStyle(color: Colors.black, fontSize: 12),
             ),
           ],
         ),

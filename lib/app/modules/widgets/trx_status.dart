@@ -7,7 +7,7 @@ class TrxStatus extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var status = statusCode;
-    double fontsize = 14;
+    double fontsize = 12;
 
     switch (status) {
       case 1:

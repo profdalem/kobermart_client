@@ -1,8 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/style.dart';
 
@@ -13,6 +16,18 @@ class TokendetailView extends GetView<TokendetailController> {
 
   @override
   Widget build(BuildContext context) {
+    String tokenCode = "-";
+    String creator = "tidak ditemukan";
+    Timestamp createdAt = Timestamp.now();
+
+    if (Get.arguments != null) {
+      tokenCode = Get.arguments["data"]["memberData"]["tokenCode"];
+      creator = Get.arguments["data"]["memberData"]["tokenCreator"];
+      createdAt = Timestamp(
+          Get.arguments["data"]["memberData"]["tokenCreatedAt"]["_seconds"],
+          Get.arguments["data"]["memberData"]["tokenCreatedAt"]
+              ["_nanoseconds"]);
+    }
     return Scaffold(
         backgroundColor: Color(0xFFF4F4F4),
         appBar: AppBar(
@@ -52,7 +67,7 @@ class TokendetailView extends GetView<TokendetailController> {
                               Row(
                                 children: [
                                   Text(
-                                    "828929348357",
+                                    tokenCode,
                                     style: TextStyle(fontSize: 18),
                                   ),
                                   SizedBox(
@@ -60,7 +75,11 @@ class TokendetailView extends GetView<TokendetailController> {
                                   ),
                                   GestureDetector(
                                       onTap: () {
-                                        print("klik");
+                                        Clipboard.setData(
+                                                ClipboardData(text: tokenCode))
+                                            .then((value) => Get.snackbar(
+                                                "Berhasil",
+                                                "Token berhasil disalin"));
                                       },
                                       child: Text(
                                         "Salin",
@@ -77,7 +96,7 @@ class TokendetailView extends GetView<TokendetailController> {
                                 print("klik");
                               },
                               child: Text(
-                                "Amanda Curtis",
+                                creator,
                                 style:
                                     TextStyle(color: Colors.blue, fontSize: 18),
                               )),
@@ -88,7 +107,7 @@ class TokendetailView extends GetView<TokendetailController> {
                                 print("klik");
                               },
                               child: Text(
-                                "16 Juni 2022 13.45 WITA",
+                                "${DateFormat.yMMMd("id_ID").format(createdAt.toDate())} ${DateFormat.Hm().format(createdAt.toDate())} WITA",
                                 style: TextStyle(fontSize: 18),
                               )),
                           sb15,
@@ -104,29 +123,32 @@ class TokendetailView extends GetView<TokendetailController> {
                   ),
                 ),
                 sb15,
-                Container(
-                  width: Get.width,
-                  decoration: Shadow1(),
-                  child: Padding(
-                    padding: EdgeInsets.all(10),
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          PanelTitle(title: "Upline"),
-                          ListTile(
-                            contentPadding: EdgeInsets.all(0),
-                            leading: CircleAvatar(
-                              backgroundImage: CachedNetworkImageProvider(
-                                  "https://i.pravatar.cc/150?img=18"),
-                            ),
-                            title: Text("Robert Xemeckis"),
-                            onTap: () {
-                              print("liht anggota");
-                            },
-                          )
-                        ]),
+                if (Get.arguments != null)
+                  Container(
+                    width: Get.width,
+                    decoration: Shadow1(),
+                    child: Padding(
+                      padding: EdgeInsets.all(10),
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            PanelTitle(title: "Upline"),
+                            ListTile(
+                              contentPadding: EdgeInsets.all(0),
+                              leading: CircleAvatar(
+                                child: Icon(Icons.person),
+                                // backgroundImage: CachedNetworkImageProvider(
+                                //     "https://i.pravatar.cc/150?img=18"),
+                              ),
+                              title: Text(
+                                  Get.arguments["data"]["uplineData"]["name"]),
+                              onTap: () {
+                                print("lihat anggota");
+                              },
+                            )
+                          ]),
+                    ),
                   ),
-                ),
               ],
             )
           ],

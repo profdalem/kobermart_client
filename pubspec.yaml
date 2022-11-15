@@ -1,5 +1,5 @@
 name: kobermart_client
-version: 1.0.0+1
+version: 1.2.1+4
 publish_to: none
 description: A new Flutter project.
 environment:
@@ -22,12 +22,29 @@ dependencies:
   google_fonts: ^3.0.1
   intl: ^0.17.0
   qr_flutter: ^4.0.0
+  sticky_grouped_list: ^3.1.0
   username_gen: ^1.0.4
 
 dev_dependencies:
   flutter_lints: ^2.0.0
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: "^0.10.0"
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icons/icon.png"
+  min_sdk_android: 21 # android min sdk min:16, default 21
+  web:
+    generate: true
+    image_path: "assets/icons/icon.png"
+    background_color: "#hexcode"
+    theme_color: "#hexcode"
+  windows:
+    generate: true
+    image_path: "assets/icons/icon.png"
+    icon_size: 48 # min:48, max:256, default: 48
 
 flutter:
   assets:

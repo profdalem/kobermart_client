@@ -2,17 +2,22 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:kobermart_client/app/controllers/auth_controller.dart';
+import 'package:kobermart_client/app/modules/home/controllers/home_controller.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/style.dart';
 
 import '../controllers/menu_controller.dart';
 
 class MenuView extends GetView<MenuController> {
-  const MenuView({Key? key}) : super(key: key);
+  MenuView({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     final authC = Get.find<AuthController>();
+    final homeC = Get.find<HomeController>();
+
     return SafeArea(
       top: false,
       child: Scaffold(
@@ -31,19 +36,23 @@ class MenuView extends GetView<MenuController> {
             padding: EdgeInsets.symmetric(horizontal: 15),
             children: [
               ListTile(
-                horizontalTitleGap: 0,
+                horizontalTitleGap: 10,
                 onTap: () {
                   Get.offAndToNamed(Routes.PROFILE);
                 },
                 leading: CircleAvatar(
-                    backgroundImage: CachedNetworkImageProvider(
-                        "https://i.pravatar.cc/150?img=1")),
-                title: PanelTitle(title: "Username 1"),
-                subtitle: Text("Referal ID: Username"),
+                  child: Icon(Icons.person),
+                  // backgroundImage: CachedNetworkImageProvider(
+                  //     "https://i.pravatar.cc/150?img=1"),
+                ),
+                title: PanelTitle(title: homeC.name.value),
+                subtitle: Text("Referal ID: -"),
                 trailing: IconButton(
                   icon: Icon(Icons.logout_rounded),
                   onPressed: () {
-                    authC.logout();
+                    authC
+                        .logout()
+                        .then((value) => Get.offAllNamed(Routes.LOGIN));
                   },
                 ),
               ),
@@ -53,7 +62,7 @@ class MenuView extends GetView<MenuController> {
                 leading: Icon(Icons.wallet),
                 title: Text("Saldo Belanja"),
                 subtitle: Text(
-                  "Rp 1.750.000,-",
+                  "Rp ${NumberFormat("#,##0", "id_ID").format(homeC.balance.value)}",
                   style: TextStyle(
                       color: Colors.blue.shade600,
                       fontWeight: FontWeight.bold,
@@ -65,7 +74,7 @@ class MenuView extends GetView<MenuController> {
                 leading: Icon(Icons.percent),
                 title: Text("Cashback"),
                 subtitle: Text(
-                  "Rp 1.750.000,-",
+                  "Rp ${NumberFormat("#,##0", "id_ID").format(homeC.cashback.value)}",
                   style: TextStyle(
                       color: Colors.blue.shade600,
                       fontWeight: FontWeight.bold,
@@ -153,7 +162,9 @@ class MenuView extends GetView<MenuController> {
               ),
               ListTile(
                 horizontalTitleGap: 0,
-                onTap: () {},
+                onTap: () {
+                  authC.logout().then((value) => Get.offAllNamed(Routes.LOGIN));
+                },
                 leading: Icon(Icons.logout_rounded),
                 title: Text("Keluar"),
               ),
@@ -161,7 +172,7 @@ class MenuView extends GetView<MenuController> {
                 height: 20,
               ),
               Text(
-                "© Kober Bali Jaya 2022",
+                "© Kober Bali Jaya ${DateFormat.y().format(DateTime.now())}",
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.grey),
               ),

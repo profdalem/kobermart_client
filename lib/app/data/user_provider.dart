@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'dart:convert';
 
@@ -19,8 +20,25 @@ class UserProvider extends GetConnect {
         headers: {"Authorization": "Bearer ${token}"});
   }
 
-  Future<Response> getInitialData(String token) {
+  Future<Response> getInitialData() async {
+    String token = "";
+    httpClient.timeout = Duration(seconds: 30);
+
+    await FirebaseAuth.instance.currentUser?.getIdToken(true).then((value) {
+      token = value;
+    });
     return get("${mainUrl}api/client/firstlogin",
+        headers: {"Authorization": "Bearer ${token}"});
+  }
+
+  Future<Response> getDownlines() async {
+    String token = "";
+    httpClient.timeout = Duration(seconds: 30);
+
+    await FirebaseAuth.instance.currentUser?.getIdToken(true).then((value) {
+      token = value;
+    });
+    return get("${mainUrl}api/client/downlines",
         headers: {"Authorization": "Bearer ${token}"});
   }
 

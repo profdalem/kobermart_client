@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:kobermart_client/app/controllers/auth_controller.dart';
 import 'package:kobermart_client/app/controllers/product_controller.dart';
-import 'package:kobermart_client/app/modules/product/controllers/product_controller.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/style.dart';
 import '../../widgets/main_appbar.dart';
@@ -15,7 +14,7 @@ import '../../widgets/bottom_menu.dart';
 
 class HomeView extends GetView {
   final authC = Get.find<AuthController>();
-  final controller = Get.put(HomeController());
+  final homeC = Get.put(HomeController(), permanent: true);
   final productC = Get.find<MainProductController>();
   @override
   Widget build(BuildContext context) {
@@ -59,17 +58,20 @@ class HomeView extends GetView {
                                   onTap: () async {
                                     Get.toNamed(Routes.PROFILE);
                                   },
-                                  child: RichText(
-                                    text: TextSpan(
-                                        text: "Halo, ",
-                                        children: [
-                                          TextSpan(
-                                              text: "${controller.name.value}",
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold))
-                                        ],
-                                        style: TextStyle(fontSize: 20)),
-                                  ),
+                                  child: homeC.isLoading.value
+                                      ? SizedBox()
+                                      : RichText(
+                                          text: TextSpan(
+                                              text: "Halo, ",
+                                              children: [
+                                                TextSpan(
+                                                    text: "${homeC.name.value}",
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold))
+                                              ],
+                                              style: TextStyle(fontSize: 20)),
+                                        ),
                                 )
                               : SizedBox(
                                   height: 25,
@@ -90,7 +92,10 @@ class HomeView extends GetView {
                                       SizedBox(
                                         width: 5,
                                       ),
-                                      Image.asset("assets/images/qr-btn.png"),
+                                      Icon(
+                                        Icons.qr_code,
+                                        size: 16,
+                                      ),
                                     ],
                                   ),
                                 )
@@ -106,7 +111,8 @@ class HomeView extends GetView {
                       child: Card(
                         elevation: 2,
                         child: Padding(
-                          padding: EdgeInsets.all(15),
+                          padding: EdgeInsets.only(
+                              top: 15, left: 15, right: 15, bottom: 10),
                           child: Obx(
                             () =>
                                 authC.isAuth.value ? InfoCepat() : LoginPanel(),
@@ -225,7 +231,8 @@ class HomeView extends GetView {
                             text1: "Token",
                             text2: "Baru",
                             todo: () {
-                              Get.toNamed(Routes.NEWTOKEN);
+                              if (homeC.settings != null)
+                                Get.toNamed(Routes.NEWTOKEN);
                             }),
                       ),
                       SizedBox(
@@ -248,7 +255,12 @@ class HomeView extends GetView {
                               text1: "Withdraw",
                               text2: "Dana",
                               todo: () {
-                                Get.toNamed(Routes.WITHDRAWAL);
+                                if (homeC.balance.value == 0) {
+                                  Get.snackbar("Saldo kosong",
+                                      "Anda tidak memiliki saldo atau data saldo anda sedang dimuat");
+                                } else {
+                                  Get.toNamed(Routes.WITHDRAWAL);
+                                }
                               })),
                       SizedBox(
                         width: 15,
@@ -303,8 +315,8 @@ class HomeView extends GetView {
                       Expanded(
                         child: FiturItem(
                             imgUrl: "tagihan",
-                            text1: "Bayar",
-                            text2: "Tagihan",
+                            text1: "PPOB",
+                            text2: "& Pulsa",
                             todo: () {
                               Get.toNamed(Routes.PPOB);
                             }),
@@ -365,61 +377,76 @@ class InfoCepat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<HomeController>();
-    return Obx(() => Column(
-          children: [
-            Row(
-              children: [
-                Expanded(
-                    child: Container(
-                  child: InfoItem(
-                    imgUrl: "saldo",
-                    title: "Saldo",
-                    content:
-                        "Rp ${NumberFormat("#,##0", "id_ID").format(controller.balance.value)}",
-                  ),
-                )),
-                SizedBox(
-                  width: 30,
-                ),
-                Expanded(
-                    child: Container(
-                  child: InfoItem(
-                    imgUrl: "anggota",
-                    title: "Anggota",
-                    content: "${controller.anggota.value.toString()}",
-                  ),
-                )),
-              ],
-            ),
-            SizedBox(
-              height: 15,
-            ),
-            Row(
-              children: [
-                Expanded(
-                    child: Container(
-                  child: InfoItem(
-                    imgUrl: "cashback",
-                    title: "Cashback",
-                    content:
-                        "Rp ${NumberFormat("#,##0", "id_ID").format(controller.cashback.value)}",
-                  ),
-                )),
-                SizedBox(
-                  width: 30,
-                ),
-                Expanded(
-                    child: Container(
-                  child: InfoItem(
-                    imgUrl: "kd",
-                    title: "Kedalaman",
-                    content: "KD${controller.kd.value.toString()}",
-                  ),
-                ))
-              ],
+    return Obx(
+      () => controller.isLoading.value
+          ? Center(
+              child: CircularProgressIndicator(),
             )
-          ],
-        ));
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                        child: Container(
+                      child: InfoItem(
+                        imgUrl: "saldo",
+                        title: "Saldo",
+                        content:
+                            "Rp ${NumberFormat("#,##0", "id_ID").format(controller.balance.value)}",
+                      ),
+                    )),
+                    SizedBox(
+                      width: 30,
+                    ),
+                    Expanded(
+                        child: Container(
+                      child: InfoItem(
+                        imgUrl: "anggota",
+                        title: "Anggota",
+                        content: "${controller.anggota.value.toString()} orang",
+                      ),
+                    )),
+                  ],
+                ),
+                SizedBox(
+                  height: 15,
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                        child: Container(
+                      child: InfoItem(
+                        imgUrl: "cashback",
+                        title: "Cashback",
+                        content:
+                            "Rp ${NumberFormat("#,##0", "id_ID").format(controller.cashback.value)}",
+                      ),
+                    )),
+                    SizedBox(
+                      width: 30,
+                    ),
+                    Expanded(
+                        child: Container(
+                      child: InfoItem(
+                        imgUrl: "kd",
+                        title: "Kedalaman",
+                        content: "KD${controller.kd.value.toString()}",
+                      ),
+                    ))
+                  ],
+                ),
+                Padding(
+                  padding: EdgeInsets.only(
+                      left: MediaQuery.of(context).size.width * 0.08),
+                  child: Text(
+                    DateFormat.yMMMM('id_ID').format(DateTime.now()),
+                    style: TextStyle(fontSize: 10),
+                  ),
+                )
+              ],
+            ),
+    );
   }
 }
 

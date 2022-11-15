@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/style.dart';
 
@@ -27,7 +28,8 @@ class TrxdetailTopupView extends GetView<TrxdetailTopupController> {
           elevation: 1,
           leading: IconButton(
               onPressed: () {
-                Get.offAllNamed(Routes.TRANSACTIONS);
+                // Get.offAllNamed(Routes.TRANSACTIONS);
+                Get.back();
               },
               icon: Icon(Icons.close)),
           actions: [
@@ -54,12 +56,12 @@ class TrxdetailTopupView extends GetView<TrxdetailTopupController> {
               Container(
                 alignment: Alignment.center,
                 child: Text(
-                  "Dibuat 19-06-2022  12.30 WITA",
+                  "Dibuat ${DateFormat.yMMMd("id_ID").format(Get.arguments["createdAt"].toDate())} ${DateFormat.Hm().format(Get.arguments["createdAt"].toDate())} WITA",
                   style: TextStyle(color: Colors.grey),
                 ),
               ),
               sb15,
-              TrxDetailMainPanel(),
+              TrxDetailMainPanel(arguments: Get.arguments),
               sb15,
               TrxDetailPaymentMessage(),
               sb15,
@@ -86,53 +88,19 @@ class TrxdetailTopupView extends GetView<TrxdetailTopupController> {
   }
 }
 
-class TrxDetailCollector extends StatelessWidget {
-  const TrxDetailCollector({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: Get.width,
-      decoration: Shadow1(),
-      child: Padding(
-        padding: EdgeInsets.all(15),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          PanelTitle(title: "Pengantar"),
-          sb10,
-          ListTile(
-            contentPadding: EdgeInsets.all(0),
-            leading: CircleAvatar(
-              backgroundImage: CachedNetworkImageProvider(
-                  "https://i.pravatar.cc/150?img=18"),
-            ),
-            title: Text("Robert Xemeckis"),
-            onTap: () {
-              print("liht anggota");
-            },
-            trailing: IconButton(
-              icon: Icon(Icons.call),
-              onPressed: () {},
-            ),
-          )
-        ]),
-      ),
-    );
-  }
-}
-
 class TrxDetailMainPanel extends StatelessWidget {
-  const TrxDetailMainPanel({
+  final dynamic arguments;
+  TrxDetailMainPanel({
     Key? key,
+    required this.arguments,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     String notrx = "TRX88432389293";
     String type = "Top Up";
-    String method = "Cash";
-    int status = 0;
+    String method = arguments["method"];
+    int status = arguments["code"];
 
     return Container(
       decoration: Shadow1(),
@@ -165,7 +133,8 @@ class TrxDetailMainPanel extends StatelessWidget {
                     Text(type),
                     sb15,
                     PanelTitle(title: "Nominal"),
-                    Text("Rp 500.000"),
+                    Text(
+                        "Rp ${NumberFormat("#,##0", "id_ID").format(arguments["nominal"])}"),
                   ],
                 ),
                 Column(
@@ -188,6 +157,93 @@ class TrxDetailMainPanel extends StatelessWidget {
   }
 }
 
+// khusus transfer, muncul jika sudah transfer divalidasi
+class TrxDetailPaymentMessage extends StatelessWidget {
+  const TrxDetailPaymentMessage({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    String method = "cash";
+    Widget content = SizedBox();
+
+    switch (method) {
+      case "transfer":
+        content = Container(
+          decoration: Shadow1(),
+          child: Padding(
+            padding: EdgeInsets.all(15),
+            child: Column(children: [
+              Text(
+                "Transfer Dana Berhasil!",
+                style: TextStyle(
+                    color: Colors.green.shade700,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18),
+              ),
+              sb10,
+              RichText(
+                  text: TextSpan(
+                      style: TextStyle(color: Colors.black),
+                      text:
+                          "Pembayaran anda telah diterima dan divalidasi oleh Admin ",
+                      children: [
+                    TextSpan(text: "(nama admin) "),
+                    TextSpan(text: "pada "),
+                    TextSpan(
+                        text: "20-06-2022",
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    TextSpan(text: " pukul "),
+                    TextSpan(
+                        text: "12.31 WITA",
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    TextSpan(text: "."),
+                  ]))
+            ]),
+          ),
+        );
+        break;
+      default:
+        content = Container(
+          decoration: Shadow1(),
+          child: Padding(
+            padding: EdgeInsets.all(15),
+            child: Column(children: [
+              Text(
+                "Dana anda telah kami terima!",
+                style: TextStyle(
+                    color: Colors.green.shade700,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18),
+              ),
+              sb10,
+              RichText(
+                  text: TextSpan(
+                      style: TextStyle(color: Colors.black),
+                      text:
+                          "Pembayaran anda telah diterima dan divalidasi oleh Admin ",
+                      children: [
+                    TextSpan(text: "(nama admin) "),
+                    TextSpan(text: "pada "),
+                    TextSpan(
+                        text: "20-06-2022",
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    TextSpan(text: " pukul "),
+                    TextSpan(
+                        text: "12.31 WITA",
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    TextSpan(text: "."),
+                  ]))
+            ]),
+          ),
+        );
+    }
+    return content;
+  }
+}
+
+// informasi cara bayar
 class TrxDetailPaymentInfoShop extends StatelessWidget {
   const TrxDetailPaymentInfoShop({
     Key? key,
@@ -195,7 +251,7 @@ class TrxDetailPaymentInfoShop extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int type = 1; // 0 cash, 2 transfer
+    int type = 0; // 0 transfer, 1 cash
     var typeTitle;
     var content;
     var btnText = "Buka QR Code";
@@ -205,7 +261,7 @@ class TrxDetailPaymentInfoShop extends StatelessWidget {
 
     switch (type) {
       case 1:
-        typeTitle = "Withdrawal (transfer)";
+        typeTitle = "Top Up (transfer)";
         btnText = "Saya sudah bayar";
         btnFunction = () {};
         content = Column(
@@ -270,7 +326,7 @@ class TrxDetailPaymentInfoShop extends StatelessWidget {
         );
         break;
       default:
-        typeTitle = "Withdrawal (cash)";
+        typeTitle = "Top Up (cash)";
         content = Column(
           children: [
             Row(
@@ -320,7 +376,7 @@ class TrxDetailPaymentInfoShop extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                PanelTitle(title: "Tata Cara Penarikan"),
+                PanelTitle(title: "Tata Cara TopUp"),
                 Text(
                   typeTitle,
                   style: TextStyle(color: Colors.grey),
@@ -344,43 +400,37 @@ class TrxDetailPaymentInfoShop extends StatelessWidget {
   }
 }
 
-class TrxDetailPaymentMessage extends StatelessWidget {
-  const TrxDetailPaymentMessage({
+// informasi kolektor yang bertanggungjawab
+class TrxDetailCollector extends StatelessWidget {
+  const TrxDetailCollector({
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: Get.width,
       decoration: Shadow1(),
       child: Padding(
         padding: EdgeInsets.all(15),
-        child: Column(children: [
-          Text(
-            "Transfer Dana Berhasil!",
-            style: TextStyle(
-                color: Colors.green.shade700,
-                fontWeight: FontWeight.bold,
-                fontSize: 18),
-          ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          PanelTitle(title: "Pengantar"),
           sb10,
-          RichText(
-              text: TextSpan(
-                  style: TextStyle(color: Colors.black),
-                  text:
-                      "Pembayaran anda telah diterima dan divalidasi oleh Admin ",
-                  children: [
-                TextSpan(text: "(nama admin) "),
-                TextSpan(text: "pada "),
-                TextSpan(
-                    text: "20-06-2022",
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                TextSpan(text: " pukul "),
-                TextSpan(
-                    text: "12.31 WITA",
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                TextSpan(text: "."),
-              ]))
+          ListTile(
+            contentPadding: EdgeInsets.all(0),
+            leading: CircleAvatar(
+              backgroundImage: CachedNetworkImageProvider(
+                  "https://i.pravatar.cc/150?img=18"),
+            ),
+            title: Text("Robert Xemeckis"),
+            onTap: () {
+              print("liht anggota");
+            },
+            trailing: IconButton(
+              icon: Icon(Icons.call),
+              onPressed: () {},
+            ),
+          )
         ]),
       ),
     );

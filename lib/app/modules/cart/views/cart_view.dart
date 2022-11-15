@@ -72,7 +72,7 @@ class CartView extends GetView<CartController> {
             : Container(
                 decoration: Shadow1(),
                 alignment: Alignment.bottomCenter,
-                height: Get.height * 0.1,
+                height: Get.height * 0.12,
                 child: Padding(
                   padding: const EdgeInsets.all(15),
                   child: Row(
@@ -135,7 +135,7 @@ class CartItem extends StatelessWidget {
     controller.totalprice.value += (itemC.count.value * itemC.price.value);
 
     return Container(
-      height: Get.width * 0.4,
+      height: Get.width * 0.45,
       decoration: Shadow1(),
       child: LayoutBuilder(
         builder: (context, constraints) => Container(

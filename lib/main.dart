@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:kobermart_client/app/controllers/product_controller.dart';
 import 'package:kobermart_client/app/modules/product/controllers/product_controller.dart';
 import 'app/controllers/auth_controller.dart';
@@ -14,8 +15,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Firebase.initializeApp();
   await GetStorage.init();
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
-      .then((value) => runApp(MyApp()));
+  await initializeDateFormatting('id_ID', null).then((value) =>
+      SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+          .then((value) => runApp(MyApp())));
 }
 
 class MyApp extends StatelessWidget {

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:get/get.dart';
 import 'package:kobermart_client/app/data/products_provider.dart';
 
@@ -26,35 +28,41 @@ class MainProductController extends GetxController {
 
   void getAllProduct() async {
     isLoading.value = true;
-    await ProductsProvider().getProducts().then((value) {
-      if (value.body != null) {
-        if (value.body["success"]) {
-          products.value = value.body["data"];
-          products.refresh();
-          print("Get all product done, product count: ${products.length}");
+    try {
+      await ProductsProvider().getProducts().then((value) {
+        if (value.body != null) {
+          if (value.body["success"]) {
+            products.value = value.body["data"];
+            products.refresh();
+            // print("Get all product done, product count: ${products.length}");
+          } else {
+            Get.snackbar("Error", value.body["message"]);
+          }
         } else {
-          Get.snackbar("Error", value.body["message"]);
+          Get.snackbar("Error", "Gagal mendapatkan data produk");
         }
-      } else {
-        Get.snackbar("Error", "Gagal mendapatkan data produk");
-      }
-    });
+      });
+    } catch (e) {
+      print("getAllProduct error: " + e.toString());
+    }
 
     isLoading.value = false;
   }
 
   void getAllCarts() async {
     isLoading.value = true;
-    await ProductsProvider().getCarts().then((value) {
-      if (value.body != null) {
-        // print(value.body);
-        carts.value = value.body["result"];
-      } else {
-        Get.snackbar("Error", "Gagal mendapatkan data produk");
-      }
-    });
-
-    print(carts[0]["productDetail"]["name"]);
+    try {
+      await ProductsProvider().getCarts().then((value) {
+        if (value.body != null) {
+          // print(value.body);
+          carts.value = value.body["result"];
+        } else {
+          Get.snackbar("Error", "Gagal mendapatkan data produk");
+        }
+      });
+    } catch (e) {
+      print("getAllCarts error: " + e.toString());
+    }
 
     isLoading.value = false;
   }
