@@ -52,6 +52,10 @@ import '../modules/trashbank/bindings/trashbank_binding.dart';
 import '../modules/trashbank/views/trashbank_view.dart';
 import '../modules/trxdetail_cashback/bindings/trxdetail_cashback_binding.dart';
 import '../modules/trxdetail_cashback/views/trxdetail_cashback_view.dart';
+import '../modules/trxdetail_postpaid/bindings/trxdetail_postpaid_binding.dart';
+import '../modules/trxdetail_postpaid/views/trxdetail_postpaid_view.dart';
+import '../modules/trxdetail_prepaid/bindings/trxdetail_prepaid_binding.dart';
+import '../modules/trxdetail_prepaid/views/trxdetail_prepaid_view.dart';
 import '../modules/trxdetail_shop/bindings/trxdetail_shop_binding.dart';
 import '../modules/trxdetail_shop/views/trxdetail_shop_view.dart';
 import '../modules/trxdetail_token/bindings/trxdetail_token_binding.dart';
@@ -124,7 +128,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.REGISTRATION,
-      page: () => const RegistrationView(),
+      page: () => RegistrationView(),
       binding: RegistrationBinding(),
     ),
     GetPage(
@@ -154,7 +158,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.TOKENDETAIL,
-      page: () => const TokendetailView(),
+      page: () => TokendetailView(),
       binding: TokendetailBinding(),
     ),
     GetPage(
@@ -234,8 +238,18 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.PPOB,
-      page: () => const PpobView(),
+      page: () => PpobView(),
       binding: PpobBinding(),
+    ),
+    GetPage(
+      name: _Paths.TRXDETAIL_PREPAID,
+      page: () => TrxdetailPrepaidView(),
+      binding: TrxdetailPrepaidBinding(),
+    ),
+    GetPage(
+      name: _Paths.TRXDETAIL_POSTPAID,
+      page: () => TrxdetailPostpaidView(),
+      binding: TrxdetailPostpaidBinding(),
     ),
   ];
 }

@@ -1,16 +1,16 @@
+// ignore_for_file: invalid_use_of_protected_member
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 
 import 'package:get/get.dart';
 import 'package:kobermart_client/app/data/transaction_provider.dart';
-import 'package:kobermart_client/app/routes/app_pages.dart';
+import 'package:kobermart_client/app/modules/transactions/views/widgets/trx_prepaid.dart';
 import 'package:kobermart_client/style.dart';
 import 'package:sticky_grouped_list/sticky_grouped_list.dart';
 import '../../widgets/bottom_menu.dart';
 import '../../widgets/main_appbar.dart';
 import '../controllers/transactions_controller.dart';
-import '../../widgets/trx_status.dart';
 
 import './widgets/trx_topup.dart';
 import './widgets/trx_withdraw.dart';
@@ -18,12 +18,21 @@ import './widgets/trx_transfer.dart';
 import './widgets/trx_belanja.dart';
 import './widgets/trx_cashback.dart';
 import './widgets/trx_token.dart';
+import './widgets/trx_postpaid.dart';
 
 class TransactionsView extends GetView<TransactionsController> {
   const TransactionsView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    if (Get.arguments != null) {
+      print(Get.arguments["refresh"]);
+      if (Get.arguments["refresh"] == true) {
+        print("Arguments refresh is true");
+        Future.delayed(Duration(milliseconds: 500),
+            () => controller.getUserTransactions());
+      }
+    }
     return SafeArea(
       top: false,
       child: Scaffold(
@@ -41,50 +50,22 @@ class TransactionsView extends GetView<TransactionsController> {
               scrollDirection: Axis.horizontal,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: Row(children: [
-                  FilterJenis(
-                    active: true,
-                    title: "Semua",
-                  ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  FilterJenis(
-                    active: false,
-                    title: "Berlangsung",
-                  ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  FilterJenis(
-                    active: false,
-                    title: "Saldo",
-                  ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  FilterJenis(
-                    active: false,
-                    title: "Cashback",
-                  ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  FilterJenis(
-                    active: false,
-                    title: "Belanja",
-                  ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  FilterJenis(
-                    active: false,
-                    title: "Selesai",
-                  ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                ]),
+                child: Obx(
+                  () => controller.filterBy.isNotEmpty
+                      ? Row(
+                          children: List.generate(
+                            controller.filters.length,
+                            (index) => Padding(
+                              padding: EdgeInsets.only(right: 10),
+                              child: FilterJenis(
+                                code: controller.filters[index]["code"]!,
+                                title: controller.filters[index]["name"]!,
+                              ),
+                            ),
+                          ),
+                        )
+                      : SizedBox(),
+                ),
               ),
             ),
             Row(
@@ -101,26 +82,41 @@ class TransactionsView extends GetView<TransactionsController> {
                     scrollDirection: Axis.horizontal,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: Row(children: [
-                        FilterJenis(
-                          active: true,
-                          title: "1 bulan",
+                      child: Obx(
+                        () => Row(
+                          children: [
+                            FilterRentang(
+                              title: "7 hari",
+                              days: 7,
+                              selectedDays: controller.days.value,
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            FilterRentang(
+                              title: "30 hari",
+                              days: 30,
+                              selectedDays: controller.days.value,
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            FilterRentang(
+                              title: "6 bulan",
+                              days: 180,
+                              selectedDays: controller.days.value,
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            FilterRentang(
+                              title: "1 tahun",
+                              days: 365,
+                              selectedDays: controller.days.value,
+                            ),
+                          ],
                         ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        FilterJenis(
-                          active: false,
-                          title: "6 bulan",
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        FilterJenis(
-                          active: false,
-                          title: "1 tahun",
-                        ),
-                      ]),
+                      ),
                     ),
                   ),
                 ),
@@ -137,7 +133,8 @@ class TransactionsView extends GetView<TransactionsController> {
                               children: [Text("Transaksi kosong")],
                             )
                       : StickyGroupedListView(
-                          elements: controller.transactions.value,
+                          elements: controller
+                              .filteredTransaction(controller.filterBy.value),
                           itemComparator: (dynamic a, dynamic b) {
                             return double.parse(
                                         (a["createdAt"]["_seconds"] * 1000 +
@@ -161,10 +158,6 @@ class TransactionsView extends GetView<TransactionsController> {
                           },
                           itemBuilder: (BuildContext context, dynamic element) {
                             Widget item;
-
-                            print(Timestamp.fromMillisecondsSinceEpoch(
-                                    element["createdAt"]["_seconds"] * 1000)
-                                .toDate());
 
                             switch (element['type']) {
                               case 'topup':
@@ -247,6 +240,14 @@ class TransactionsView extends GetView<TransactionsController> {
                                               1000),
                                 );
                                 break;
+                              case 'prepaid':
+                                item = ItemTransaksiPrepaid(data: element);
+                                break;
+                              case 'postpaid':
+                                item = ItemTransaksiPostpaid(
+                                  data: element,
+                                );
+                                break;
                               default:
                                 item = ItemTransaksiBelanja();
                             }
@@ -322,10 +323,11 @@ class TransactionsView extends GetView<TransactionsController> {
                 // ),
                 onRefresh: () {
                   return TransactionProvider()
-                      .getUserTransactions()
+                      .getUserTransactions(controller.days.value)
                       .then((value) {
                     print("refresh");
-                    controller.getUserTransactions();
+                    controller.transactions.value = value.body;
+                    controller.transactions.refresh();
                   });
                 },
               ),
@@ -344,17 +346,28 @@ class TransactionsView extends GetView<TransactionsController> {
   }
 }
 
-class FilterJenis extends StatelessWidget {
-  const FilterJenis({Key? key, required this.active, required this.title})
+class FilterRentang extends StatelessWidget {
+  FilterRentang(
+      {Key? key,
+      required this.title,
+      required this.days,
+      required this.selectedDays})
       : super(key: key);
 
-  final bool active;
   final String title;
+  final int days;
+  final int selectedDays;
+  final transactionC = Get.find<TransactionsController>();
 
   @override
   Widget build(BuildContext context) {
     return TextButton(
-      onPressed: () {},
+      onPressed: () {
+        if (transactionC.days.value != days) {
+          transactionC.days.value = days;
+          transactionC.getUserTransactions();
+        }
+      },
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8),
         child: Row(
@@ -369,11 +382,57 @@ class FilterJenis extends StatelessWidget {
       style: ButtonStyle(
           shape: MaterialStateProperty.all(RoundedRectangleBorder(
             side: BorderSide(
-              color: active ? Color(0xFFFF9800) : Colors.grey.shade400,
+              color: transactionC.days.value == days
+                  ? Color(0xFFFF9800)
+                  : Colors.grey.shade400,
             ),
             borderRadius: BorderRadius.circular(15.0),
           )),
-          backgroundColor: active
+          backgroundColor: transactionC.days.value == days
+              ? MaterialStateProperty.all(Color(0xFFFFD89E))
+              : MaterialStateProperty.all(Color(0xFFE4E4E4))),
+    );
+  }
+}
+
+class FilterJenis extends StatelessWidget {
+  FilterJenis({Key? key, required this.code, required this.title})
+      : super(key: key);
+
+  final String code;
+  final String title;
+  final transactionC = Get.find<TransactionsController>();
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      onPressed: () {
+        if (transactionC.filterBy.value != code) {
+          transactionC.filterBy.value = code;
+          transactionC.getUserTransactions();
+        }
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: Row(
+          children: [
+            Text(
+              title,
+              style: TextStyle(color: Colors.black, fontSize: 12),
+            ),
+          ],
+        ),
+      ),
+      style: ButtonStyle(
+          shape: MaterialStateProperty.all(RoundedRectangleBorder(
+            side: BorderSide(
+              color: transactionC.filterBy.value == code
+                  ? Color(0xFFFF9800)
+                  : Colors.grey.shade400,
+            ),
+            borderRadius: BorderRadius.circular(15.0),
+          )),
+          backgroundColor: transactionC.filterBy.value == code
               ? MaterialStateProperty.all(Color(0xFFFFD89E))
               : MaterialStateProperty.all(Color(0xFFE4E4E4))),
     );

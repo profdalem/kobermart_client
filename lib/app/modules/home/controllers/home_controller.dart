@@ -1,4 +1,4 @@
-import 'dart:convert';
+// ignore_for_file: invalid_use_of_protected_member
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -15,6 +15,7 @@ class HomeController extends GetxController {
 
   var name = "".obs;
   var id = "".obs;
+  var user;
 
   var balance = 0.obs;
   var cashback = 0.obs;
@@ -65,13 +66,15 @@ class HomeController extends GetxController {
     sortedDownlines.value = temp;
   }
 
-  Future<void> getBalance() async {
-    await UserProvider().getBalance(box.read("token")).then((value) {
-      // print(value.body);
+  Future<int> getBalance() async {
+    int result = 0;
+    await UserProvider().getBalance().then((value) {
       if (value.body["balance"] != null) {
         balance.value = value.body["balance"];
+        result = balance.value;
       }
     });
+    return result;
   }
 
   Future<void> getCashback() async {
@@ -110,12 +113,18 @@ class HomeController extends GetxController {
 
   Future<void> getInitialData() async {
     if (devMode) print("starting getInitialData");
+
     isLoading.value = true;
     final stopwatch = Stopwatch();
     stopwatch.start();
+
     await UserProvider().getInitialData().then((value) {
       if (value.body["user"] != null) {
         name.value = value.body["user"]["name"];
+      }
+
+      if (value.body["user"] != null) {
+        user = value.body["user"];
       }
 
       if (value.body["id"] != null) {

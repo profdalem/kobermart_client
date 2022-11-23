@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,13 +5,15 @@ import 'package:flutter_svg/svg.dart';
 
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:kobermart_client/app/modules/home/controllers/home_controller.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/style.dart';
 
 import '../controllers/tokendetail_controller.dart';
 
 class TokendetailView extends GetView<TokendetailController> {
-  const TokendetailView({Key? key}) : super(key: key);
+  TokendetailView({Key? key}) : super(key: key);
+  final homeC = Get.find<HomeController>();
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +29,7 @@ class TokendetailView extends GetView<TokendetailController> {
           Get.arguments["data"]["memberData"]["tokenCreatedAt"]
               ["_nanoseconds"]);
     }
+
     return Scaffold(
         backgroundColor: Color(0xFFF4F4F4),
         appBar: AppBar(
@@ -76,10 +78,10 @@ class TokendetailView extends GetView<TokendetailController> {
                                   GestureDetector(
                                       onTap: () {
                                         Clipboard.setData(
-                                                ClipboardData(text: tokenCode))
-                                            .then((value) => Get.snackbar(
-                                                "Berhasil",
-                                                "Token berhasil disalin"));
+                                          ClipboardData(text: tokenCode),
+                                        ).then((value) => Get.snackbar(
+                                            "Berhasil",
+                                            "Token berhasil disalin"));
                                       },
                                       child: Text(
                                         "Salin",
@@ -111,14 +113,17 @@ class TokendetailView extends GetView<TokendetailController> {
                                 style: TextStyle(fontSize: 18),
                               )),
                           sb15,
-                          Container(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                                onPressed: () {
-                                  Get.toNamed(Routes.REGISTRATION);
-                                },
-                                child: Text("Isi Data Anggota")),
-                          )
+                          if (creator == homeC.id.value ||
+                              Get.arguments["data"]["upline"] == homeC.id.value)
+                            Container(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                  onPressed: () {
+                                    Get.toNamed(Routes.REGISTRATION,
+                                        arguments: {"tokenCode": tokenCode});
+                                  },
+                                  child: Text("Isi Data Anggota")),
+                            )
                         ]),
                   ),
                 ),

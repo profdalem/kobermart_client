@@ -4,6 +4,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:kobermart_client/app/modules/home/views/home_view.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:kobermart_client/config.dart';
 import 'package:kobermart_client/firebase.dart';
 
 class AuthController extends GetxController {
@@ -32,6 +33,8 @@ class AuthController extends GetxController {
 
   Future<void> logout() async {
     box.remove("token");
+    box.remove("email");
+    box.remove("password");
     FirebaseAuth.instance.signOut();
     Get.offAllNamed(Routes.LOGIN);
   }
@@ -44,12 +47,16 @@ class AuthController extends GetxController {
         if (value.docs[0]["active"]) {
           FirebaseAuth.instance
               .signInWithEmailAndPassword(email: email, password: password)
-              .then((value) {
+              .then((value) async {
             loading.value = false;
             isAuth.value = true;
-            FirebaseAuth.instance.currentUser!
-                .getIdToken(true)
-                .then((value) => print(value));
+            // await box.write("email", email);
+            // await box.write("password", password);
+            if (devMode)
+              FirebaseAuth.instance.currentUser!.getIdToken(true).then((value) {
+                print(value);
+                // box.write("token", value);
+              });
 
             Get.defaultDialog(
                 barrierDismissible: false,
@@ -60,7 +67,7 @@ class AuthController extends GetxController {
                   ],
                 ));
 
-            Future.delayed(Duration(seconds: 1)).then((value) =>
+            Future.delayed(Duration(milliseconds: 500)).then((value) =>
                 Get.off(() => HomeView(), transition: Transition.zoom));
           }).catchError((error) {
             var message = "";

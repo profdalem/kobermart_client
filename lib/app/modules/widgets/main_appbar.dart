@@ -42,10 +42,10 @@ class DefaultAppBar extends StatelessWidget {
           : Text(pageTitle),
       actions: [
         IconButton(
-            onPressed: () {
+            onPressed: () async {
               // productC.getAllProduct();
               // productC.getAllCarts();
-              homeC.getInitialData();
+              await homeC.getInitialData();
               // homeC.getDownlines();
             },
             icon: Icon(Icons.refresh)),

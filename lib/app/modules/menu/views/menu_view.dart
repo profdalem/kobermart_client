@@ -1,6 +1,4 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:kobermart_client/app/controllers/auth_controller.dart';
@@ -46,7 +44,9 @@ class MenuView extends GetView<MenuController> {
                   //     "https://i.pravatar.cc/150?img=1"),
                 ),
                 title: PanelTitle(title: homeC.name.value),
-                subtitle: Text("Referal ID: -"),
+                subtitle: homeC.user == null
+                    ? Text("Referral ID: -")
+                    : Text("Referral ID: ${homeC.user["refid"]}"),
                 trailing: IconButton(
                   icon: Icon(Icons.logout_rounded),
                   onPressed: () {

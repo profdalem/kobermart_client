@@ -1,14 +1,13 @@
+// ignore_for_file: invalid_use_of_protected_member
+
 import 'package:badges/badges.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/style.dart';
-import 'package:username_gen/username_gen.dart';
 
 import '../controllers/tokenlist_controller.dart';
 
@@ -99,8 +98,34 @@ class TokenlistView extends GetView<TokenlistController> {
                                         child: ListTile(
                                           contentPadding: EdgeInsets.symmetric(
                                               vertical: 0, horizontal: 15),
-                                          onTap: () {
-                                            Get.toNamed(Routes.TOKENDETAIL);
+                                          onTap: () async {
+                                            if (!(getTokens(controller
+                                                    .keyword.value))[index]
+                                                ["memberData"]["opened"]) {
+                                              await FirebaseFirestore.instance
+                                                  .collection("members")
+                                                  .doc((getTokens(controller.keyword.value))[index]
+                                                      ["id"])
+                                                  .set({
+                                                "opened": true
+                                              }, SetOptions(merge: true)).then(
+                                                      (value) => Get.toNamed(
+                                                              Routes.TOKENDETAIL,
+                                                              arguments: {
+                                                                "data": (getTokens(
+                                                                    controller
+                                                                        .keyword
+                                                                        .value))[index]
+                                                              }));
+                                              controller.homeC.getDownlines();
+                                            } else {
+                                              Get.toNamed(Routes.TOKENDETAIL,
+                                                  arguments: {
+                                                    "data": (getTokens(
+                                                        controller.keyword
+                                                            .value))[index]
+                                                  });
+                                            }
                                           },
                                           leading: Badge(
                                             badgeColor: Colors.amber,
@@ -162,71 +187,77 @@ class TokenlistView extends GetView<TokenlistController> {
                             ),
                           ),
                           sb10,
-                          Obx(() =>
-                              getRegisteredTokens(controller.keyword.value)
-                                      .isEmpty
-                                  ? Center(child: Text("Kosong"))
-                                  : Column(
-                                      children: List.generate(
-                                        getRegisteredTokens(
-                                                controller.keyword.value)
-                                            .length,
-                                        (index) => Padding(
-                                          padding:
-                                              const EdgeInsets.only(bottom: 12),
-                                          child: Container(
-                                            decoration: Shadow1(),
-                                            child: ListTile(
-                                              contentPadding:
-                                                  EdgeInsets.symmetric(
-                                                      vertical: 0,
-                                                      horizontal: 15),
-                                              onTap: () {
-                                                Get.toNamed(Routes.TOKENDETAIL);
-                                              },
-                                              leading: Badge(
-                                                badgeColor: Colors.amber,
-                                                showBadge: false,
-                                                padding: EdgeInsets.all(8),
-                                                child: CircleAvatar(
-                                                  child: Icon(Icons.person),
-                                                  // backgroundImage:
-                                                  //     CachedNetworkImageProvider(
-                                                  //         "https://i.pravatar.cc/150?img=${index + 10}"),
-                                                ),
-                                              ),
-                                              title: Text(
-                                                getRegisteredTokens(controller
-                                                        .keyword.value)[index]
-                                                    ["memberData"]["name"],
-                                                style: TextStyle(
-                                                  fontSize: 20,
-                                                ),
-                                              ),
-                                              subtitle: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  // Text("16 Juni 2022 13.45 WITA"),
-                                                  Text(
-                                                      "Upline: ${getRegisteredTokens(controller.keyword.value)[index]["uplineData"]["name"]}"),
-                                                ],
-                                              ),
-                                              trailing: ItemMenu(
-                                                tokenCode: getRegisteredTokens(
-                                                        controller.keyword
-                                                            .value)[index]
-                                                    ["memberData"]["tokenCode"],
-                                                tokenUsed: getRegisteredTokens(
-                                                        controller.keyword
-                                                            .value)[index]
-                                                    ["tokenUsed"],
-                                              ),
+                          Obx(() => getRegisteredTokens(
+                                      controller.keyword.value)
+                                  .isEmpty
+                              ? Center(child: Text("Kosong"))
+                              : Column(
+                                  children: List.generate(
+                                    getRegisteredTokens(
+                                            controller.keyword.value)
+                                        .length,
+                                    (index) => Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 12),
+                                      child: Container(
+                                        decoration: Shadow1(),
+                                        child: ListTile(
+                                          contentPadding: EdgeInsets.symmetric(
+                                              vertical: 0, horizontal: 15),
+                                          onTap: () {
+                                            Get.toNamed(Routes.MEMBERPROFILE,
+                                                arguments: {
+                                                  "name": getRegisteredTokens(
+                                                          controller.keyword
+                                                              .value)[index]
+                                                      ["memberData"]["name"],
+                                                  "id": getRegisteredTokens(
+                                                      controller.keyword
+                                                          .value)[index]["id"]
+                                                });
+                                          },
+                                          leading: Badge(
+                                            badgeColor: Colors.amber,
+                                            showBadge: false,
+                                            padding: EdgeInsets.all(8),
+                                            child: CircleAvatar(
+                                              child: Icon(Icons.person),
+                                              // backgroundImage:
+                                              //     CachedNetworkImageProvider(
+                                              //         "https://i.pravatar.cc/150?img=${index + 10}"),
                                             ),
+                                          ),
+                                          title: Text(
+                                            getRegisteredTokens(controller
+                                                    .keyword.value)[index]
+                                                ["memberData"]["name"],
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                            ),
+                                          ),
+                                          subtitle: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              // Text("16 Juni 2022 13.45 WITA"),
+                                              Text(
+                                                  "Upline: ${getRegisteredTokens(controller.keyword.value)[index]["uplineData"]["name"]}"),
+                                            ],
+                                          ),
+                                          trailing: ItemMenu(
+                                            tokenCode: getRegisteredTokens(
+                                                    controller
+                                                        .keyword.value)[index]
+                                                ["memberData"]["tokenCode"],
+                                            tokenUsed: getRegisteredTokens(
+                                                controller.keyword
+                                                    .value)[index]["tokenUsed"],
                                           ),
                                         ),
                                       ),
-                                    )),
+                                    ),
+                                  ),
+                                )),
                         ],
                       )),
               ),
@@ -265,28 +296,31 @@ class ItemMenu extends StatelessWidget {
             ),
           ),
         ),
-        PopupMenuItem<String>(
-          value: "register",
-          child: ListTile(
-            leading: const Icon(Icons.person_add),
-            title: Text(
-              "Isi data",
+        if (!tokenUsed)
+          PopupMenuItem<String>(
+            value: "register",
+            enabled: !tokenUsed,
+            child: ListTile(
+              leading: const Icon(Icons.person_add),
+              title: Text(
+                "Isi data",
+              ),
             ),
           ),
-        ),
-        const PopupMenuDivider(),
-        PopupMenuItem<String>(
-          value: "hapus",
-          enabled: !tokenUsed,
-          child: ListTile(
-            iconColor: Colors.red.shade400,
-            textColor: Colors.red.shade400,
-            leading: const Icon(Icons.delete),
-            title: Text(
-              "Hapus",
+        if (!tokenUsed) const PopupMenuDivider(),
+        if (!tokenUsed)
+          PopupMenuItem<String>(
+            value: "hapus",
+            enabled: !tokenUsed,
+            child: ListTile(
+              iconColor: Colors.red.shade400,
+              textColor: Colors.red.shade400,
+              leading: const Icon(Icons.delete),
+              title: Text(
+                "Hapus",
+              ),
             ),
           ),
-        ),
       ],
     );
   }

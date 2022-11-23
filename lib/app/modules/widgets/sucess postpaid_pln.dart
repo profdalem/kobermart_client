@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/style.dart';
 
-import '../../routes/app_pages.dart';
-
-class SuccessBuynowPage extends StatelessWidget {
+class SuccessPostpaidPlnPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -37,13 +36,16 @@ class SuccessBuynowPage extends StatelessWidget {
                 SizedBox(
                   height: 20,
                 ),
-                Text(
-                  "Transaksi berhasil!",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: Get.width * 0.08),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: Text(
+                    "Pembayaran Tagihan Listrik anda berhasil!",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: Get.width * 0.08),
+                  ),
                 ),
                 SizedBox(
                   height: 50,
@@ -52,7 +54,10 @@ class SuccessBuynowPage extends StatelessWidget {
                   width: Get.width - 30,
                   height: 50,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Get.toNamed(Routes.TRANSACTIONS,
+                          arguments: {"refresh": true});
+                    },
                     child: PanelTitle(title: "Lihat Transaksi"),
                     style: ButtonStyle(
                         backgroundColor:

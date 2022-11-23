@@ -8,7 +8,7 @@ class TransactionProvider extends GetConnect {
     httpClient.baseUrl = mainUrl;
   }
 
-  Future<Response> getUserTransactions() async {
+  Future<Response> getUserTransactions(int days) async {
     String token = "";
     httpClient.timeout = Duration(seconds: 30);
 
@@ -17,7 +17,7 @@ class TransactionProvider extends GetConnect {
         .then((value) => {token = value});
 
     return get(
-      "${mainUrl}api/transaction/${await FirebaseAuth.instance.currentUser!.uid}",
+      "${mainUrl}api/transaction/${await FirebaseAuth.instance.currentUser!.uid}/${days.toString()}",
       headers: {
         "Authorization": "Bearer $token",
       },

@@ -31,6 +31,17 @@ class UserProvider extends GetConnect {
         headers: {"Authorization": "Bearer ${token}"});
   }
 
+  Future<Response> getMemberProfile(String id) async {
+    String token = "";
+    httpClient.timeout = Duration(seconds: 30);
+
+    await FirebaseAuth.instance.currentUser?.getIdToken(true).then((value) {
+      token = value;
+    });
+    return get("${mainUrl}api/client/memberprofile/${id}",
+        headers: {"Authorization": "Bearer ${token}"});
+  }
+
   Future<Response> getDownlines() async {
     String token = "";
     httpClient.timeout = Duration(seconds: 30);
@@ -42,7 +53,13 @@ class UserProvider extends GetConnect {
         headers: {"Authorization": "Bearer ${token}"});
   }
 
-  Future<Response> getBalance(String token) {
+  Future<Response> getBalance() async {
+    String token = "";
+    httpClient.timeout = Duration(seconds: 30);
+
+    await FirebaseAuth.instance.currentUser?.getIdToken(true).then((value) {
+      token = value;
+    });
     return get("${mainUrl}api/balance/mybalance",
         headers: {"Authorization": "Bearer ${token}"});
   }

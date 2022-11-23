@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -64,7 +62,7 @@ class TopupView extends GetView<TopupController> {
                                   // isDense: true,
                                   contentPadding: EdgeInsets.all(12)),
                               inputFormatters: <TextInputFormatter>[
-                                FilteringTextInputFormatter.digitsOnly
+                                FilteringTextInputFormatter.digitsOnly,
                               ],
                               onChanged: (value) {
                                 if (value.isNotEmpty) {

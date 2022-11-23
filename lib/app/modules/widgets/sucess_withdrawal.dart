@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:kobermart_client/app/modules/home/views/home_view.dart';
 import 'package:kobermart_client/style.dart';
 
 import '../../routes/app_pages.dart';

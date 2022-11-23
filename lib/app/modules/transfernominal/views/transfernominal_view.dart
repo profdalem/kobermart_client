@@ -175,59 +175,58 @@ class TransfernominalView extends GetView<TransfernominalController> {
           ),
         ),
         bottomNavigationBar: Container(
-            color: Colors.white,
-            height: Get.height * 0.08,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Expanded(flex: 2, child: SizedBox()),
-                Expanded(
-                  flex: 5,
-                  child: ElevatedButton(
-                      onPressed: () {
-                        Get.back();
-                      },
-                      child: Text("Kembali"),
-                      style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(Colors.grey))),
-                ),
-                Expanded(flex: 2, child: SizedBox()),
-                Expanded(
-                  flex: 5,
-                  child: Obx(() => ElevatedButton(
-                      onPressed: () {
-                        controller.jumlah.value > controller.saldo.value ||
-                                controller.jumlah < 10000
-                            ? print("")
-                            : Get.off(
-                                () => SuccessTransferPage(),
-                              );
+          color: Colors.white,
+          height: Get.height * 0.08,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Expanded(flex: 2, child: SizedBox()),
+              Expanded(
+                flex: 5,
+                child: ElevatedButton(
+                    onPressed: () {
+                      Get.back();
+                    },
+                    child: Text("Kembali"),
+                    style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all(Colors.grey))),
+              ),
+              Expanded(flex: 2, child: SizedBox()),
+              Expanded(
+                flex: 5,
+                child: Obx(() => ElevatedButton(
+                    onPressed: () {
+                      controller.jumlah.value > controller.saldo.value ||
+                              controller.jumlah < 10000
+                          ? print("")
+                          : Get.off(
+                              () => SuccessTransferPage(),
+                            );
 
-                        controller.jumlah < 10000
-                            ? Get.defaultDialog(
-                                title: "Nominal kurang",
-                                content:
-                                    Text("Jumlah transfer minimal Rp10.000"),
-                                cancel: TextButton(
-                                    onPressed: () {
-                                      Get.back();
-                                    },
-                                    child: Text("Tutup")))
-                            : print("");
-                      },
-                      child: Text("Kirim"),
-                      style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(
-                              controller.jumlah.value >
-                                          controller.saldo.value ||
-                                      controller.jumlah < 10000
-                                  ? Colors.grey
-                                  : Colors.amber.shade700)))),
-                ),
-                Expanded(flex: 2, child: SizedBox()),
-              ],
-            )),
+                      controller.jumlah < 10000
+                          ? Get.defaultDialog(
+                              title: "Nominal kurang",
+                              content: Text("Jumlah transfer minimal Rp10.000"),
+                              cancel: TextButton(
+                                  onPressed: () {
+                                    Get.back();
+                                  },
+                                  child: Text("Tutup")))
+                          : print("");
+                    },
+                    child: Text("Kirim"),
+                    style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(
+                            controller.jumlah.value > controller.saldo.value ||
+                                    controller.jumlah < 10000
+                                ? Colors.grey
+                                : Colors.amber.shade700)))),
+              ),
+              Expanded(flex: 2, child: SizedBox()),
+            ],
+          ),
+        ),
       ),
     );
   }

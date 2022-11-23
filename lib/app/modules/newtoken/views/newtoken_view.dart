@@ -1,12 +1,11 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
+// ignore_for_file: invalid_use_of_protected_member
 
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kobermart_client/app/controllers/auth_controller.dart';
 import 'package:kobermart_client/app/modules/home/controllers/home_controller.dart';
 import 'package:kobermart_client/app/modules/widgets/success_token.dart';
 import 'package:kobermart_client/style.dart';
-import 'package:username_gen/username_gen.dart';
 
 import '../controllers/newtoken_controller.dart';
 

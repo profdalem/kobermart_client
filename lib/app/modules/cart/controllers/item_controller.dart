@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kobermart_client/app/controllers/product_controller.dart';
 import 'package:kobermart_client/app/modules/cart/controllers/cart_controller.dart';
-import 'package:kobermart_client/app/modules/product/controllers/product_controller.dart';
 
 class ItemController extends GetxController {
   var cartC = Get.find<CartController>();

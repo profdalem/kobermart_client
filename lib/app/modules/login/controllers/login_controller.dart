@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:kobermart_client/app/controllers/auth_controller.dart';
-import 'package:kobermart_client/app/data/user_provider.dart';
-import 'package:kobermart_client/app/routes/app_pages.dart';
 
 class LoginController extends GetxController {
   final authC = Get.find<AuthController>();
@@ -20,6 +18,7 @@ class LoginController extends GetxController {
   void onInit() {
     emailC = TextEditingController();
     passwordC = TextEditingController();
+    checkToken();
     emailC.text = "kobermart@gmail.com";
     passwordC.text = "123456";
     super.onInit();
@@ -39,6 +38,9 @@ class LoginController extends GetxController {
   }
 
   void checkToken() {
+    print("storage data:");
     print(box.read("token"));
+    print(box.read("email"));
+    print(box.read("password"));
   }
 }

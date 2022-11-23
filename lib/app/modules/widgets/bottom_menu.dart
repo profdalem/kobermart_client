@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:kobermart_client/app/modules/members/views/members_view.dart';
-import 'package:kobermart_client/app/modules/transactions/views/transactions_view.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/style.dart';
-
-import '../home/views/home_view.dart';
-import '../shop/views/shop_view.dart';
 
 class BottomNav extends StatelessWidget {
   const BottomNav({

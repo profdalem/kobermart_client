@@ -10,6 +10,22 @@ class MemberProvider extends GetConnect {
     httpClient.baseUrl = mainUrl;
   }
 
+  Future<Response> setMember(var body) async {
+    var token;
+
+    await FirebaseAuth.instance.currentUser
+        ?.getIdToken(true)
+        .then((value) => {token = value});
+
+    return post(
+      "${mainUrl}api/member/member",
+      body,
+      headers: {
+        "Authorization": "Bearer ${token}",
+      },
+    );
+  }
+
   Future<Response> newToken(String upline, String ref) async {
     var token;
 
@@ -21,6 +37,7 @@ class MemberProvider extends GetConnect {
       "upline": upline,
       "ref": ref,
     });
+
     return post(
       "${mainUrl}api/member/token",
       body,

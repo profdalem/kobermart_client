@@ -36,6 +36,8 @@ abstract class Routes {
   static const TRASHBANK = _Paths.TRASHBANK;
   static const INVESTMENT = _Paths.INVESTMENT;
   static const PPOB = _Paths.PPOB;
+  static const TRXDETAIL_PREPAID = _Paths.TRXDETAIL_PREPAID;
+  static const TRXDETAIL_POSTPAID = _Paths.TRXDETAIL_POSTPAID;
 }
 
 abstract class _Paths {
@@ -73,4 +75,6 @@ abstract class _Paths {
   static const TRASHBANK = '/trashbank';
   static const INVESTMENT = '/investment';
   static const PPOB = '/ppob';
+  static const TRXDETAIL_PREPAID = '/trxdetail-prepaid';
+  static const TRXDETAIL_POSTPAID = '/trxdetail-postpaid';
 }

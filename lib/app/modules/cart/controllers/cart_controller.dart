@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-import 'package:kobermart_client/app/controllers/product_controller.dart';
 
 class CartController extends GetxController {
   RxList carts = [].obs;

@@ -4,8 +4,6 @@ import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:kobermart_client/app/controllers/product_controller.dart';
-import 'package:kobermart_client/app/modules/product/controllers/product_controller.dart';
 import 'app/controllers/auth_controller.dart';
 import 'app/modules/widgets/splashscreen.dart';
 import 'app/routes/app_pages.dart';
@@ -22,12 +20,11 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   final authC = Get.put(AuthController(), permanent: true);
-  final productC = Get.put(MainProductController(), permanent: true);
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: Future.delayed(Duration(seconds: 1)),
+      future: Future.delayed(Duration(milliseconds: 500)),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           return Obx(() => GetMaterialApp(
@@ -46,14 +43,6 @@ class MyApp extends StatelessWidget {
           future: authC.firstInitialized(),
           builder: (context, snapshot) => SplashScreen(),
         );
-
-        // return GetMaterialApp(
-        //   debugShowCheckedModeBanner: false,
-        //   title: "Kobermart Client App",
-        //   initialRoute: AppPages.INITIAL,
-        //   getPages: AppPages.routes,
-        //   defaultTransition: Transition.rightToLeft,
-        // );
       },
     );
   }
