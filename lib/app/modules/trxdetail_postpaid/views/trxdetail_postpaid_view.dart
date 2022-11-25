@@ -1,15 +1,11 @@
 // ignore_for_file: invalid_return_type_for_catch_error
-
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/svg.dart';
 
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:kobermart_client/app/data/iakpostpaid_provider.dart';
-import 'package:kobermart_client/app/modules/widgets/sucess%20postpaid_pln.dart';
 
 import '../../../../style.dart';
 import '../../../routes/app_pages.dart';
@@ -50,6 +46,12 @@ class TrxdetailPostpaidView extends GetView<TrxdetailPostpaidController> {
       case "PAYMENT SUCCESS":
         status = 4;
 
+        break;
+      case "PEMBAYARAN GAGAL":
+        status = 7;
+        break;
+      case "PENDING / TRANSAKSI SEDANG DIPROSES":
+        status = 2;
         break;
       default:
         status = 1;
@@ -335,26 +337,36 @@ class TrxdetailPostpaidView extends GetView<TrxdetailPostpaidController> {
                     SizedBox(
                       height: 30,
                     ),
-                    Container(
-                      width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          print("bayar");
-                          await IakpostpaidProvider()
-                              .setPayment(
-                                  data["tr_id"], data["ref_id"], data["hp"])
-                              .then((value) {
-                            print(value.body);
-                            // Get.off(() => SuccessPostpaidPlnPage());
-                          }).catchError((err) => {print(err)});
-                        },
-                        style: ButtonStyle(
-                            minimumSize:
-                                MaterialStateProperty.all(Size(30, 60))),
-                        child: Text("Bayar Sekarang"),
+                    if (status == 1)
+                      Container(
+                        width: double.infinity,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            print("bayar");
+                            await IakpostpaidProvider()
+                                .setPayment(
+                                    data["tr_id"], data["ref_id"], data["hp"])
+                                .then((value) {
+                              print(value.body);
+                              if (value.body["code"] == 400) {
+                                Get.defaultDialog(
+                                    title: "Gagal",
+                                    content: Text(value.body["message"]));
+                              } else {
+                                Get.offNamed(Routes.TRANSACTIONS,
+                                    arguments: {"refresh": true});
+                              }
+                            }).catchError(
+                              (err) => {print(err)},
+                            );
+                          },
+                          style: ButtonStyle(
+                              minimumSize:
+                                  MaterialStateProperty.all(Size(30, 60))),
+                          child: Text("Bayar Sekarang"),
+                        ),
                       ),
-                    ),
                     Container(
                       width: Get.width,
                       child: Padding(

@@ -96,23 +96,27 @@ class LoginView extends GetView<LoginController> {
                       child: ElevatedButton(
                         clipBehavior: Clip.antiAlias,
                         onPressed: () async {
-                          authC.loading.value = true;
-                          if (controller.emailC.text.isNotEmpty &&
-                              controller.passwordC.text.isNotEmpty) {
-                            GetUtils.isEmail(controller.emailC.text)
-                                ? await authC
-                                    .login(controller.emailC.text,
-                                        controller.passwordC.text)
-                                    .then(
-                                        (value) => authC.loading.value = false)
-                                : Get.defaultDialog(
-                                    title: "Error",
-                                    content: Text("Email tidak valid"));
-                          } else {
-                            Get.defaultDialog(
-                                title: "Error",
-                                content:
-                                    Text("Email dan password harus diisi"));
+                          if (authC.loading.value == false) {
+                            authC.loading.value = true;
+                            if (controller.emailC.text.isNotEmpty &&
+                                controller.passwordC.text.isNotEmpty) {
+                              GetUtils.isEmail(controller.emailC.text)
+                                  ? await authC
+                                      .login(controller.emailC.text,
+                                          controller.passwordC.text)
+                                      .then((value) =>
+                                          authC.loading.value = false)
+                                  : Get.defaultDialog(
+                                      title: "Error",
+                                      content: Text("Email tidak valid"));
+                              authC.loading.value = false;
+                            } else {
+                              authC.loading.value = false;
+                              Get.defaultDialog(
+                                  title: "Error",
+                                  content:
+                                      Text("Email dan password harus diisi"));
+                            }
                           }
                         },
                         child: Obx(() => Container(

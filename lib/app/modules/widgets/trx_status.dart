@@ -30,6 +30,9 @@ class TrxStatus extends StatelessWidget {
       case 6:
         return pillShape("batal", Colors.red.shade300, Colors.red.shade500,
             borderRadius, padding, fontsize);
+      case 7:
+        return pillShape("gagal", Colors.red.shade300, Colors.red.shade500,
+            borderRadius, padding, fontsize);
       default:
         return pillShape("belum dibayar", Colors.grey.shade200,
             Colors.grey.shade300, borderRadius, padding, fontsize);

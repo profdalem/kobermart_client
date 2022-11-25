@@ -119,7 +119,7 @@ class HomeView extends GetView {
                             padding: EdgeInsets.only(
                                 top: 15, left: 15, right: 15, bottom: 10),
                             child: Container(
-                              height: Get.width * 0.33,
+                              // height: Get.width * 0.33,
                               child: Obx(
                                 () => authC.isAuth.value
                                     ? InfoCepat()
@@ -408,64 +408,61 @@ class InfoCepat extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    Expanded(
-                        child: Container(
-                      child: InfoItem(
-                        imgUrl: "saldo",
-                        title: "Saldo",
-                        content:
-                            "Rp ${NumberFormat("#,##0", "id_ID").format(controller.balance.value)}",
-                      ),
-                    )),
-                    SizedBox(
-                      width: 20,
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          child: InfoItem(
+                            imgUrl: "saldo",
+                            title: "Saldo",
+                            content:
+                                "Rp ${NumberFormat("#,##0", "id_ID").format(controller.balance.value)}",
+                          ),
+                        ),
+                        sb10,
+                        Container(
+                          child: InfoItem(
+                            imgUrl: "cashback",
+                            title: "Cashback",
+                            content:
+                                "Rp ${NumberFormat("#,##0", "id_ID").format(controller.cashback.value)}",
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(
+                              left: MediaQuery.of(context).size.width * 0.08),
+                          child: Text(
+                            DateFormat.yMMMM('id_ID').format(DateTime.now()),
+                            style: TextStyle(fontSize: 10),
+                          ),
+                        )
+                      ],
                     ),
-                    Expanded(
-                        child: Container(
-                      child: InfoItem(
-                        imgUrl: "anggota",
-                        title: "Anggota",
-                        content: "${controller.anggota.value.toString()} orang",
-                      ),
-                    )),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          child: InfoItem(
+                            imgUrl: "anggota",
+                            title: "Anggota",
+                            content:
+                                "${controller.anggota.value.toString()} orang",
+                          ),
+                        ),
+                        sb10,
+                        Container(
+                          child: InfoItem(
+                            imgUrl: "kd",
+                            title: "Kedalaman",
+                            content: "KD${controller.kd.value.toString()}",
+                          ),
+                        )
+                      ],
+                    ),
                   ],
                 ),
-                SizedBox(
-                  height: 15,
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                        child: Container(
-                      child: InfoItem(
-                        imgUrl: "cashback",
-                        title: "Cashback",
-                        content:
-                            "Rp ${NumberFormat("#,##0", "id_ID").format(controller.cashback.value)}",
-                      ),
-                    )),
-                    SizedBox(
-                      width: 20,
-                    ),
-                    Expanded(
-                        child: Container(
-                      child: InfoItem(
-                        imgUrl: "kd",
-                        title: "Kedalaman",
-                        content: "KD${controller.kd.value.toString()}",
-                      ),
-                    ))
-                  ],
-                ),
-                Padding(
-                  padding: EdgeInsets.only(
-                      left: MediaQuery.of(context).size.width * 0.08),
-                  child: Text(
-                    DateFormat.yMMMM('id_ID').format(DateTime.now()),
-                    style: TextStyle(fontSize: 10),
-                  ),
-                )
               ],
             ),
     );

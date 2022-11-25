@@ -276,15 +276,21 @@ class PanelKedalaman extends StatelessWidget {
                                                   ? item.members[index]
                                                       ["memberData"]["name"]
                                                   : (FirebaseAuth
-                                                              .instance
-                                                              .currentUser!
-                                                              .uid ==
-                                                          item.members[index]
-                                                                  ["memberData"]
-                                                              ["tokenCreator"]
+                                                                  .instance
+                                                                  .currentUser!
+                                                                  .uid ==
+                                                              item.members[index]
+                                                                      ["memberData"][
+                                                                  "tokenCreator"] ||
+                                                          FirebaseAuth
+                                                                  .instance
+                                                                  .currentUser!
+                                                                  .uid ==
+                                                              item.members[index]
+                                                                      ["memberData"]
+                                                                  ["upline"]
                                                       ? item.members[index]
-                                                              ["memberData"]
-                                                          ["tokenCode"]
+                                                          ["memberData"]["tokenCode"]
                                                       : "?"),
                                               overflow: TextOverflow.ellipsis,
                                               maxLines: 1,

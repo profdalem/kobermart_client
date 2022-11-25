@@ -59,13 +59,12 @@ class AuthController extends GetxController {
               });
 
             Get.defaultDialog(
-                barrierDismissible: false,
                 content: Column(
-                  children: [
-                    Icon(Icons.check),
-                    Text("Login berhasil"),
-                  ],
-                ));
+              children: [
+                Icon(Icons.check),
+                Text("Login berhasil"),
+              ],
+            ));
 
             Future.delayed(Duration(milliseconds: 500)).then((value) =>
                 Get.off(() => HomeView(), transition: Transition.zoom));

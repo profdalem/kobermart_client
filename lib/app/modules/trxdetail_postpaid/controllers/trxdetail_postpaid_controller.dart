@@ -1,8 +1,6 @@
 import 'package:get/get.dart';
 
 class TrxdetailPostpaidController extends GetxController {
-  //TODO: Implement TrxdetailPostpaidController
-
   final count = 0.obs;
   @override
   void onInit() {

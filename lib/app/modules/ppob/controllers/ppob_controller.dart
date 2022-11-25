@@ -1,4 +1,9 @@
+// ignore_for_file: dead_code, invalid_use_of_protected_member
+
+import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
+import 'package:path_provider/path_provider.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -14,8 +19,8 @@ import 'package:kobermart_client/style.dart';
 class PpobController extends GetxController
     with GetSingleTickerProviderStateMixin {
   final List<Tab> myTabs = <Tab>[
-    const Tab(text: 'Listrik'),
     const Tab(text: 'Paket Data'),
+    const Tab(text: 'Listrik'),
     const Tab(text: 'Pulsa'),
     const Tab(text: 'Internet/Wifi'),
     const Tab(text: 'PDAM'),
@@ -25,22 +30,35 @@ class PpobController extends GetxController
 
   late TabController tabC;
   late TextEditingController customerId;
+  late TextEditingController phoneNumber;
 
   var isLoading = false.obs;
   var isGetDataLoading = false.obs;
   var isProceedLoading = false.obs;
+
+  // Listrik PLN
   var nominalSelected = "".obs;
   var codeSelected = "".obs;
-  var tokenSelected = false.obs;
+  var tokenSelected = true.obs;
   var pricelistPln = [].obs;
+
+  // Paket Data
+  var paketDataOperator = "".obs;
+  var paketDataIcon = "".obs;
+  var paketDataNominalSelected = "0".obs;
+  var paketDataCodeSelected = "".obs;
+  var paketDataNameSelected = "".obs;
+  var paketDataPhoneNumberError = false.obs;
+  var pricelistPaketData = [].obs;
 
   @override
   void onInit() async {
     tabC = TabController(
         length: 5, vsync: this, animationDuration: Duration(milliseconds: 300));
     customerId = TextEditingController();
-    if (preFilled) customerId.text = "530000000001";
-    getPlnProduct();
+    phoneNumber = TextEditingController();
+    if (preFilled) customerId.text = "";
+    getProductData();
     super.onInit();
   }
 
@@ -52,6 +70,14 @@ class PpobController extends GetxController
   @override
   void onClose() {
     customerId.dispose();
+    phoneNumber.dispose();
+    paketDataOperator.close();
+    paketDataIcon.close();
+    paketDataNominalSelected.close();
+    paketDataCodeSelected.close();
+    paketDataNameSelected.close();
+    paketDataPhoneNumberError.close();
+    pricelistPaketData.close();
     super.onClose();
   }
 
@@ -66,20 +92,251 @@ class PpobController extends GetxController
         List.generate(len, (index) => _chars[r.nextInt(_chars.length)]).join();
   }
 
-  void getPlnProduct() async {
+  void getProductData() async {
     if (devMode) print("Starting getPlnProduct");
     var timer = new Stopwatch();
     timer.start();
     isGetDataLoading.value = true;
-    await IakprepaidProvider().getPlnProduct().then((value) {
-      // print(value.body);
-      pricelistPln.value = value.body;
-    });
+
+    var update = false;
+
+    final directory = await getApplicationDocumentsDirectory();
+    final File productPrepaidPlnFile =
+        File('${directory.path}/productPrepaidPln.json');
+    final File productPrepaidDataFile =
+        File('${directory.path}/productPrepaidData.json');
+
+    if (update) {
+      await IakprepaidProvider()
+          .getPaketDataPricelist()
+          .then((value) => pricelistPaketData.value = value.body);
+      productPrepaidDataFile
+          .writeAsString(json.encode(pricelistPaketData.value));
+      await IakprepaidProvider()
+          .getPlnProduct()
+          .then((value) => pricelistPln.value = value.body);
+      productPrepaidPlnFile.writeAsString(json.encode(pricelistPln.value));
+    } else {
+      if (await productPrepaidDataFile.exists()) {
+        pricelistPaketData.value =
+            json.decode(await productPrepaidDataFile.readAsString());
+      } else {
+        await IakprepaidProvider()
+            .getPaketDataPricelist()
+            .then((value) => pricelistPaketData.value = value.body);
+        productPrepaidDataFile
+            .writeAsString(json.encode(pricelistPaketData.value));
+      }
+
+      if (await productPrepaidPlnFile.exists()) {
+        pricelistPln.value =
+            json.decode(await productPrepaidPlnFile.readAsString());
+      } else {
+        await IakprepaidProvider()
+            .getPlnProduct()
+            .then((value) => pricelistPln.value = value.body);
+        productPrepaidPlnFile.writeAsString(json.encode(pricelistPln.value));
+      }
+    }
+
     isGetDataLoading.value = false;
     Get.snackbar("Waktu getPlnProduct:", timer.elapsed.toString(),
         duration: Duration(seconds: 1));
+    pricelistPaketData.refresh();
     timer.stop();
     timer.reset();
+  }
+
+  void getOperator(int length, String prefix) {
+    var op = "";
+    // three
+    if (length == 4) {
+      switch (prefix) {
+        case "0896":
+          op = "three";
+          break;
+        case "0897":
+          op = "three";
+          break;
+        case "0898":
+          op = "three";
+          break;
+        case "0899":
+          op = "three";
+          break;
+        case "0895":
+          op = "three";
+          break;
+        // smartfren
+        case "0881":
+          op = "smartfren";
+          break;
+        case "0882":
+          op = "smartfren";
+          break;
+        case "0883":
+          op = "smartfren";
+          break;
+        case "0884":
+          op = "smartfren";
+          break;
+        case "0885":
+          op = "smartfren";
+          break;
+        case "0886":
+          op = "smartfren";
+          break;
+        case "0887":
+          op = "smartfren";
+          break;
+        case "0888":
+          op = "smartfren";
+          break;
+
+        //telkomsel
+        case "0812":
+          op = "tsel";
+          break;
+        case "0813":
+          op = "tsel";
+          break;
+        case "0852":
+          op = "tsel";
+          break;
+        case "0853":
+          op = "tsel";
+          break;
+        case "0821":
+          op = "tsel";
+          break;
+        case "0823":
+          op = "tsel";
+          break;
+        case "0822":
+          op = "tsel";
+          break;
+        case "0851":
+          op = "tsel";
+          break;
+        // axis
+        case "0838":
+          op = "axis";
+          break;
+        case "0837":
+          op = "axis";
+          break;
+        case "0831":
+          op = "axis";
+          break;
+        case "0832":
+          op = "axis";
+          break;
+        // XL
+        case "0817":
+          op = "xl";
+          break;
+        case "0818":
+          op = "xl";
+          break;
+        case "0819":
+          op = "xl";
+          break;
+        case "0859":
+          op = "xl";
+          break;
+        case "0878":
+          op = "xl";
+          break;
+        case "0877":
+          op = "xl";
+          break;
+        // indosat
+        case "0814":
+          op = "indosat";
+          break;
+        case "0815":
+          op = "indosat";
+          break;
+        case "0816":
+          op = "indosat";
+          break;
+        case "0855":
+          op = "indosat";
+          break;
+        case "0856":
+          op = "indosat";
+          break;
+        case "0857":
+          op = "indosat";
+          break;
+        case "0858":
+          op = "indosat";
+          break;
+        default:
+          op = "unknown";
+      }
+    } else if (length == 6) {
+      switch (prefix) {
+        case "085154":
+          op = "byu";
+          break;
+        case "085155":
+          op = "byu";
+          break;
+        case "085156":
+          op = "byu";
+          break;
+        case "085157":
+          op = "byu";
+          break;
+        case "085158":
+          op = "byu";
+          break;
+        default:
+      }
+    }
+
+    switch (op) {
+      case "axis":
+        paketDataOperator.value = "Axis Paket Internet";
+        paketDataIcon.value = "assets/images/operator/axis.png";
+        break;
+      case "byu":
+        paketDataOperator.value = "axis_paket_internet";
+        paketDataIcon.value = "assets/images/operator/byu.png";
+        break;
+      case "indosat":
+        paketDataOperator.value = "Indosat Paket Internet";
+        paketDataIcon.value = "assets/images/operator/indosat.png";
+        break;
+      case "smartfren":
+        paketDataOperator.value = "Smartfren Paket Internet";
+        paketDataIcon.value = "assets/images/operator/smart.png";
+        break;
+      case "tsel":
+        paketDataOperator.value = "Telkomsel Paket Internet";
+        paketDataIcon.value = "assets/images/operator/telkomsel.png";
+        break;
+      case "three":
+        paketDataOperator.value = "Three Paket Internet";
+        paketDataIcon.value = "assets/images/operator/three.png";
+        break;
+      case "xl":
+        paketDataOperator.value = "XL Paket Internet";
+        paketDataIcon.value = "assets/images/operator/xl.png";
+        break;
+      default:
+    }
+  }
+
+  List<dynamic> getPaketDataProductList(List pricelist, String operator) {
+    List result = [];
+    pricelist.forEach((element) {
+      if (element["product_description"] == operator) {
+        result.add(element);
+      }
+    });
+    return result;
   }
 
   void setPostpaidInquiryPln() async {
@@ -270,12 +527,16 @@ class PpobController extends GetxController
                                       nominalSelected.value,
                                       response["data"])
                                   .then((value) {
-                                if (value.body["code"] == 200) {
+                                if (value.statusCode != 400) {
                                   nominalSelected.value = "";
                                   codeSelected.value = "";
-                                  Get.offNamed(Routes.TRANSACTIONS,
-                                      arguments: {"refresh": true});
+                                  // Get.offNamed(Routes.TRANSACTIONS,
+                                  //     arguments: {"refresh": true});
+                                  Get.offNamed(Routes.TRXDETAIL_PREPAID,
+                                      arguments: {"data": value.body});
                                 } else {
+                                  nominalSelected.value = "";
+                                  codeSelected.value = "";
                                   Get.defaultDialog(
                                       title: "Gagal",
                                       content: Text(

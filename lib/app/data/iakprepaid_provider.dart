@@ -49,6 +49,7 @@ class IakprepaidProvider extends GetConnect {
 
   Future<Response> getPlnProduct() async {
     var token;
+    httpClient.timeout = Duration(seconds: 30);
 
     await FirebaseAuth.instance.currentUser
         ?.getIdToken(true)
@@ -56,6 +57,23 @@ class IakprepaidProvider extends GetConnect {
 
     return get(
       "${mainUrl}api/ppob/prepaid/pricelist/pln",
+      headers: {
+        "Authorization": "Bearer ${token}",
+      },
+    );
+  }
+
+  Future<Response> getPaketDataPricelist() async {
+    var token;
+    httpClient.timeout = Duration(seconds: 30);
+
+    await FirebaseAuth.instance.currentUser
+        ?.getIdToken(true)
+        .then((value) => {token = value});
+
+    return post(
+      "${mainUrl}api/ppob/prepaid/paketdata/operator",
+      {},
       headers: {
         "Authorization": "Bearer ${token}",
       },

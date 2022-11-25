@@ -1,5 +1,5 @@
 name: kobermart_client
-version: 1.2.2+5
+version: 1.2.3+6
 publish_to: none
 description: A new Flutter project.
 environment:
@@ -23,6 +23,7 @@ dependencies:
   google_fonts: ^3.0.1
   image_picker: ^0.8.6
   intl: ^0.17.0
+  path_provider: ^2.0.11
   qr_flutter: ^4.0.0
   sticky_grouped_list: ^3.1.0
   username_gen: ^1.0.4
@@ -51,6 +52,7 @@ flutter_icons:
 flutter:
   assets:
     - assets/images/
+    - assets/images/operator/
     - assets/logo/
     - assets/icons/
   uses-material-design: true

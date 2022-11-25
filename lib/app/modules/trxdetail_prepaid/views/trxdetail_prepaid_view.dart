@@ -32,7 +32,7 @@ class TrxdetailPrepaidView extends GetView {
         leading: IconButton(
             onPressed: () {
               // Get.offAllNamed(Routes.TRANSACTIONS);
-              Get.back();
+              Get.offNamed(Routes.TRANSACTIONS, arguments: {"refresh": true});
             },
             icon: Icon(Icons.close)),
         actions: [
@@ -194,8 +194,6 @@ class TrxDetailSerialNumber extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget result = SizedBox();
-    print(data);
-
     switch (data["rc"]) {
       case "00":
         result = Container(

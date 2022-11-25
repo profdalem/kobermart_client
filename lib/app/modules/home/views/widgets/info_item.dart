@@ -36,7 +36,7 @@ class InfoItem extends StatelessWidget {
             Text(
               content,
               maxLines: 1,
-              overflow: TextOverflow.visible,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             )
           ],

@@ -18,6 +18,7 @@ class ItemTransaksiPostpaid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(data);
     String logo = "assets/icons/logo_pln.svg";
     String product = "";
     String name = "";
@@ -41,10 +42,16 @@ class ItemTransaksiPostpaid extends StatelessWidget {
         product = "Produk";
     }
 
-    switch (data["data"]["status"]) {
-      case 1:
+    switch (data["data"]["message"]) {
+      case "PAYMENT SUCCESS":
         status = 4;
 
+        break;
+      case "PEMBAYARAN GAGAL":
+        status = 7;
+        break;
+      case "PENDING / TRANSAKSI SEDANG DIPROSES":
+        status = 2;
         break;
       default:
         status = 1;

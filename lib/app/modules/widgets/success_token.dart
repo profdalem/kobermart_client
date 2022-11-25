@@ -61,7 +61,8 @@ class SuccessTokenPage extends StatelessWidget {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: () {
-                      Get.offAllNamed(Routes.TRANSACTIONS);
+                      Get.offAllNamed(Routes.TRANSACTIONS,
+                          arguments: {"refresh": true});
                     },
                     child: PanelTitle(title: "Lihat Transaksi"),
                     style: ButtonStyle(

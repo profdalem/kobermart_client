@@ -53,7 +53,10 @@ class SuccessPage extends StatelessWidget {
                   width: Get.width - 30,
                   height: 50,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Get.offNamed(Routes.TRANSACTIONS,
+                          arguments: {"refresh": true});
+                    },
                     child: PanelTitle(title: "Lihat Transaksi"),
                     style: ButtonStyle(
                         backgroundColor:

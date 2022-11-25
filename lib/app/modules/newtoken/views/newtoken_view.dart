@@ -17,6 +17,7 @@ class NewtokenView extends GetView {
 
   @override
   Widget build(BuildContext context) {
+    print(homeC.kd1count.value);
     return SafeArea(
       top: false,
       child: Scaffold(
