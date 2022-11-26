@@ -29,8 +29,7 @@ class TransactionsView extends GetView<TransactionsController> {
       print(Get.arguments["refresh"]);
       if (Get.arguments["refresh"] == true) {
         print("Arguments refresh is true");
-        Future.delayed(Duration(milliseconds: 500),
-            () => controller.getUserTransactions());
+        Future.delayed(Duration(milliseconds: 500), () => controller.getUserTransactions());
       }
     }
     return SafeArea(
@@ -133,28 +132,13 @@ class TransactionsView extends GetView<TransactionsController> {
                               children: [Text("Transaksi kosong")],
                             )
                       : StickyGroupedListView(
-                          elements: controller
-                              .filteredTransaction(controller.filterBy.value),
+                          elements: controller.filteredTransaction(controller.filterBy.value),
                           itemComparator: (dynamic a, dynamic b) {
-                            return double.parse(
-                                        (a["createdAt"]["_seconds"] * 1000 +
-                                                a["createdAt"]["_nanoseconds"] /
-                                                    1000000)
-                                            .toString())
-                                    .round() -
-                                double.parse((b["createdAt"]["_seconds"] *
-                                                1000 +
-                                            b["createdAt"]["_nanoseconds"] /
-                                                1000000)
-                                        .toString())
-                                    .round();
+                            return double.parse((a["createdAt"]["_seconds"] * 1000 + a["createdAt"]["_nanoseconds"] / 1000000).toString()).round() -
+                                double.parse((b["createdAt"]["_seconds"] * 1000 + b["createdAt"]["_nanoseconds"] / 1000000).toString()).round();
                           },
                           groupBy: (dynamic element) {
-                            return Timestamp.fromMillisecondsSinceEpoch(
-                                    element['createdAt']['_seconds'] * 1000)
-                                .toDate()
-                                .toString()
-                                .substring(0, 10);
+                            return Timestamp.fromMillisecondsSinceEpoch(element['createdAt']['_seconds'] * 1000).toDate().toString().substring(0, 10);
                           },
                           itemBuilder: (BuildContext context, dynamic element) {
                             Widget item;
@@ -165,12 +149,8 @@ class TransactionsView extends GetView<TransactionsController> {
                                 item = ItemTransaksiTopup(
                                   nominal: element['nominal'],
                                   method: element['method'],
-                                  code: element['history'][history.length - 1]
-                                      ['code'],
-                                  createdAt:
-                                      Timestamp.fromMillisecondsSinceEpoch(
-                                          element['createdAt']['_seconds'] *
-                                              1000),
+                                  code: element['history'][history.length - 1]['code'],
+                                  createdAt: Timestamp.fromMillisecondsSinceEpoch(element['createdAt']['_seconds'] * 1000),
                                 );
                                 break;
                               case 'withdraw':
@@ -178,32 +158,22 @@ class TransactionsView extends GetView<TransactionsController> {
                                 item = ItemTransaksiWithdrawal(
                                   nominal: element['nominal'],
                                   method: element['method'],
-                                  code: element['history'][history.length - 1]
-                                      ['code'],
-                                  createdAt:
-                                      Timestamp.fromMillisecondsSinceEpoch(
-                                          element['createdAt']['_seconds'] *
-                                              1000),
+                                  code: element['history'][history.length - 1]['code'],
+                                  createdAt: Timestamp.fromMillisecondsSinceEpoch(element['createdAt']['_seconds'] * 1000),
                                 );
                                 break;
                               case 'transfer-in':
                                 item = ItemTransaksiTransferIn(
                                   nominal: element['nominal'],
                                   sender: element['senderData']['name'],
-                                  createdAt:
-                                      Timestamp.fromMillisecondsSinceEpoch(
-                                          element['createdAt']['_seconds'] *
-                                              1000),
+                                  createdAt: Timestamp.fromMillisecondsSinceEpoch(element['createdAt']['_seconds'] * 1000),
                                 );
                                 break;
                               case 'transfer-out':
                                 item = ItemTransaksiTransferOut(
                                   nominal: element['nominal'],
                                   recipient: element['recipientData']['name'],
-                                  createdAt:
-                                      Timestamp.fromMillisecondsSinceEpoch(
-                                          element['createdAt']['_seconds'] *
-                                              1000),
+                                  createdAt: Timestamp.fromMillisecondsSinceEpoch(element['createdAt']['_seconds'] * 1000),
                                 );
                                 break;
                               case 'ref':
@@ -212,10 +182,7 @@ class TransactionsView extends GetView<TransactionsController> {
                                   isCount: element['isCount'],
                                   type: element['type'],
                                   message: element['message'],
-                                  createdAt:
-                                      Timestamp.fromMillisecondsSinceEpoch(
-                                          element['createdAt']['_seconds'] *
-                                              1000),
+                                  createdAt: Timestamp.fromMillisecondsSinceEpoch(element['createdAt']['_seconds'] * 1000),
                                 );
                                 break;
                               case 'plan-a':
@@ -224,20 +191,14 @@ class TransactionsView extends GetView<TransactionsController> {
                                   isCount: element['isCount'],
                                   type: element['type'],
                                   message: element['message'],
-                                  createdAt:
-                                      Timestamp.fromMillisecondsSinceEpoch(
-                                          element['createdAt']['_seconds'] *
-                                              1000),
+                                  createdAt: Timestamp.fromMillisecondsSinceEpoch(element['createdAt']['_seconds'] * 1000),
                                 );
                                 break;
                               case 'token':
                                 item = ItemTransaksiToken(
                                   nominal: element["tokenPrice"],
                                   tokenCode: element["tokenCode"],
-                                  createdAt:
-                                      Timestamp.fromMillisecondsSinceEpoch(
-                                          element['createdAt']['_seconds'] *
-                                              1000),
+                                  createdAt: Timestamp.fromMillisecondsSinceEpoch(element['createdAt']['_seconds'] * 1000),
                                 );
                                 break;
                               case 'prepaid':
@@ -256,29 +217,19 @@ class TransactionsView extends GetView<TransactionsController> {
                           },
                           groupSeparatorBuilder: (dynamic element) {
                             return DateTime.now().toString().substring(0, 10) ==
-                                    Timestamp.fromMillisecondsSinceEpoch(
-                                            element['createdAt']['_seconds'] *
-                                                1000)
-                                        .toDate()
-                                        .toString()
-                                        .substring(0, 10)
+                                    Timestamp.fromMillisecondsSinceEpoch(element['createdAt']['_seconds'] * 1000).toDate().toString().substring(0, 10)
                                 ? const Padding(
                                     padding: EdgeInsets.all(8.0),
-                                    child: Text("Hari ini",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
+                                    child: Text("Hari ini", style: TextStyle(fontWeight: FontWeight.bold)),
                                   )
                                 : Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Text(
-                                      Timestamp.fromMillisecondsSinceEpoch(
-                                              element['createdAt']['_seconds'] *
-                                                  1000)
+                                      Timestamp.fromMillisecondsSinceEpoch(element['createdAt']['_seconds'] * 1000)
                                           .toDate()
                                           .toString()
                                           .substring(0, 10),
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold),
+                                      style: const TextStyle(fontWeight: FontWeight.bold),
                                     ),
                                   );
                           },
@@ -322,9 +273,7 @@ class TransactionsView extends GetView<TransactionsController> {
                 //   ],
                 // ),
                 onRefresh: () {
-                  return TransactionProvider()
-                      .getUserTransactions(controller.days.value)
-                      .then((value) {
+                  return TransactionProvider().getUserTransactions(controller.days.value).then((value) {
                     print("refresh");
                     controller.transactions.value = value.body;
                     controller.transactions.refresh();
@@ -347,12 +296,7 @@ class TransactionsView extends GetView<TransactionsController> {
 }
 
 class FilterRentang extends StatelessWidget {
-  FilterRentang(
-      {Key? key,
-      required this.title,
-      required this.days,
-      required this.selectedDays})
-      : super(key: key);
+  FilterRentang({Key? key, required this.title, required this.days, required this.selectedDays}) : super(key: key);
 
   final String title;
   final int days;
@@ -382,22 +326,18 @@ class FilterRentang extends StatelessWidget {
       style: ButtonStyle(
           shape: MaterialStateProperty.all(RoundedRectangleBorder(
             side: BorderSide(
-              color: transactionC.days.value == days
-                  ? Color(0xFFFF9800)
-                  : Colors.grey.shade400,
+              color: transactionC.days.value == days ? Color(0xFFFF9800) : Colors.grey.shade400,
             ),
             borderRadius: BorderRadius.circular(15.0),
           )),
-          backgroundColor: transactionC.days.value == days
-              ? MaterialStateProperty.all(Color(0xFFFFD89E))
-              : MaterialStateProperty.all(Color(0xFFE4E4E4))),
+          backgroundColor:
+              transactionC.days.value == days ? MaterialStateProperty.all(Color(0xFFFFD89E)) : MaterialStateProperty.all(Color(0xFFE4E4E4))),
     );
   }
 }
 
 class FilterJenis extends StatelessWidget {
-  FilterJenis({Key? key, required this.code, required this.title})
-      : super(key: key);
+  FilterJenis({Key? key, required this.code, required this.title}) : super(key: key);
 
   final String code;
   final String title;
@@ -426,15 +366,12 @@ class FilterJenis extends StatelessWidget {
       style: ButtonStyle(
           shape: MaterialStateProperty.all(RoundedRectangleBorder(
             side: BorderSide(
-              color: transactionC.filterBy.value == code
-                  ? Color(0xFFFF9800)
-                  : Colors.grey.shade400,
+              color: transactionC.filterBy.value == code ? Color(0xFFFF9800) : Colors.grey.shade400,
             ),
             borderRadius: BorderRadius.circular(15.0),
           )),
-          backgroundColor: transactionC.filterBy.value == code
-              ? MaterialStateProperty.all(Color(0xFFFFD89E))
-              : MaterialStateProperty.all(Color(0xFFE4E4E4))),
+          backgroundColor:
+              transactionC.filterBy.value == code ? MaterialStateProperty.all(Color(0xFFFFD89E)) : MaterialStateProperty.all(Color(0xFFE4E4E4))),
     );
   }
 }

@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:kobermart_client/app/controllers/product_controller.dart';
+import 'package:kobermart_client/app/modules/home/controllers/home_controller.dart';
 import 'package:kobermart_client/app/modules/home/views/home_view.dart';
-import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:kobermart_client/config.dart';
 import 'package:kobermart_client/firebase.dart';
+
+import '../routes/app_pages.dart';
 
 class AuthController extends GetxController {
   final box = GetStorage();
@@ -35,8 +38,9 @@ class AuthController extends GetxController {
     box.remove("token");
     box.remove("email");
     box.remove("password");
-    FirebaseAuth.instance.signOut();
-    Get.offAllNamed(Routes.LOGIN);
+    Get.find<HomeController>().dispose();
+    Get.find<MainProductController>().dispose();
+    FirebaseAuth.instance.signOut().then((value) => Get.off(Routes.LOGIN));
   }
 
   Future<void> login(String email, String password) async {
@@ -45,9 +49,7 @@ class AuthController extends GetxController {
         Get.snackbar("result", "Member tidak ditemukan");
       } else {
         if (value.docs[0]["active"]) {
-          FirebaseAuth.instance
-              .signInWithEmailAndPassword(email: email, password: password)
-              .then((value) async {
+          FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password).then((value) async {
             loading.value = false;
             isAuth.value = true;
             // await box.write("email", email);
@@ -66,8 +68,7 @@ class AuthController extends GetxController {
               ],
             ));
 
-            Future.delayed(Duration(milliseconds: 500)).then((value) =>
-                Get.off(() => HomeView(), transition: Transition.zoom));
+            Future.delayed(Duration(milliseconds: 500)).then((value) => Get.offNamed(Routes.HOME));
           }).catchError((error) {
             var message = "";
             switch (error.code) {

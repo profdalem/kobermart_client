@@ -1,11 +1,15 @@
 // ignore_for_file: invalid_use_of_protected_member
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:kobermart_client/app/data/setting_provider.dart';
 import 'package:kobermart_client/app/data/user_provider.dart';
 import 'package:kobermart_client/config.dart';
+
+import '../../../../firebase.dart';
 
 class HomeController extends GetxController {
   late TextEditingController emailC;
@@ -30,6 +34,7 @@ class HomeController extends GetxController {
   RxList sortedDownlines = [].obs;
 
   var box = GetStorage();
+  var fcmToken = "";
 
   final count = 0.obs;
   @override
@@ -38,12 +43,31 @@ class HomeController extends GetxController {
     passwordC = TextEditingController();
     // await getBalance();
     // await getCashback();
-    getInitialData();
+    await getInitialData();
+    await FirebaseMessaging.instance.getToken().then((value) {
+      Members.doc(id.value).set({"fcmToken": value}, SetOptions(merge: true));
+      fcmToken = value!;
+    }).onError((error, stackTrace) {
+      print(error.toString());
+    });
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print('Got a message whilst in the foreground!');
+      print('Message data: ${message}');
+      Get.defaultDialog(title: "Pesan", content: Text(message.data["body"]));
+      name.value = message.data["title"];
+      this.refresh();
+
+      if (message.notification != null) {
+        print('Message also contained a notification: ${message.notification}');
+      }
+    });
     super.onInit();
   }
 
   @override
   void onReady() {
+    print("home is ready");
     super.onReady();
   }
 
@@ -60,8 +84,7 @@ class HomeController extends GetxController {
       }
     }
     temp.sort((a, b) {
-      return b["memberData"]["tokenCreatedAt"]["_seconds"] -
-          a["memberData"]["tokenCreatedAt"]["_seconds"];
+      return b["memberData"]["tokenCreatedAt"]["_seconds"] - a["memberData"]["tokenCreatedAt"]["_seconds"];
     });
     sortedDownlines.value = temp;
   }
@@ -104,8 +127,7 @@ class HomeController extends GetxController {
       print("getInitialData error: " + error.toString());
     });
     sortDownlines();
-    if (devMode)
-      Get.snackbar("GetDownlines Waktu", stopwatch.elapsed.toString());
+    if (devMode) Get.snackbar("GetDownlines Waktu", stopwatch.elapsed.toString());
     stopwatch.stop();
     stopwatch.reset();
     isLoading.value = false;

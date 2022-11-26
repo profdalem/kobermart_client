@@ -38,8 +38,7 @@ class LoginView extends GetView<LoginController> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    SvgPicture.asset("assets/logo/kobermart-logo-long.svg",
-                        width: Get.width * 0.5),
+                    SvgPicture.asset("assets/logo/kobermart-logo-long.svg", width: Get.width * 0.5),
                     SizedBox(
                       height: 20,
                     ),
@@ -98,24 +97,14 @@ class LoginView extends GetView<LoginController> {
                         onPressed: () async {
                           if (authC.loading.value == false) {
                             authC.loading.value = true;
-                            if (controller.emailC.text.isNotEmpty &&
-                                controller.passwordC.text.isNotEmpty) {
+                            if (controller.emailC.text.isNotEmpty && controller.passwordC.text.isNotEmpty) {
                               GetUtils.isEmail(controller.emailC.text)
-                                  ? await authC
-                                      .login(controller.emailC.text,
-                                          controller.passwordC.text)
-                                      .then((value) =>
-                                          authC.loading.value = false)
-                                  : Get.defaultDialog(
-                                      title: "Error",
-                                      content: Text("Email tidak valid"));
+                                  ? await authC.login(controller.emailC.text, controller.passwordC.text).then((value) => authC.loading.value = false)
+                                  : Get.defaultDialog(title: "Error", content: Text("Email tidak valid"));
                               authC.loading.value = false;
                             } else {
                               authC.loading.value = false;
-                              Get.defaultDialog(
-                                  title: "Error",
-                                  content:
-                                      Text("Email dan password harus diisi"));
+                              Get.defaultDialog(title: "Error", content: Text("Email dan password harus diisi"));
                             }
                           }
                         },
@@ -145,9 +134,7 @@ class LoginView extends GetView<LoginController> {
                                 ],
                               ),
                             )),
-                        style: TextButton.styleFrom(
-                            padding: EdgeInsets.all(15),
-                            backgroundColor: Colors.blue),
+                        style: TextButton.styleFrom(padding: EdgeInsets.all(15), backgroundColor: Colors.blue),
                       ),
                     ),
                     SizedBox(
@@ -172,9 +159,7 @@ class LoginView extends GetView<LoginController> {
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
-                    IconButton(
-                        onPressed: () => controller.checkToken(),
-                        icon: Icon(Icons.refresh))
+                    IconButton(onPressed: () {}, icon: Icon(Icons.refresh))
                   ],
                 ),
               ),
@@ -207,8 +192,7 @@ class DefaultTextInput extends StatelessWidget {
           autocorrect: false,
           obscureText: obsecure,
           keyboardType: TextInputType.text,
-          decoration:
-              InputDecoration(hintText: inputLabel, border: InputBorder.none),
+          decoration: InputDecoration(hintText: inputLabel, border: InputBorder.none),
           textAlign: TextAlign.center,
         ),
       ),

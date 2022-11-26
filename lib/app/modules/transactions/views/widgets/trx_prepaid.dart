@@ -15,8 +15,7 @@ class ItemTransaksiPrepaid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var createdAt = Timestamp.fromMillisecondsSinceEpoch(
-        data['createdAt']['_seconds'] * 1000);
+    var createdAt = Timestamp.fromMillisecondsSinceEpoch(data['createdAt']['_seconds'] * 1000);
     var nominal = data["nominal"];
     var status = 2;
     var product = "Product";
@@ -30,10 +29,13 @@ class ItemTransaksiPrepaid extends StatelessWidget {
         status = 2;
     }
 
-    switch (
-        data["data"]["transactionData"]["ref_id"].toString().substring(0, 6)) {
+    switch (data["data"]["transactionData"]["ref_id"].toString().substring(0, 6)) {
       case 'PREPLN':
         product = "Token Listrik";
+        icon = data["data"]["productData"]["icon_url"];
+        break;
+      case 'PREDAT':
+        product = "Paket Internet";
         icon = data["data"]["productData"]["icon_url"];
         break;
       default:
@@ -81,13 +83,11 @@ class ItemTransaksiPrepaid extends StatelessWidget {
                           children: [
                             Text(
                               product,
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 14),
+                              style: TextStyle(color: Colors.black, fontSize: 14),
                             ),
                             Text(
                               "${DateFormat.Hm().format(createdAt.toDate())} WITA",
-                              style:
-                                  TextStyle(color: Colors.grey, fontSize: 12),
+                              style: TextStyle(color: Colors.grey, fontSize: 12),
                             ),
                           ],
                         ),
@@ -107,8 +107,7 @@ class ItemTransaksiPrepaid extends StatelessWidget {
                             children: [
                               Text(
                                 "SN: ${data["data"]["transactionData"]["sn"].toString().split("/")[0]}",
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 14),
+                                style: TextStyle(color: Colors.black, fontSize: 14),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -124,15 +123,11 @@ class ItemTransaksiPrepaid extends StatelessWidget {
                             children: [
                               Text(
                                 "Harga:",
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 14),
+                                style: TextStyle(color: Colors.black, fontSize: 14),
                               ),
                               Text(
                                 "Rp ${NumberFormat("#,##0", "id_ID").format(int.parse(nominal.toString()))}",
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14),
+                                style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14),
                               ),
                             ],
                           ),
@@ -143,13 +138,11 @@ class ItemTransaksiPrepaid extends StatelessWidget {
                             children: [
                               Text(
                                 "Metode:",
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 14),
+                                style: TextStyle(color: Colors.black, fontSize: 14),
                               ),
                               Text(
                                 "Potong Saldo",
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 14),
+                                style: TextStyle(color: Colors.black, fontSize: 14),
                               ),
                             ],
                           ),

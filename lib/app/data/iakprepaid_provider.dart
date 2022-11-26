@@ -11,9 +11,7 @@ class IakprepaidProvider extends GetConnect {
   Future<Response> setInquiryPln(var customerId) async {
     var token;
 
-    await FirebaseAuth.instance.currentUser
-        ?.getIdToken(true)
-        .then((value) => {token = value});
+    await FirebaseAuth.instance.currentUser?.getIdToken(true).then((value) => {token = value});
 
     return post(
       "${mainUrl}api/ppob/prepaid/pln/",
@@ -24,16 +22,19 @@ class IakprepaidProvider extends GetConnect {
     );
   }
 
-  Future<Response> setTopUp(var customerId, var refId, var productCode,
-      var nominal, var customerData) async {
+  Future<Response> setTopUpPln(
+    var customerId,
+    var refId,
+    var productCode,
+    var nominal,
+    var customerData,
+  ) async {
     var token;
 
-    await FirebaseAuth.instance.currentUser
-        ?.getIdToken(true)
-        .then((value) => {token = value});
+    await FirebaseAuth.instance.currentUser?.getIdToken(true).then((value) => {token = value});
 
     return post(
-      "${mainUrl}api/ppob/prepaid/topup/",
+      "${mainUrl}api/ppob/prepaid/topup/pln",
       {
         "customerId": customerId,
         "refId": refId,
@@ -47,13 +48,30 @@ class IakprepaidProvider extends GetConnect {
     );
   }
 
+  Future<Response> setTopUpPaketData(var customerId, var refId, var productCode, var nominal) async {
+    var token;
+
+    await FirebaseAuth.instance.currentUser?.getIdToken(true).then((value) => {token = value});
+
+    return post(
+      "${mainUrl}api/ppob/prepaid/topup/data",
+      {
+        "customerId": customerId,
+        "refId": refId,
+        "productCode": productCode,
+        "nominal": nominal,
+      },
+      headers: {
+        "Authorization": "Bearer ${token}",
+      },
+    );
+  }
+
   Future<Response> getPlnProduct() async {
     var token;
     httpClient.timeout = Duration(seconds: 30);
 
-    await FirebaseAuth.instance.currentUser
-        ?.getIdToken(true)
-        .then((value) => {token = value});
+    await FirebaseAuth.instance.currentUser?.getIdToken(true).then((value) => {token = value});
 
     return get(
       "${mainUrl}api/ppob/prepaid/pricelist/pln",
@@ -67,9 +85,7 @@ class IakprepaidProvider extends GetConnect {
     var token;
     httpClient.timeout = Duration(seconds: 30);
 
-    await FirebaseAuth.instance.currentUser
-        ?.getIdToken(true)
-        .then((value) => {token = value});
+    await FirebaseAuth.instance.currentUser?.getIdToken(true).then((value) => {token = value});
 
     return post(
       "${mainUrl}api/ppob/prepaid/paketdata/operator",
@@ -81,8 +97,7 @@ class IakprepaidProvider extends GetConnect {
   }
 
   Future<Response> getStatus(String ref) async {
-    var token =
-        await FirebaseAuth.instance.currentUser?.getIdToken(true).then((value) {
+    var token = await FirebaseAuth.instance.currentUser?.getIdToken(true).then((value) {
       return value;
     });
 

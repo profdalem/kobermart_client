@@ -18,7 +18,7 @@ class TrxdetailPostpaidView extends GetView<TrxdetailPostpaidController> {
   }) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    var data = Get.arguments["data"]["data"];
+    var data = Get.arguments["data"]["data"]["transactionData"];
     var detail = data["desc"]["tagihan"]["detail"];
     print(data["ref_id"].toString().toLowerCase().substring(3, 6));
 
@@ -131,8 +131,7 @@ class TrxdetailPostpaidView extends GetView<TrxdetailPostpaidController> {
                             Text(product),
                             sb15,
                             PanelTitle(title: "Total Biaya"),
-                            Text(
-                                "Rp ${NumberFormat("#,##0", "id_ID").format(int.parse(nominal.toString()))}"),
+                            Text("Rp ${NumberFormat("#,##0", "id_ID").format(int.parse(nominal.toString()))}"),
                           ],
                         ),
                         Column(
@@ -179,8 +178,7 @@ class TrxdetailPostpaidView extends GetView<TrxdetailPostpaidController> {
                               "Tarif/Daya:",
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
-                            Text(
-                                "${data["desc"]["tarif"]}/${data["desc"]["daya"]} VA"),
+                            Text("${data["desc"]["tarif"]}/${data["desc"]["daya"]} VA"),
                           ],
                         ),
                         Column(
@@ -200,8 +198,7 @@ class TrxdetailPostpaidView extends GetView<TrxdetailPostpaidController> {
                                 ? Text("Belum terlambat")
                                 : Text(
                                     "Terlambat",
-                                    style:
-                                        TextStyle(color: Colors.red.shade700),
+                                    style: TextStyle(color: Colors.red.shade700),
                                   ),
                           ],
                         ),
@@ -227,8 +224,7 @@ class TrxdetailPostpaidView extends GetView<TrxdetailPostpaidController> {
                               color: Colors.grey.shade50,
                               elevation: 3,
                               child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Container(
                                     width: double.infinity,
@@ -237,18 +233,11 @@ class TrxdetailPostpaidView extends GetView<TrxdetailPostpaidController> {
                                     padding: EdgeInsets.symmetric(vertical: 5),
                                     decoration: BoxDecoration(
                                       color: Colors.amber.shade100,
-                                      borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(2),
-                                          topRight: Radius.circular(2)),
+                                      borderRadius: BorderRadius.only(topLeft: Radius.circular(2), topRight: Radius.circular(2)),
                                     ),
                                     child: Text(
-                                      DateFormat.yMMMM('id_ID').format(DateTime(
-                                          int.parse(detail[index]["periode"]
-                                              .toString()
-                                              .substring(0, 4)),
-                                          int.parse(detail[index]["periode"]
-                                              .toString()
-                                              .substring(5, 6)))),
+                                      DateFormat.yMMMM('id_ID').format(DateTime(int.parse(detail[index]["periode"].toString().substring(0, 4)),
+                                          int.parse(detail[index]["periode"].toString().substring(5, 6)))),
                                       textAlign: TextAlign.center,
                                     ),
                                   ),
@@ -257,26 +246,20 @@ class TrxdetailPostpaidView extends GetView<TrxdetailPostpaidController> {
                                       height: double.infinity,
                                       alignment: Alignment.centerLeft,
                                       child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
                                           Padding(
-                                            padding:
-                                                const EdgeInsets.only(left: 10),
+                                            padding: const EdgeInsets.only(left: 10),
                                             child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
                                                 Row(
                                                   children: [
                                                     Text("Tagihan: "),
                                                     Text(
                                                       "Rp ${NumberFormat("#,##0", "id_ID").format(int.parse(detail[index]["nilai_tagihan"].toString()))}",
-                                                      style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold),
+                                                      style: TextStyle(fontWeight: FontWeight.bold),
                                                     ),
                                                   ],
                                                 ),
@@ -286,9 +269,7 @@ class TrxdetailPostpaidView extends GetView<TrxdetailPostpaidController> {
                                                     Text("Admin: "),
                                                     Text(
                                                       "Rp ${NumberFormat("#,##0", "id_ID").format(int.parse(detail[index]["admin"].toString()))}",
-                                                      style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold),
+                                                      style: TextStyle(fontWeight: FontWeight.bold),
                                                     ),
                                                   ],
                                                 ),
@@ -298,9 +279,7 @@ class TrxdetailPostpaidView extends GetView<TrxdetailPostpaidController> {
                                                     Text("Denda: "),
                                                     Text(
                                                       "Rp ${NumberFormat("#,##0", "id_ID").format(int.parse(detail[index]["denda"].toString()))}",
-                                                      style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold),
+                                                      style: TextStyle(fontWeight: FontWeight.bold),
                                                     ),
                                                   ],
                                                 ),
@@ -309,16 +288,13 @@ class TrxdetailPostpaidView extends GetView<TrxdetailPostpaidController> {
                                           ),
                                           Divider(),
                                           Padding(
-                                            padding:
-                                                const EdgeInsets.only(left: 10),
+                                            padding: const EdgeInsets.only(left: 10),
                                             child: Row(
                                               children: [
                                                 Text("Total: "),
                                                 Text(
                                                   "Rp ${NumberFormat("#,##0", "id_ID").format(int.parse(detail[index]["total"].toString()))}",
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold),
+                                                  style: TextStyle(fontWeight: FontWeight.bold),
                                                 ),
                                               ],
                                             ),
@@ -344,26 +320,18 @@ class TrxdetailPostpaidView extends GetView<TrxdetailPostpaidController> {
                         child: ElevatedButton(
                           onPressed: () async {
                             print("bayar");
-                            await IakpostpaidProvider()
-                                .setPayment(
-                                    data["tr_id"], data["ref_id"], data["hp"])
-                                .then((value) {
+                            await IakpostpaidProvider().setPayment(data["tr_id"], data["ref_id"], data["hp"]).then((value) {
                               print(value.body);
                               if (value.body["code"] == 400) {
-                                Get.defaultDialog(
-                                    title: "Gagal",
-                                    content: Text(value.body["message"]));
+                                Get.defaultDialog(title: "Gagal", content: Text(value.body["data"]["message"]));
                               } else {
-                                Get.offNamed(Routes.TRANSACTIONS,
-                                    arguments: {"refresh": true});
+                                Get.offNamed(Routes.TRANSACTIONS, arguments: {"refresh": true});
                               }
                             }).catchError(
                               (err) => {print(err)},
                             );
                           },
-                          style: ButtonStyle(
-                              minimumSize:
-                                  MaterialStateProperty.all(Size(30, 60))),
+                          style: ButtonStyle(minimumSize: MaterialStateProperty.all(Size(30, 60))),
                           child: Text("Bayar Sekarang"),
                         ),
                       ),

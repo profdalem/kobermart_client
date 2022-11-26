@@ -36,8 +36,8 @@ class PpobView extends GetView<PpobController> {
                 child: CircularProgressIndicator(),
               )
             : TabBarView(controller: controller.tabC, children: [
-                PaketDataView(),
                 ListrikView(),
+                PaketDataView(),
                 Center(child: Text("Segera hadir")),
                 Center(child: Text("Segera hadir")),
                 Center(child: Text("Segera hadir")),
@@ -64,14 +64,10 @@ class ListrikView extends StatelessWidget {
             height: 25,
           ),
           Card(
-            child: CachedNetworkImage(
-                imageUrl:
-                    "https://cdn.mobilepulsa.net/img/logo/pulsa/small/listrik.png"),
+            child: CachedNetworkImage(imageUrl: "https://cdn.mobilepulsa.net/img/logo/pulsa/small/listrik.png"),
           ),
           sb5,
-          Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [PanelTitle(title: "Beli Token & Bayar Listrik")]),
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [PanelTitle(title: "Beli Token & Bayar Listrik")]),
           sb20,
           Container(
             alignment: Alignment.centerLeft,
@@ -97,87 +93,65 @@ class ListrikView extends StatelessWidget {
               children: [
                 Text("Pilih produk:"),
                 sb10,
-                Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          controller.tokenSelected.value = true;
-                          // controller.customerId.text = "";
-                        },
-                        child: Obx(
-                          () => Container(
-                            decoration: BoxDecoration(
-                                color: controller.tokenSelected.value
-                                    ? Colors.amber.shade300
-                                    : Colors.transparent,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(15))),
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 12, top: 8, right: 12, bottom: 8),
-                              child: Row(
-                                children: [
-                                  controller.tokenSelected.value
-                                      ? Icon(Icons.check_circle_outline)
-                                      : Icon(Icons.circle_outlined),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  Text(
-                                    "Token Listrik",
-                                    style: TextStyle(
-                                        fontWeight:
-                                            controller.tokenSelected.value
-                                                ? FontWeight.bold
-                                                : FontWeight.normal),
-                                  ),
-                                ],
+                Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+                  GestureDetector(
+                    onTap: () {
+                      controller.tokenSelected.value = true;
+                      // controller.customerId.text = "";
+                    },
+                    child: Obx(
+                      () => Container(
+                        decoration: BoxDecoration(
+                            color: controller.tokenSelected.value ? Colors.amber.shade300 : Colors.transparent,
+                            borderRadius: BorderRadius.all(Radius.circular(15))),
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 12, top: 8, right: 12, bottom: 8),
+                          child: Row(
+                            children: [
+                              controller.tokenSelected.value ? Icon(Icons.check_circle_outline) : Icon(Icons.circle_outlined),
+                              SizedBox(
+                                width: 5,
                               ),
-                            ),
+                              Text(
+                                "Token Listrik",
+                                style: TextStyle(fontWeight: controller.tokenSelected.value ? FontWeight.bold : FontWeight.normal),
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                      GestureDetector(
-                        onTap: () {
-                          controller.tokenSelected.value = false;
-                          // controller.customerId.text = "";
-                          controller.nominalSelected.value = "";
-                        },
-                        child: Obx(
-                          () => Container(
-                            decoration: BoxDecoration(
-                                color: !controller.tokenSelected.value
-                                    ? Colors.amber.shade300
-                                    : Colors.transparent,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(15))),
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 12, top: 8, right: 12, bottom: 8),
-                              child: Row(
-                                children: [
-                                  !controller.tokenSelected.value
-                                      ? Icon(Icons.check_circle_outline)
-                                      : Icon(Icons.circle_outlined),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  Text(
-                                    "Tagihan Listrik",
-                                    style: TextStyle(
-                                        fontWeight:
-                                            !controller.tokenSelected.value
-                                                ? FontWeight.bold
-                                                : FontWeight.normal),
-                                  ),
-                                ],
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      controller.tokenSelected.value = false;
+                      // controller.customerId.text = "";
+                      controller.nominalSelected.value = "";
+                    },
+                    child: Obx(
+                      () => Container(
+                        decoration: BoxDecoration(
+                            color: !controller.tokenSelected.value ? Colors.amber.shade300 : Colors.transparent,
+                            borderRadius: BorderRadius.all(Radius.circular(15))),
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 12, top: 8, right: 12, bottom: 8),
+                          child: Row(
+                            children: [
+                              !controller.tokenSelected.value ? Icon(Icons.check_circle_outline) : Icon(Icons.circle_outlined),
+                              SizedBox(
+                                width: 5,
                               ),
-                            ),
+                              Text(
+                                "Tagihan Listrik",
+                                style: TextStyle(fontWeight: !controller.tokenSelected.value ? FontWeight.bold : FontWeight.normal),
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                    ]),
+                    ),
+                  ),
+                ]),
               ],
             ),
           ),
@@ -189,8 +163,7 @@ class ListrikView extends StatelessWidget {
                 width: Get.width,
                 decoration: Shadow1(),
                 child: Padding(
-                  padding:
-                      EdgeInsets.only(left: 15, top: 15, bottom: 15, right: 15),
+                  padding: EdgeInsets.only(left: 15, top: 15, bottom: 15, right: 15),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -210,19 +183,15 @@ class ListrikView extends StatelessWidget {
                                 borderSide: BorderSide(
                                   color: Colors.grey,
                                 ),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(5))),
+                                borderRadius: BorderRadius.all(Radius.circular(5))),
                             border: OutlineInputBorder(
                                 borderSide: BorderSide(
                                   color: Colors.grey,
                                 ),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(5))),
+                                borderRadius: BorderRadius.all(Radius.circular(5))),
                             // isDense: true,
                             contentPadding: EdgeInsets.all(12)),
-                        inputFormatters: <TextInputFormatter>[
-                          FilteringTextInputFormatter.digitsOnly
-                        ],
+                        inputFormatters: <TextInputFormatter>[FilteringTextInputFormatter.digitsOnly],
                         onChanged: (value) {},
                         onTap: () {},
                       ),
@@ -252,19 +221,11 @@ class ListrikView extends StatelessWidget {
                                         "1.000.000",
                                       ],
                                       onChanged: (value) {
-                                        controller.nominalSelected.value =
-                                            value!
-                                                .replaceAll(".", "")
-                                                .toString();
-                                        controller.pricelistPln
-                                            .forEach((element) {
-                                          if (controller
-                                                  .nominalSelected.value ==
-                                              element["nominal"]) {
-                                            controller.nominalSelected.value =
-                                                element["price"].toString();
-                                            controller.codeSelected.value =
-                                                element["code"].toString();
+                                        controller.nominalSelected.value = value!.replaceAll(".", "").toString();
+                                        controller.pricelistPln.forEach((element) {
+                                          if (controller.nominalSelected.value == element["nominal"]) {
+                                            controller.nominalSelected.value = element["price"].toString();
+                                            controller.codeSelected.value = element["code"].toString();
                                           }
                                         });
                                       },
@@ -274,43 +235,23 @@ class ListrikView extends StatelessWidget {
                                   Obx(
                                     () => controller.nominalSelected.isNotEmpty
                                         ? Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
-                                              Obx(() => homeC.balance.value <
-                                                      int.parse(controller
-                                                          .nominalSelected
-                                                          .value)
+                                              Obx(() => homeC.balance.value < int.parse(controller.nominalSelected.value)
                                                   ? Column(
                                                       children: [
                                                         Container(
-                                                          alignment:
-                                                              Alignment.center,
-                                                          width:
-                                                              double.infinity,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                                  border: Border.all(
-                                                                      color: Colors
-                                                                          .amber,
-                                                                      style: BorderStyle
-                                                                          .solid),
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .all(
-                                                                    Radius
-                                                                        .circular(
-                                                                            5),
-                                                                  ),
-                                                                  color: Colors
-                                                                      .amber
-                                                                      .shade100),
+                                                          alignment: Alignment.center,
+                                                          width: double.infinity,
+                                                          decoration: BoxDecoration(
+                                                              border: Border.all(color: Colors.amber, style: BorderStyle.solid),
+                                                              borderRadius: BorderRadius.all(
+                                                                Radius.circular(5),
+                                                              ),
+                                                              color: Colors.amber.shade100),
                                                           child: Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(5.0),
-                                                            child: Text(
-                                                                "Saldo anda tidak cukup"),
+                                                            padding: const EdgeInsets.all(5.0),
+                                                            child: Text("Saldo anda tidak cukup"),
                                                           ),
                                                         ),
                                                         sb10
@@ -412,9 +353,7 @@ class PaketDataView extends StatelessWidget {
             size: 30,
           ),
           sb5,
-          Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [PanelTitle(title: "Beli Paket Data")]),
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [PanelTitle(title: "Beli Paket Data")]),
           sb20,
           Container(
             alignment: Alignment.centerLeft,
@@ -441,8 +380,7 @@ class PaketDataView extends StatelessWidget {
                 width: Get.width,
                 decoration: Shadow1(),
                 child: Padding(
-                  padding:
-                      EdgeInsets.only(left: 15, top: 15, bottom: 15, right: 15),
+                  padding: EdgeInsets.only(left: 15, top: 15, bottom: 15, right: 15),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -457,37 +395,31 @@ class PaketDataView extends StatelessWidget {
                             suffixIcon: Container(
                               child: Padding(
                                 padding: const EdgeInsets.only(right: 5),
-                                child: Obx(() =>
-                                    controller.paketDataIcon.value.isNotEmpty
-                                        ? Image.asset(
-                                            controller.paketDataIcon.value,
-                                            fit: BoxFit.contain,
-                                          )
-                                        : SizedBox()),
+                                child: Obx(() => controller.paketDataIcon.value.isNotEmpty
+                                    ? Image.asset(
+                                        controller.paketDataIcon.value,
+                                        fit: BoxFit.contain,
+                                      )
+                                    : SizedBox()),
                               ),
                             ),
-                            suffixIconConstraints:
-                                BoxConstraints.expand(width: 50, height: 35),
+                            suffixIconConstraints: BoxConstraints.expand(width: 50, height: 35),
                             isDense: true,
                             hintText: "08xx xxxx xxxx",
                             focusedBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
                                   color: Colors.grey,
                                 ),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(5))),
+                                borderRadius: BorderRadius.all(Radius.circular(5))),
                             border: OutlineInputBorder(
                                 borderSide: BorderSide(
                                   color: Colors.grey,
                                 ),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(5))),
+                                borderRadius: BorderRadius.all(Radius.circular(5))),
                             // isDense: true,
                             contentPadding: EdgeInsets.all(10)),
                         textAlignVertical: TextAlignVertical.center,
-                        inputFormatters: <TextInputFormatter>[
-                          FilteringTextInputFormatter.digitsOnly
-                        ],
+                        inputFormatters: <TextInputFormatter>[FilteringTextInputFormatter.digitsOnly],
                         onEditingComplete: () {
                           onEditingCompleteMethod();
                         },
@@ -517,135 +449,73 @@ class PaketDataView extends StatelessWidget {
                                       child: ListView(
                                         children: List.generate(
                                             controller
-                                                .getPaketDataProductList(
-                                                    controller
-                                                        .pricelistPaketData,
-                                                    controller.paketDataOperator
-                                                        .value)
+                                                .getPaketDataProductList(controller.pricelistPaketData, controller.paketDataOperator.value)
                                                 .length,
                                             (index) => Padding(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(vertical: 5),
+                                                  padding: const EdgeInsets.symmetric(vertical: 5),
                                                   child: GestureDetector(
                                                     onTap: () {
                                                       onTapProductMethod(index);
                                                     },
                                                     child: Card(
-                                                      margin: EdgeInsets.only(
-                                                          right: 10),
-                                                      color: controller
-                                                                  .paketDataCodeSelected
-                                                                  .value ==
+                                                      margin: EdgeInsets.only(right: 10),
+                                                      color: controller.paketDataCodeSelected.value ==
                                                               controller
-                                                                  .getPaketDataProductList(
-                                                                      controller
-                                                                          .pricelistPaketData,
-                                                                      controller
-                                                                          .paketDataOperator
-                                                                          .value)[
-                                                                      index][
-                                                                      "product_code"]
+                                                                  .getPaketDataProductList(controller.pricelistPaketData,
+                                                                      controller.paketDataOperator.value)[index]["product_code"]
                                                                   .toString()
                                                           ? Colors.blue.shade100
                                                           : Colors.white,
                                                       elevation: 2,
                                                       child: Container(
-                                                        padding:
-                                                            EdgeInsets.all(10),
+                                                        padding: EdgeInsets.all(10),
                                                         width: Get.width * 0.4,
                                                         child: Column(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .spaceBetween,
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
+                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
                                                           children: [
                                                             Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
+                                                              crossAxisAlignment: CrossAxisAlignment.start,
                                                               children: [
                                                                 Text(
                                                                   controller.getPaketDataProductList(
-                                                                      controller
-                                                                          .pricelistPaketData,
-                                                                      controller
-                                                                          .paketDataOperator
-                                                                          .value)[index]["product_description"],
+                                                                          controller.pricelistPaketData, controller.paketDataOperator.value)[index]
+                                                                      ["product_description"],
                                                                   maxLines: 2,
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                  style: TextStyle(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w300,
-                                                                      fontSize:
-                                                                          8),
+                                                                  overflow: TextOverflow.ellipsis,
+                                                                  style: TextStyle(fontWeight: FontWeight.w300, fontSize: 8),
                                                                 ),
                                                                 Text(
                                                                   controller.getPaketDataProductList(
-                                                                      controller
-                                                                          .pricelistPaketData,
-                                                                      controller
-                                                                          .paketDataOperator
-                                                                          .value)[index]["product_nominal"],
+                                                                          controller.pricelistPaketData, controller.paketDataOperator.value)[index]
+                                                                      ["product_nominal"],
                                                                   maxLines: 2,
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                  style: TextStyle(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      fontSize:
-                                                                          12),
+                                                                  overflow: TextOverflow.ellipsis,
+                                                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                                                                 ),
                                                                 Text(
                                                                   controller.getPaketDataProductList(
-                                                                      controller
-                                                                          .pricelistPaketData,
-                                                                      controller
-                                                                          .paketDataOperator
-                                                                          .value)[index]["product_details"],
+                                                                          controller.pricelistPaketData, controller.paketDataOperator.value)[index]
+                                                                      ["product_details"],
                                                                   maxLines: 2,
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                  style: TextStyle(
-                                                                      fontSize:
-                                                                          10),
+                                                                  overflow: TextOverflow.ellipsis,
+                                                                  style: TextStyle(fontSize: 10),
                                                                 ),
                                                               ],
                                                             ),
                                                             Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
+                                                              crossAxisAlignment: CrossAxisAlignment.start,
                                                               children: [
                                                                 Text(
                                                                   "Rp ${NumberFormat("#,##0", "id_ID").format(controller.getPaketDataProductList(controller.pricelistPaketData, controller.paketDataOperator.value)[index]["sell_price"])}",
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .left,
-                                                                  style: TextStyle(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      color: Colors
-                                                                          .blue
-                                                                          .shade800),
+                                                                  textAlign: TextAlign.left,
+                                                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue.shade800),
                                                                 ),
                                                                 Text(
                                                                   "Masa aktif: ${controller.getPaketDataProductList(controller.pricelistPaketData, controller.paketDataOperator.value)[index]["active_period"]} hari",
                                                                   maxLines: 1,
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                  style: TextStyle(
-                                                                      fontSize:
-                                                                          8),
+                                                                  overflow: TextOverflow.ellipsis,
+                                                                  style: TextStyle(fontSize: 10),
                                                                 ),
                                                               ],
                                                             ),
@@ -663,9 +533,7 @@ class PaketDataView extends StatelessWidget {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Obx(() => homeC.balance.value <
-                                      int.parse(controller
-                                          .paketDataNominalSelected.value)
+                              Obx(() => homeC.balance.value < int.parse(controller.paketDataNominalSelected.value)
                                   ? Column(
                                       children: [
                                         sb10,
@@ -673,32 +541,37 @@ class PaketDataView extends StatelessWidget {
                                           alignment: Alignment.center,
                                           width: double.infinity,
                                           decoration: BoxDecoration(
-                                              border: Border.all(
-                                                  color: Colors.amber,
-                                                  style: BorderStyle.solid),
+                                              border: Border.all(color: Colors.amber, style: BorderStyle.solid),
                                               borderRadius: BorderRadius.all(
                                                 Radius.circular(5),
                                               ),
                                               color: Colors.amber.shade100),
                                           child: Padding(
                                             padding: const EdgeInsets.all(5.0),
-                                            child:
-                                                Text("Saldo anda tidak cukup"),
+                                            child: Text("Saldo anda tidak cukup"),
                                           ),
                                         ),
                                         sb10
                                       ],
                                     )
                                   : SizedBox()),
-                              sb10,
-                              Text("Paket Pilihan:"),
-                              PanelTitle(title: "Paket Pilihan"),
+                              Obx(
+                                () => controller.paketDataNameSelected.isNotEmpty
+                                    ? Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          sb10,
+                                          Text("Paket Pilihan:"),
+                                          PanelTitle(title: controller.paketDataNameSelected.value),
+                                        ],
+                                      )
+                                    : SizedBox(),
+                              ),
                               Obx(
                                 () => controller.paketDataOperator.isEmpty
                                     ? SizedBox()
                                     : Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           sb10,
                                           Text("Harga:"),
@@ -717,32 +590,9 @@ class PaketDataView extends StatelessWidget {
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: () {
-                            if (controller.paketDataPhoneNumberError.isFalse &&
-                                controller.phoneNumber.text.isNotEmpty &&
-                                controller.phoneNumber.text.length >= 10 &&
-                                controller.paketDataCodeSelected.isNotEmpty) {
-                              print("beli paket data");
-                            } else {
-                              if (controller.phoneNumber.text.length < 10) {
-                                Get.defaultDialog(
-                                    title: "Peringatan",
-                                    content: Text("Nomor minimal 10 angka"));
-                              } else {
-                                Get.defaultDialog(
-                                    title: "Peringatan",
-                                    content:
-                                        Text("Pilih paket terlebih dahulu"));
-                              }
-                            }
-                            print(controller
-                                    .paketDataPhoneNumberError.isFalse &&
-                                controller.phoneNumber.text.isNotEmpty &&
-                                controller.phoneNumber.text.length >= 10 &&
-                                controller.paketDataCodeSelected.isNotEmpty);
+                            controller.setPrepaidTopupPaketData();
                           },
-                          style: ButtonStyle(
-                              backgroundColor:
-                                  MaterialStatePropertyAll(Colors.blue)),
+                          style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.blue)),
                           child: Container(
                             alignment: Alignment.center,
                             height: 50,
@@ -771,17 +621,16 @@ class PaketDataView extends StatelessWidget {
   }
 
   void onTapProductMethod(int index) {
-    controller.paketDataCodeSelected.value = controller
-        .getPaketDataProductList(controller.pricelistPaketData,
-            controller.paketDataOperator.value)[index]["product_code"]
-        .toString();
+    controller.paketDataCodeSelected.value =
+        controller.getPaketDataProductList(controller.pricelistPaketData, controller.paketDataOperator.value)[index]["product_code"].toString();
     controller.paketDataCodeSelected.refresh();
 
-    controller.paketDataNominalSelected.value = controller
-        .getPaketDataProductList(controller.pricelistPaketData,
-            controller.paketDataOperator.value)[index]["sell_price"]
-        .toString();
+    controller.paketDataNominalSelected.value =
+        controller.getPaketDataProductList(controller.pricelistPaketData, controller.paketDataOperator.value)[index]["sell_price"].toString();
     controller.paketDataNominalSelected.refresh();
+
+    controller.paketDataNameSelected.value =
+        controller.getPaketDataProductList(controller.pricelistPaketData, controller.paketDataOperator.value)[index]["product_nominal"].toString();
 
     print(controller.paketDataCodeSelected.value);
   }
@@ -791,15 +640,18 @@ class PaketDataView extends StatelessWidget {
       controller.getOperator(4, value);
       controller.paketDataNominalSelected.value = "0";
       controller.paketDataCodeSelected.value = "";
+      controller.paketDataNameSelected.value = "";
     } else if (value.length > 6) {
       controller.getOperator(6, value);
       controller.paketDataNominalSelected.value = "0";
       controller.paketDataCodeSelected.value = "";
+      controller.paketDataNameSelected.value = "";
     } else if (value.isEmpty) {
       controller.paketDataIcon.value = "";
       controller.paketDataOperator.value = "";
       controller.paketDataNominalSelected.value = "0";
       controller.paketDataCodeSelected.value = "";
+      controller.paketDataNameSelected.value = "";
     }
 
     if (value.length > 1) {
@@ -819,8 +671,7 @@ class PaketDataView extends StatelessWidget {
     print(controller.phoneNumber.text);
     if (controller.phoneNumber.text.length > 3) {
       print("length > 3");
-      if (controller.phoneNumber.text.substring(0, 2) != "08" &&
-          controller.phoneNumber.text.length > 1) {
+      if (controller.phoneNumber.text.substring(0, 2) != "08" && controller.phoneNumber.text.length > 1) {
         controller.paketDataPhoneNumberError.value = true;
       } else {
         controller.paketDataPhoneNumberError.value = false;
@@ -828,17 +679,20 @@ class PaketDataView extends StatelessWidget {
       controller.getOperator(4, controller.phoneNumber.text.substring(0, 4));
       controller.paketDataNominalSelected.value = "0";
       controller.paketDataCodeSelected.value = "";
+      controller.paketDataNameSelected.value = "";
     } else if (controller.phoneNumber.text.length > 6) {
       print("length > 6");
       controller.getOperator(6, controller.phoneNumber.text.substring(0, 6));
       controller.paketDataNominalSelected.value = "0";
       controller.paketDataCodeSelected.value = "";
+      controller.paketDataNameSelected.value = "";
     } else if (controller.phoneNumber.text.isEmpty) {
       print("length 0");
       controller.paketDataIcon.value = "";
       controller.paketDataOperator.value = "";
       controller.paketDataNominalSelected.value = "0";
       controller.paketDataCodeSelected.value = "";
+      controller.paketDataNameSelected.value = "";
     }
 
     if (controller.phoneNumber.text.length < 2) {

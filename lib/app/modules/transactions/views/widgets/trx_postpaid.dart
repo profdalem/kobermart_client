@@ -27,22 +27,21 @@ class ItemTransaksiPostpaid extends StatelessWidget {
 
     int nominal = data["nominal"];
     int status = 1;
-    var createdAt = Timestamp.fromMillisecondsSinceEpoch(
-        data["createdAt"]["_seconds"] * 1000);
+    var createdAt = Timestamp.fromMillisecondsSinceEpoch(data["createdAt"]["_seconds"] * 1000);
 
     switch (data["additional"].toString().split("_")[0].toLowerCase()) {
       case "pln":
         logo = "assets/icons/logo_pln.svg";
         product = "Tagihan Listrik";
-        name = data["data"]["tr_name"];
-        meterNo = data["data"]["hp"];
+        name = data["data"]["transactionData"]["tr_name"];
+        meterNo = data["data"]["transactionData"]["hp"];
         break;
       default:
         logo = "assets/icons/logo_pln.svg";
         product = "Produk";
     }
 
-    switch (data["data"]["message"]) {
+    switch (data["data"]["transactionData"]["message"]) {
       case "PAYMENT SUCCESS":
         status = 4;
 
@@ -61,8 +60,7 @@ class ItemTransaksiPostpaid extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 10),
       child: TextButton(
         onPressed: () {
-          Get.toNamed(Routes.TRXDETAIL_POSTPAID,
-              arguments: {"data": data, "createdAt": createdAt});
+          Get.toNamed(Routes.TRXDETAIL_POSTPAID, arguments: {"data": data, "createdAt": createdAt});
         },
         style: ButtonStyle(
             shadowColor: MaterialStateProperty.all(Colors.grey),
@@ -115,42 +113,32 @@ class ItemTransaksiPostpaid extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Biaya:",
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 14),
-                              ),
-                              Text(
-                                "Rp ${NumberFormat("#,##0", "id_ID").format(int.parse(nominal.toString()))}",
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14),
-                              ),
-                            ]),
+                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Text(
+                            "Biaya:",
+                            style: TextStyle(color: Colors.black, fontSize: 14),
+                          ),
+                          Text(
+                            "Rp ${NumberFormat("#,##0", "id_ID").format(int.parse(nominal.toString()))}",
+                            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14),
+                          ),
+                        ]),
                       ),
                       Expanded(
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                name,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 14),
-                              ),
-                              Text(
-                                meterNo,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 14),
-                              ),
-                            ]),
+                        child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                          Text(
+                            name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(color: Colors.black, fontSize: 14),
+                          ),
+                          Text(
+                            meterNo,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(color: Colors.black, fontSize: 14),
+                          ),
+                        ]),
                       )
                     ],
                   )

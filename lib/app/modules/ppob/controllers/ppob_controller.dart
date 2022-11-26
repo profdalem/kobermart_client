@@ -3,6 +3,8 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'package:get_storage/get_storage.dart';
+import 'package:kobermart_client/firebase.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -16,17 +18,17 @@ import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/config.dart';
 import 'package:kobermart_client/style.dart';
 
-class PpobController extends GetxController
-    with GetSingleTickerProviderStateMixin {
+class PpobController extends GetxController with GetSingleTickerProviderStateMixin {
   final List<Tab> myTabs = <Tab>[
-    const Tab(text: 'Paket Data'),
     const Tab(text: 'Listrik'),
+    const Tab(text: 'Paket Data'),
     const Tab(text: 'Pulsa'),
     const Tab(text: 'Internet/Wifi'),
     const Tab(text: 'PDAM'),
   ];
 
   final homeC = Get.find<HomeController>();
+  final box = GetStorage();
 
   late TabController tabC;
   late TextEditingController customerId;
@@ -53,11 +55,10 @@ class PpobController extends GetxController
 
   @override
   void onInit() async {
-    tabC = TabController(
-        length: 5, vsync: this, animationDuration: Duration(milliseconds: 300));
+    tabC = TabController(length: 5, vsync: this, animationDuration: Duration(milliseconds: 300));
     customerId = TextEditingController();
     phoneNumber = TextEditingController();
-    if (preFilled) customerId.text = "";
+    if (preFilled) customerId.text = "530000000002";
     getProductData();
     super.onInit();
   }
@@ -84,12 +85,8 @@ class PpobController extends GetxController
   String generateRandomString(int len, String code) {
     var r = Random();
     const _chars = 'ABCDEFGHJKMNOPQRSTUVWXYZ1234567890';
-    var _time = DateTime.now().year.toString().substring(2, 4) +
-        DateTime.now().month.toString() +
-        DateTime.now().day.toString();
-    return code +
-        _time +
-        List.generate(len, (index) => _chars[r.nextInt(_chars.length)]).join();
+    var _time = DateTime.now().year.toString().substring(2, 4) + DateTime.now().month.toString() + DateTime.now().day.toString();
+    return code + _time + List.generate(len, (index) => _chars[r.nextInt(_chars.length)]).join();
   }
 
   void getProductData() async {
@@ -98,51 +95,59 @@ class PpobController extends GetxController
     timer.start();
     isGetDataLoading.value = true;
 
-    var update = false;
-
     final directory = await getApplicationDocumentsDirectory();
-    final File productPrepaidPlnFile =
-        File('${directory.path}/productPrepaidPln.json');
-    final File productPrepaidDataFile =
-        File('${directory.path}/productPrepaidData.json');
+    final File productPrepaidPlnFile = File('${directory.path}/productPrepaidPln.json');
+    final File productPrepaidDataFile = File('${directory.path}/productPrepaidData.json');
 
-    if (update) {
-      await IakprepaidProvider()
-          .getPaketDataPricelist()
-          .then((value) => pricelistPaketData.value = value.body);
-      productPrepaidDataFile
-          .writeAsString(json.encode(pricelistPaketData.value));
-      await IakprepaidProvider()
-          .getPlnProduct()
-          .then((value) => pricelistPln.value = value.body);
+    // get lastupdate data from database
+    final paketDataLastUpdate = (await UpdateRef.doc("paketdata").get()).data()!["lastUpdate"] as Timestamp;
+    final milliseconds = paketDataLastUpdate.millisecondsSinceEpoch;
+
+    // box.remove("paketDataLastUpdate");
+
+    if (box.read("paketDataLastUpdate") == null) {
+      //write it on the device so it can be used to compare
+      box.write("paketDataLastUpdate", milliseconds);
+      print(box.read("paketDataLastUpdate"));
+
+      // Get first batch of data
+      await IakprepaidProvider().getPaketDataPricelist().then((value) => pricelistPaketData.value = value.body);
+      productPrepaidDataFile.writeAsString(json.encode(pricelistPaketData.value));
+      await IakprepaidProvider().getPlnProduct().then((value) => pricelistPln.value = value.body);
       productPrepaidPlnFile.writeAsString(json.encode(pricelistPln.value));
     } else {
-      if (await productPrepaidDataFile.exists()) {
-        pricelistPaketData.value =
-            json.decode(await productPrepaidDataFile.readAsString());
-      } else {
-        await IakprepaidProvider()
-            .getPaketDataPricelist()
-            .then((value) => pricelistPaketData.value = value.body);
-        productPrepaidDataFile
-            .writeAsString(json.encode(pricelistPaketData.value));
-      }
+      if (milliseconds > box.read("paketDataLastUpdate")) {
+        if (devMode) print("data is old");
 
-      if (await productPrepaidPlnFile.exists()) {
-        pricelistPln.value =
-            json.decode(await productPrepaidPlnFile.readAsString());
-      } else {
-        await IakprepaidProvider()
-            .getPlnProduct()
-            .then((value) => pricelistPln.value = value.body);
+        await IakprepaidProvider().getPaketDataPricelist().then((value) => pricelistPaketData.value = value.body);
+        productPrepaidDataFile.writeAsString(json.encode(pricelistPaketData.value));
+
+        await IakprepaidProvider().getPlnProduct().then((value) => pricelistPln.value = value.body);
         productPrepaidPlnFile.writeAsString(json.encode(pricelistPln.value));
+
+        box.write("paketDataLastUpdate", milliseconds);
+      } else {
+        if (devMode) print("data is the newest");
+        if (await productPrepaidDataFile.exists()) {
+          pricelistPaketData.value = json.decode(await productPrepaidDataFile.readAsString());
+        } else {
+          await IakprepaidProvider().getPaketDataPricelist().then((value) => pricelistPaketData.value = value.body);
+          productPrepaidDataFile.writeAsString(json.encode(pricelistPaketData.value));
+        }
+
+        if (await productPrepaidPlnFile.exists()) {
+          pricelistPln.value = json.decode(await productPrepaidPlnFile.readAsString());
+        } else {
+          await IakprepaidProvider().getPlnProduct().then((value) => pricelistPln.value = value.body);
+          productPrepaidPlnFile.writeAsString(json.encode(pricelistPln.value));
+        }
       }
     }
 
     isGetDataLoading.value = false;
-    Get.snackbar("Waktu getPlnProduct:", timer.elapsed.toString(),
-        duration: Duration(seconds: 1));
     pricelistPaketData.refresh();
+    pricelistPln.refresh();
+    if (devMode) Get.snackbar("Waktu getPlnProduct:", timer.elapsed.toString(), duration: Duration(seconds: 1));
     timer.stop();
     timer.reset();
   }
@@ -339,14 +344,31 @@ class PpobController extends GetxController
     return result;
   }
 
+  void setPrepaidTopupPaketData() async {
+    if (paketDataPhoneNumberError.isFalse && phoneNumber.text.isNotEmpty && phoneNumber.text.length >= 10 && paketDataCodeSelected.isNotEmpty) {
+      // setTopUp
+      // print("beli paket data");
+      var refId = generateRandomString(6, "PREDAT");
+      IakprepaidProvider().setTopUpPaketData(phoneNumber.text, refId, paketDataCodeSelected.value, paketDataNominalSelected.value).then((value) {
+        print(value.body);
+      }).catchError((err) {
+        print(err);
+      });
+    } else {
+      if (phoneNumber.text.length < 10) {
+        Get.defaultDialog(title: "Peringatan", content: Text("Nomor minimal 10 angka"));
+      } else {
+        Get.defaultDialog(title: "Peringatan", content: Text("Pilih paket terlebih dahulu"));
+      }
+    }
+  }
+
   void setPostpaidInquiryPln() async {
     if (customerId.text.isEmpty) {
-      Get.snackbar(
-          "Peringatan", "Kolom ID Pelanggan/No Meter tidak boleh kosong");
+      Get.snackbar("Peringatan", "Kolom ID Pelanggan/No Meter tidak boleh kosong");
     } else {
       if (customerId.text.length < 12) {
-        Get.snackbar(
-            "Peringatan", "ID Pelanggan/No Meter kurang dari 12 digit");
+        Get.snackbar("Peringatan", "ID Pelanggan/No Meter kurang dari 12 digit");
       } else {
         var refId = generateRandomString(6, "POSPLN");
         isLoading.value = true;
@@ -354,79 +376,11 @@ class PpobController extends GetxController
           (value) {
             isLoading.value = false;
             if (value.body["code"] == 400) {
-              Get.defaultDialog(
-                  title: value.body["status"],
-                  content: Text(value.body["data"]["message"]));
+              Get.defaultDialog(title: value.body["status"], content: Text(value.body["data"]["message"]));
             } else {
               var data = value.body;
 
-              Get.toNamed(Routes.TRXDETAIL_POSTPAID,
-                  arguments: {"data": data, "createdAt": Timestamp.now()});
-              // Get.defaultDialog(
-              //   title: "Rincian Tagihan",
-              //   content: Padding(
-              //     padding: const EdgeInsets.only(left: 15, right: 15),
-              //     child: Column(
-              //       mainAxisAlignment: MainAxisAlignment.start,
-              //       children: [
-              //         Text("Nama rekening:"),
-              //         Text(data["tr_name"],
-              //             style: TextStyle(fontWeight: FontWeight.bold)),
-              //         sb10,
-              //         Row(
-              //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //           crossAxisAlignment: CrossAxisAlignment.start,
-              //           children: [
-              //             Column(
-              //               crossAxisAlignment: CrossAxisAlignment.start,
-              //               children: [
-              //                 Text("No Meter:"),
-              //                 Text(data["hp"],
-              //                     style:
-              //                         TextStyle(fontWeight: FontWeight.bold)),
-              //                 sb5,
-              //                 Text("Denda:"),
-              //                 Text(
-              //                     "Rp ${NumberFormat("#,##0", "id_ID").format(int.parse(data["desc"]["tagihan"]["detail"][0]["denda"].toString()))}",
-              //                     style:
-              //                         TextStyle(fontWeight: FontWeight.bold)),
-              //               ],
-              //             ),
-              //             Column(
-              //               crossAxisAlignment: CrossAxisAlignment.end,
-              //               children: [
-              //                 Text("Periode:"),
-              //                 Text(
-              //                   DateFormat.yMMMM('id_ID').format(DateTime(
-              //                       int.parse(data["period"]
-              //                           .toString()
-              //                           .substring(0, 4)),
-              //                       int.parse(data["period"]
-              //                           .toString()
-              //                           .substring(5, 6)))),
-              //                   style: TextStyle(fontWeight: FontWeight.bold),
-              //                 ),
-              //                 sb5,
-              //                 Text("Biaya Admin:"),
-              //                 Text(
-              //                     "Rp ${NumberFormat("#,##0", "id_ID").format(int.parse(data["admin"].toString()))}",
-              //                     style:
-              //                         TextStyle(fontWeight: FontWeight.bold)),
-              //               ],
-              //             )
-              //           ],
-              //         ),
-              //         sb5,
-              //         Text("Total Biaya"),
-              //         Text(
-              //             "Rp ${NumberFormat("#,##0", "id_ID").format(data["price"])}",
-              //             style: TextStyle(
-              //                 fontWeight: FontWeight.bold, fontSize: 20)),
-              //         sb5,
-              //       ],
-              //     ),
-              //   ),
-              // );
+              Get.toNamed(Routes.TRXDETAIL_POSTPAID, arguments: {"data": data, "createdAt": Timestamp.now()});
             }
           },
         );
@@ -436,22 +390,17 @@ class PpobController extends GetxController
 
   void setPrepaidInquiryPln() async {
     if (customerId.text.isEmpty) {
-      Get.snackbar(
-          "Peringatan", "Kolom ID Pelanggan/No Meter tidak boleh kosong");
+      Get.snackbar("Peringatan", "Kolom ID Pelanggan/No Meter tidak boleh kosong");
     } else {
       if (customerId.text.length < 11) {
-        Get.snackbar(
-            "Peringatan", "ID Pelanggan/No Meter kurang dari 11 digit");
+        Get.snackbar("Peringatan", "ID Pelanggan/No Meter kurang dari 11 digit");
       } else {
         if (nominalSelected.isEmpty) {
           Get.snackbar("Peringatan", "Pilih nominal token terlebih dahulu");
         } else {
           isLoading.value = true;
-          await IakprepaidProvider()
-              .setInquiryPln(customerId.text)
-              .then((value) {
+          await IakprepaidProvider().setInquiryPln(customerId.text).then((value) {
             var response = value.body;
-
             if (response["status"] == "failed") {
               Get.defaultDialog(
                 title: "Pembelian Gagal",
@@ -470,8 +419,7 @@ class PpobController extends GetxController
                       "Jenis Layanan",
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    Text(
-                        "Token Listrik ${NumberFormat("#,##0", "id_ID").format(int.parse(nominalSelected.value.toString()))}"),
+                    Text("Token Listrik ${NumberFormat("#,##0", "id_ID").format(int.parse(nominalSelected.value.toString()))}"),
                     sb5,
                     Text(
                       "Nomor",
@@ -495,8 +443,7 @@ class PpobController extends GetxController
                       "Harga",
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    Text(
-                        "Rp ${NumberFormat("#,##0", "id_ID").format(int.parse(nominalSelected.value.toString()))}"),
+                    Text("Rp ${NumberFormat("#,##0", "id_ID").format(int.parse(nominalSelected.value.toString()))}"),
                   ],
                 ),
                 radius: 15,
@@ -510,37 +457,24 @@ class PpobController extends GetxController
                       : ElevatedButton(
                           onPressed: () async {
                             isProceedLoading.value = true;
-                            if (await HomeController().getBalance() <
-                                int.parse(nominalSelected.value)) {
+                            if (await HomeController().getBalance() < int.parse(nominalSelected.value)) {
                               isProceedLoading.value = false;
-                              Get.defaultDialog(
-                                  title: "Saldo tidak cukup",
-                                  content: Text(
-                                      "Pastikan saldo anda cukup sebelum melakukan transaksi"));
+                              Get.defaultDialog(title: "Saldo tidak cukup", content: Text("Pastikan saldo anda cukup sebelum melakukan transaksi"));
                             } else {
                               var refId = generateRandomString(6, "PREPLN");
                               await IakprepaidProvider()
-                                  .setTopUp(
-                                      customerId.text,
-                                      refId,
-                                      codeSelected.value,
-                                      nominalSelected.value,
-                                      response["data"])
+                                  .setTopUpPln(customerId.text, refId, codeSelected.value, nominalSelected.value, response["data"])
                                   .then((value) {
                                 if (value.statusCode != 400) {
                                   nominalSelected.value = "";
                                   codeSelected.value = "";
                                   // Get.offNamed(Routes.TRANSACTIONS,
                                   //     arguments: {"refresh": true});
-                                  Get.offNamed(Routes.TRXDETAIL_PREPAID,
-                                      arguments: {"data": value.body});
+                                  Get.offNamed(Routes.TRXDETAIL_PREPAID, arguments: {"data": value.body});
                                 } else {
                                   nominalSelected.value = "";
                                   codeSelected.value = "";
-                                  Get.defaultDialog(
-                                      title: "Gagal",
-                                      content: Text(
-                                          "Terjadi kesalahan, mohon ulangi transaksi kembali"));
+                                  Get.defaultDialog(title: "Gagal", content: Text("Terjadi kesalahan, mohon ulangi transaksi kembali"));
                                 }
                               });
                               homeC.balance.value = await homeC.getBalance();
