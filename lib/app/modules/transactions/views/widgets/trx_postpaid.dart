@@ -63,8 +63,8 @@ class ItemTransaksiPostpaid extends StatelessWidget {
           Get.toNamed(Routes.TRXDETAIL_POSTPAID, arguments: {"data": data, "createdAt": createdAt});
         },
         style: ButtonStyle(
-            shadowColor: MaterialStateProperty.all(Colors.grey),
-            elevation: MaterialStateProperty.all(2),
+            shadowColor: MaterialStateProperty.all(Colors.grey.shade300),
+            elevation: MaterialStateProperty.all(1),
             backgroundColor: MaterialStateProperty.all(Colors.white)),
         child: Padding(
           padding: EdgeInsets.only(left: 15, right: 15),
@@ -95,53 +95,77 @@ class ItemTransaksiPostpaid extends StatelessWidget {
                             product,
                             style: TextStyle(color: Colors.black, fontSize: 14),
                           ),
-                          Text(
-                            "${DateFormat.Hm().format(createdAt.toDate())} WITA",
-                            style: TextStyle(color: Colors.grey, fontSize: 12),
-                          ),
+                          // Text(
+                          //   "${DateFormat.Hm().format(createdAt.toDate())} WITA",
+                          //   style: TextStyle(color: Colors.grey, fontSize: 12),
+                          // ),
                         ],
                       ),
-                      TrxStatus(
-                        statusCode: status,
+                      Text(
+                        "- Rp ${NumberFormat("#,##0", "id_ID").format(int.parse(nominal.toString()))}",
+                        style: TextStyle(color: Colors.red.shade400, fontWeight: FontWeight.bold, fontSize: 14),
                       ),
+                      // TrxStatus(
+                      //   statusCode: status,
+                      // ),
                     ],
                   ),
-                  Divider(
-                    height: 2,
-                  ),
-                  sb5,
+                  // Divider(
+                  //   height: 2,
+                  // ),
+                  // sb5,
                   Row(
                     children: [
-                      Expanded(
-                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          Text(
-                            "Biaya:",
-                            style: TextStyle(color: Colors.black, fontSize: 14),
-                          ),
-                          Text(
-                            "Rp ${NumberFormat("#,##0", "id_ID").format(int.parse(nominal.toString()))}",
-                            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14),
-                          ),
-                        ]),
+                      Container(
+                        width: Get.width * 0.09,
+                        child: Text(
+                          "${DateFormat.Hm().format(createdAt.toDate())}",
+                          style: TextStyle(color: Colors.grey, fontSize: 12),
+                        ),
                       ),
                       Expanded(
-                        child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                          Text(
-                            name,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(color: Colors.black, fontSize: 14),
-                          ),
-                          Text(
-                            meterNo,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(color: Colors.black, fontSize: 14),
-                          ),
-                        ]),
+                        child: Text(
+                          meterNo,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(color: Colors.black, fontSize: 14),
+                        ),
                       )
                     ],
-                  )
+                  ),
+                  TrxStatus(statusCode: status)
+                  // Row(
+                  //   children: [
+                  //     Expanded(
+                  //       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  //         Text(
+                  //           "Biaya:",
+                  //           style: TextStyle(color: Colors.black, fontSize: 14),
+                  //         ),
+                  //         Text(
+                  //           "Rp ${NumberFormat("#,##0", "id_ID").format(int.parse(nominal.toString()))}",
+                  //           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14),
+                  //         ),
+                  //       ]),
+                  //     ),
+                  //     Expanded(
+                  //       child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                  //         Text(
+                  //           name,
+                  //           maxLines: 1,
+                  //           overflow: TextOverflow.ellipsis,
+                  //           style: TextStyle(color: Colors.black, fontSize: 14),
+                  //         ),
+                  //         Text(
+                  //           meterNo,
+                  //           maxLines: 1,
+                  //           overflow: TextOverflow.ellipsis,
+                  //           style: TextStyle(color: Colors.black, fontSize: 14),
+                  //         ),
+                  //       ]),
+                  //     )
+                  //   ],
+                  // )
                 ],
               ),
             ),

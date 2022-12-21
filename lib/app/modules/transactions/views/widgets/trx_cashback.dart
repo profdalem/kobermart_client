@@ -1,26 +1,15 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:kobermart_client/app/models/Transactions.dart';
 
 import '../../../../routes/app_pages.dart';
 import '../../../widgets/trx_status.dart';
 
 class ItemTransaksiCashback extends StatelessWidget {
-  final int nominal;
-  final String type;
-  final bool isCount;
-  final Timestamp createdAt;
-  final String message;
-  const ItemTransaksiCashback(
-      {Key? key,
-      required this.nominal,
-      required this.type,
-      required this.isCount,
-      required this.createdAt,
-      required this.message})
-      : super(key: key);
+  final Transaction data;
+  ItemTransaksiCashback({Key? key, required this.data}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -29,19 +18,24 @@ class ItemTransaksiCashback extends StatelessWidget {
     Color? iconColor = Colors.blue;
     int code = 4;
 
-    if (!isCount) {
+    if (data.status == "FAILED") {
       code = 5;
     }
 
-    switch (type) {
-      case "ref":
-        sumber = message;
+    switch (data.type) {
+      case "referral":
+        sumber = data.data["transactionData"]["message"];
         jenis = "Referral";
         break;
       case "plan-a":
-        sumber = message;
+        sumber = data.data["transactionData"]["message"];
         jenis = "Plan A";
-        iconColor = Colors.red[600];
+        iconColor = Colors.red[400];
+        break;
+      case "plan-b":
+        sumber = data.data["transactionData"]["message"];
+        jenis = "Plan B";
+        iconColor = Colors.orange[400];
         break;
       default:
         sumber = "N/A";
@@ -52,19 +46,11 @@ class ItemTransaksiCashback extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 10),
       child: TextButton(
         onPressed: () {
-          Get.toNamed(Routes.TRXDETAIL_CASHBACK, arguments: {
-            "nominal": nominal,
-            "jenis": jenis,
-            "message": message,
-            "createdAt": createdAt,
-            "type": type,
-            "isCount": isCount,
-            "iconColor": iconColor
-          });
+          Get.toNamed(Routes.TRXDETAIL_CASHBACK, arguments: {"data": data, "jenis": jenis, "iconColor": iconColor});
         },
         style: ButtonStyle(
-            shadowColor: MaterialStateProperty.all(Colors.grey),
-            elevation: MaterialStateProperty.all(2),
+            shadowColor: MaterialStateProperty.all(Colors.grey.shade300),
+            elevation: MaterialStateProperty.all(1),
             backgroundColor: MaterialStateProperty.all(Colors.white)),
         child: Padding(
           padding: EdgeInsets.only(left: 15, right: 15),
@@ -93,65 +79,44 @@ class ItemTransaksiCashback extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Cashback (${jenis})",
+                            "${jenis}",
                             style: TextStyle(color: Colors.black, fontSize: 14),
-                          ),
-                          Text(
-                            "${DateFormat.Hm().format(createdAt.toDate())} WITA",
-                            style: TextStyle(color: Colors.grey, fontSize: 12),
                           ),
                         ],
                       ),
-                      TrxStatus(
-                        statusCode: code,
+                      Text(
+                        "+ Rp ${NumberFormat("#,##0", "id_ID").format(data.nominal)}",
+                        style: TextStyle(color: Colors.green.shade300, fontWeight: FontWeight.bold, fontSize: 14),
                       ),
                     ],
-                  ),
-                  Divider(
-                    height: 2,
-                  ),
-                  SizedBox(
-                    height: 5,
                   ),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              Text(
-                                "Jumlah:",
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 14),
+                              Container(
+                                width: Get.width * 0.1,
+                                child: Text(
+                                  "${DateFormat.Hm().format(data.createdAt)}",
+                                  style: TextStyle(color: Colors.grey, fontSize: 12),
+                                ),
                               ),
-                              Text(
-                                "Rp ${NumberFormat("#,##0", "id_ID").format(nominal)}",
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14),
+                              Expanded(
+                                child: Text(
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  sumber,
+                                  style: TextStyle(color: Colors.black, fontSize: 14),
+                                ),
                               ),
-                            ]),
+                            ],
+                          ),
+                        ]),
                       ),
-                      Expanded(
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                "Sumber:",
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 14),
-                              ),
-                              Text(
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                sumber,
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 12),
-                              ),
-                            ]),
-                      )
                     ],
                   )
                 ],

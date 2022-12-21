@@ -7,6 +7,42 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:49021389415:android:24acbd54444024c64ea2c2",
+        "android_client_info": {
+          "package_name": "com.example.kobermart_admin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "49021389415-n252b57d0cp8fvqnikl6hna5pn5iqr7a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBRdZWPmlOjenl_bIvOSw8W6ZCb2QuTOZo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "49021389415-n252b57d0cp8fvqnikl6hna5pn5iqr7a.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "49021389415-asuqfd7189ee886m33d9k1nqrfp28nbd.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.kobermartAdmin"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:49021389415:android:28939c384f276b3e4ea2c2",
         "android_client_info": {
           "package_name": "com.wakesadigital.kobermart_client"
@@ -37,6 +73,13 @@
             {
               "client_id": "49021389415-n252b57d0cp8fvqnikl6hna5pn5iqr7a.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "49021389415-asuqfd7189ee886m33d9k1nqrfp28nbd.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.kobermartAdmin"
+              }
             }
           ]
         }

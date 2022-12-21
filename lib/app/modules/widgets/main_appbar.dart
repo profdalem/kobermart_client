@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:kobermart_client/app/controllers/product_controller.dart';
+import 'package:kobermart_client/app/data/iakprepaid_provider.dart';
 import 'package:kobermart_client/app/modules/home/controllers/home_controller.dart';
 
 import '../../routes/app_pages.dart';
@@ -46,6 +47,7 @@ class DefaultAppBar extends StatelessWidget {
               // productC.getAllProduct();
               // productC.getAllCarts();
               await homeC.getInitialData();
+              // print(homeC.downlines.length);
               // homeC.getDownlines();
             },
             icon: Icon(Icons.refresh)),

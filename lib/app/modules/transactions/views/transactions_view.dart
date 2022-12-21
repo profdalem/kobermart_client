@@ -1,11 +1,13 @@
 // ignore_for_file: invalid_use_of_protected_member
 
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart' show Timestamp;
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:kobermart_client/app/data/transaction_provider.dart';
+import 'package:kobermart_client/app/models/Transactions.dart';
 import 'package:kobermart_client/app/modules/transactions/views/widgets/trx_prepaid.dart';
+import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/style.dart';
 import 'package:sticky_grouped_list/sticky_grouped_list.dart';
 import '../../widgets/bottom_menu.dart';
@@ -32,6 +34,7 @@ class TransactionsView extends GetView<TransactionsController> {
         Future.delayed(Duration(milliseconds: 500), () => controller.getUserTransactions());
       }
     }
+
     return SafeArea(
       top: false,
       child: Scaffold(
@@ -44,7 +47,7 @@ class TransactionsView extends GetView<TransactionsController> {
         ),
         body: Column(
           children: [
-            sb15,
+            sb10,
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Padding(
@@ -67,65 +70,65 @@ class TransactionsView extends GetView<TransactionsController> {
                 ),
               ),
             ),
-            Row(
-              children: [
-                SizedBox(
-                  width: 15,
-                ),
-                Text(
-                  "Rentang: ",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                Expanded(
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: Obx(
-                        () => Row(
-                          children: [
-                            FilterRentang(
-                              title: "7 hari",
-                              days: 7,
-                              selectedDays: controller.days.value,
-                            ),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            FilterRentang(
-                              title: "30 hari",
-                              days: 30,
-                              selectedDays: controller.days.value,
-                            ),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            FilterRentang(
-                              title: "6 bulan",
-                              days: 180,
-                              selectedDays: controller.days.value,
-                            ),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            FilterRentang(
-                              title: "1 tahun",
-                              days: 365,
-                              selectedDays: controller.days.value,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            sb15,
+            // Row(
+            //   children: [
+            //     SizedBox(
+            //       width: 15,
+            //     ),
+            //     Text(
+            //       "Rentang: ",
+            //       style: TextStyle(fontWeight: FontWeight.bold),
+            //     ),
+            //     Expanded(
+            //       child: SingleChildScrollView(
+            //         scrollDirection: Axis.horizontal,
+            //         child: Padding(
+            //           padding: const EdgeInsets.symmetric(horizontal: 15),
+            //           child: Obx(
+            //             () => Row(
+            //               children: [
+            //                 FilterRentang(
+            //                   title: "7 hari",
+            //                   days: 7,
+            //                   selectedDays: controller.days.value,
+            //                 ),
+            //                 SizedBox(
+            //                   width: 10,
+            //                 ),
+            //                 FilterRentang(
+            //                   title: "30 hari",
+            //                   days: 30,
+            //                   selectedDays: controller.days.value,
+            //                 ),
+            //                 SizedBox(
+            //                   width: 10,
+            //                 ),
+            //                 FilterRentang(
+            //                   title: "6 bulan",
+            //                   days: 180,
+            //                   selectedDays: controller.days.value,
+            //                 ),
+            //                 SizedBox(
+            //                   width: 10,
+            //                 ),
+            //                 FilterRentang(
+            //                   title: "1 tahun",
+            //                   days: 365,
+            //                   selectedDays: controller.days.value,
+            //                 ),
+            //               ],
+            //             ),
+            //           ),
+            //         ),
+            //       ),
+            //     ),
+            //   ],
+            // ),
+            sb10,
             Expanded(
               child: RefreshIndicator(
                 child: Obx(
-                  () => controller.transactions.isEmpty
+                  () => controller.globaltrx.isEmpty
                       ? controller.isLoading.value
                           ? Center(child: CircularProgressIndicator())
                           : ListView(
@@ -133,74 +136,49 @@ class TransactionsView extends GetView<TransactionsController> {
                             )
                       : StickyGroupedListView(
                           elements: controller.filteredTransaction(controller.filterBy.value),
-                          itemComparator: (dynamic a, dynamic b) {
-                            return double.parse((a["createdAt"]["_seconds"] * 1000 + a["createdAt"]["_nanoseconds"] / 1000000).toString()).round() -
-                                double.parse((b["createdAt"]["_seconds"] * 1000 + b["createdAt"]["_nanoseconds"] / 1000000).toString()).round();
+                          itemComparator: (Transaction a, Transaction b) {
+                            return a.createdAt.millisecondsSinceEpoch - b.createdAt.millisecondsSinceEpoch;
                           },
-                          groupBy: (dynamic element) {
-                            return Timestamp.fromMillisecondsSinceEpoch(element['createdAt']['_seconds'] * 1000).toDate().toString().substring(0, 10);
+                          groupBy: (Transaction element) {
+                            return element.createdAt.toLocal().toString().substring(0, 10);
                           },
-                          itemBuilder: (BuildContext context, dynamic element) {
+                          itemBuilder: (BuildContext context, Transaction element) {
                             Widget item;
 
-                            switch (element['type']) {
+                            switch (element.type) {
                               case 'topup':
-                                var history = element['history'];
-                                item = ItemTransaksiTopup(
-                                  nominal: element['nominal'],
-                                  method: element['method'],
-                                  code: element['history'][history.length - 1]['code'],
-                                  createdAt: Timestamp.fromMillisecondsSinceEpoch(element['createdAt']['_seconds'] * 1000),
-                                );
+                                item = ItemTransaksiTopup(data: element);
                                 break;
                               case 'withdraw':
-                                var history = element['history'];
-                                item = ItemTransaksiWithdrawal(
-                                  nominal: element['nominal'],
-                                  method: element['method'],
-                                  code: element['history'][history.length - 1]['code'],
-                                  createdAt: Timestamp.fromMillisecondsSinceEpoch(element['createdAt']['_seconds'] * 1000),
-                                );
+                                 item = ItemTransaksiWithdrawal(data: element);
                                 break;
-                              case 'transfer-in':
-                                item = ItemTransaksiTransferIn(
-                                  nominal: element['nominal'],
-                                  sender: element['senderData']['name'],
-                                  createdAt: Timestamp.fromMillisecondsSinceEpoch(element['createdAt']['_seconds'] * 1000),
-                                );
+                                case 'token':
+                                item = ItemTransaksiToken(data: element);
                                 break;
-                              case 'transfer-out':
-                                item = ItemTransaksiTransferOut(
-                                  nominal: element['nominal'],
-                                  recipient: element['recipientData']['name'],
-                                  createdAt: Timestamp.fromMillisecondsSinceEpoch(element['createdAt']['_seconds'] * 1000),
-                                );
-                                break;
-                              case 'ref':
-                                item = ItemTransaksiCashback(
-                                  nominal: element['nominal'],
-                                  isCount: element['isCount'],
-                                  type: element['type'],
-                                  message: element['message'],
-                                  createdAt: Timestamp.fromMillisecondsSinceEpoch(element['createdAt']['_seconds'] * 1000),
-                                );
+                              case 'referral':
+                                item = ItemTransaksiCashback(data: element);
                                 break;
                               case 'plan-a':
-                                item = ItemTransaksiCashback(
-                                  nominal: element['nominal'],
-                                  isCount: element['isCount'],
-                                  type: element['type'],
-                                  message: element['message'],
-                                  createdAt: Timestamp.fromMillisecondsSinceEpoch(element['createdAt']['_seconds'] * 1000),
-                                );
+                                item = ItemTransaksiCashback(data: element);
                                 break;
-                              case 'token':
-                                item = ItemTransaksiToken(
-                                  nominal: element["tokenPrice"],
-                                  tokenCode: element["tokenCode"],
-                                  createdAt: Timestamp.fromMillisecondsSinceEpoch(element['createdAt']['_seconds'] * 1000),
-                                );
+                              case 'plan-b':
+                                item = ItemTransaksiCashback(data: element);
                                 break;
+                              // case 'transfer-in':
+                              //   item = ItemTransaksiTransferIn(
+                              //     nominal: element.nominal,
+                              //     sender: element['senderData']['name'],
+                              //     createdAt: Timestamp.fromMillisecondsSinceEpoch(element['createdAt']['_seconds'] * 1000),
+                              //   );
+                              //   break;
+                              // case 'transfer-out':
+                              //   item = ItemTransaksiTransferOut(
+                              //     nominal: element.nominal,
+                              //     recipient: element['recipientData']['name'],
+                              //     createdAt: Timestamp.fromMillisecondsSinceEpoch(element['createdAt']['_seconds'] * 1000),
+                              //   );
+                              //   break;
+                              
                               case 'prepaid':
                                 item = ItemTransaksiPrepaid(data: element);
                                 break;
@@ -215,9 +193,8 @@ class TransactionsView extends GetView<TransactionsController> {
 
                             return item;
                           },
-                          groupSeparatorBuilder: (dynamic element) {
-                            return DateTime.now().toString().substring(0, 10) ==
-                                    Timestamp.fromMillisecondsSinceEpoch(element['createdAt']['_seconds'] * 1000).toDate().toString().substring(0, 10)
+                          groupSeparatorBuilder: (Transaction element) {
+                            return DateTime.now().toString().substring(0, 10) == element.createdAt.toLocal().toString().substring(0, 10)
                                 ? const Padding(
                                     padding: EdgeInsets.all(8.0),
                                     child: Text("Hari ini", style: TextStyle(fontWeight: FontWeight.bold)),
@@ -225,10 +202,7 @@ class TransactionsView extends GetView<TransactionsController> {
                                 : Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Text(
-                                      Timestamp.fromMillisecondsSinceEpoch(element['createdAt']['_seconds'] * 1000)
-                                          .toDate()
-                                          .toString()
-                                          .substring(0, 10),
+                                      element.createdAt.toLocal().toString().substring(0, 10),
                                       style: const TextStyle(fontWeight: FontWeight.bold),
                                     ),
                                   );
@@ -273,11 +247,7 @@ class TransactionsView extends GetView<TransactionsController> {
                 //   ],
                 // ),
                 onRefresh: () {
-                  return TransactionProvider().getUserTransactions(controller.days.value).then((value) {
-                    print("refresh");
-                    controller.transactions.value = value.body;
-                    controller.transactions.refresh();
-                  });
+                  return controller.getUserTransactions();
                 },
               ),
             )
@@ -290,7 +260,57 @@ class TransactionsView extends GetView<TransactionsController> {
           menu3: false,
           menu4: true,
         ),
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.date_range_rounded),
+          onPressed: () {
+            Get.defaultDialog(
+                title: "Rentang Waktu",
+                content: Column(
+                  children: [
+                    RentangButtonBottomSheet(controller: controller, day: 7, text: "7 hari"),
+                    RentangButtonBottomSheet(controller: controller, day: 30, text: "30 hari"),
+                    RentangButtonBottomSheet(controller: controller, day: 180, text: "6 bulan"),
+                    RentangButtonBottomSheet(controller: controller, day: 365, text: "1 tahun"),
+                  ],
+                ));
+          },
+        ),
       ),
+    );
+  }
+}
+
+class RentangButtonBottomSheet extends StatelessWidget {
+  const RentangButtonBottomSheet({
+    Key? key,
+    required this.controller,
+    required this.day,
+    required this.text,
+  }) : super(key: key);
+
+  final TransactionsController controller;
+  final int day;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () async {
+        if (day != controller.days.value) {
+          controller.days.value = day;
+          if (Get.isDialogOpen!) {
+            Get.back();
+          }
+          controller.getUserTransactions();
+        }
+      },
+      child: Text(
+        text,
+        style: TextStyle(color: day != controller.days.value ? Colors.grey.shade800 : Colors.grey.shade400),
+      ),
+      style: ButtonStyle(
+          side: MaterialStatePropertyAll(BorderSide(width: 1, color: day != controller.days.value ? Colors.amber.shade400 : Colors.grey.shade300)),
+          backgroundColor: MaterialStatePropertyAll(day != controller.days.value ? Colors.amber.shade200 : Colors.grey.shade300)),
     );
   }
 }
@@ -330,8 +350,7 @@ class FilterRentang extends StatelessWidget {
             ),
             borderRadius: BorderRadius.circular(15.0),
           )),
-          backgroundColor:
-              transactionC.days.value == days ? MaterialStateProperty.all(Color(0xFFFFD89E)) : MaterialStateProperty.all(Color(0xFFE4E4E4))),
+          backgroundColor: transactionC.days.value == days ? MaterialStateProperty.all(Color(0xFFFFD89E)) : MaterialStateProperty.all(Color(0xFFE4E4E4))),
     );
   }
 }
@@ -370,8 +389,7 @@ class FilterJenis extends StatelessWidget {
             ),
             borderRadius: BorderRadius.circular(15.0),
           )),
-          backgroundColor:
-              transactionC.filterBy.value == code ? MaterialStateProperty.all(Color(0xFFFFD89E)) : MaterialStateProperty.all(Color(0xFFE4E4E4))),
+          backgroundColor: transactionC.filterBy.value == code ? MaterialStateProperty.all(Color(0xFFFFD89E)) : MaterialStateProperty.all(Color(0xFFE4E4E4))),
     );
   }
 }

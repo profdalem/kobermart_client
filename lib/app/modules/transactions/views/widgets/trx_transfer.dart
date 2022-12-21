@@ -21,8 +21,8 @@ class ItemTransaksiTransfer extends StatelessWidget {
           Get.toNamed(Routes.TRXDETAIL_TRANSFER);
         },
         style: ButtonStyle(
-            shadowColor: MaterialStateProperty.all(Colors.grey),
-            elevation: MaterialStateProperty.all(2),
+            shadowColor: MaterialStateProperty.all(Colors.grey.shade300),
+            elevation: MaterialStateProperty.all(1),
             backgroundColor: MaterialStateProperty.all(Colors.white)),
         child: Padding(
           padding: EdgeInsets.only(left: 15, right: 15),

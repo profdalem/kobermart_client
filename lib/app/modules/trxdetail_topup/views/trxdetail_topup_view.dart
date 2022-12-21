@@ -4,7 +4,10 @@ import 'package:flutter_svg/svg.dart';
 
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:kobermart_client/app/models/Transactions.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
+import 'package:kobermart_client/constants.dart';
+import 'package:kobermart_client/firebase.dart';
 import 'package:kobermart_client/style.dart';
 
 import '../controllers/trxdetail_topup_controller.dart';
@@ -14,6 +17,7 @@ class TrxdetailTopupView extends GetView<TrxdetailTopupController> {
   const TrxdetailTopupView({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
+    Transaction data = Get.arguments["data"] as Transaction;
     return SafeArea(
       top: false,
       child: Scaffold(
@@ -33,11 +37,16 @@ class TrxdetailTopupView extends GetView<TrxdetailTopupController> {
               },
               icon: Icon(Icons.close)),
           actions: [
-            IconButton(
-                onPressed: () {
-                  Get.toNamed(Routes.CART);
-                },
-                icon: Icon(Icons.shopping_cart))
+            if (data.status == "PENDING")
+              IconButton(
+                  tooltip: "Hapus",
+                  onPressed: () {
+                    GlobalTrx.doc(data.id).delete().then((value) => Get.toNamed(Routes.TRANSACTIONS, arguments: {"refresh": true}));
+                  },
+                  icon: Icon(
+                    Icons.delete_rounded,
+                    color: Colors.red,
+                  ))
           ],
         ),
         body: SingleChildScrollView(
@@ -56,18 +65,33 @@ class TrxdetailTopupView extends GetView<TrxdetailTopupController> {
               Container(
                 alignment: Alignment.center,
                 child: Text(
-                  "Dibuat ${DateFormat.yMMMd("id_ID").format(Get.arguments["createdAt"].toDate())} ${DateFormat.Hm().format(Get.arguments["createdAt"].toDate())} WITA",
+                  "Dibuat ${DateFormat.yMMMd("id_ID").format(data.createdAt)} ${DateFormat.Hm().format(data.createdAt)} WITA",
                   style: TextStyle(color: Colors.grey),
                 ),
               ),
               sb15,
-              TrxDetailMainPanel(arguments: Get.arguments),
-              sb15,
-              TrxDetailPaymentMessage(),
-              sb15,
-              TrxDetailPaymentInfoShop(),
-              sb15,
-              TrxDetailCollector(),
+              TrxDetailMainPanel(data: data),
+              if (data.status == "ACTIVE")
+                Column(
+                  children: [
+                    sb15,
+                    TrxDetailPaymentMessage(),
+                  ],
+                ),
+              if (data.status == "PENDING")
+                Column(
+                  children: [
+                    sb15,
+                    TrxDetailPaymentInfoShop(data: data),
+                  ],
+                ),
+              if (data.data["collectorData"] != null)
+                Column(
+                  children: [
+                    sb15,
+                    TrxDetailCollector(),
+                  ],
+                ),
               Container(
                 width: Get.width,
                 child: Padding(
@@ -79,7 +103,7 @@ class TrxdetailTopupView extends GetView<TrxdetailTopupController> {
                     },
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ),
@@ -89,18 +113,18 @@ class TrxdetailTopupView extends GetView<TrxdetailTopupController> {
 }
 
 class TrxDetailMainPanel extends StatelessWidget {
-  final dynamic arguments;
+  final Transaction data;
   TrxDetailMainPanel({
     Key? key,
-    required this.arguments,
+    required this.data,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    String notrx = "TRX88432389293";
+    String notrx = data.id;
     String type = "Top Up";
-    String method = arguments["method"];
-    int status = arguments["code"];
+    String method = data.getMethod();
+    int status = data.getStatus();
 
     return Container(
       decoration: Shadow1(),
@@ -133,8 +157,7 @@ class TrxDetailMainPanel extends StatelessWidget {
                     Text(type),
                     sb15,
                     PanelTitle(title: "Nominal"),
-                    Text(
-                        "Rp ${NumberFormat("#,##0", "id_ID").format(arguments["nominal"])}"),
+                    Text("Rp ${NumberFormat("#,##0", "id_ID").format(data.nominal)}"),
                   ],
                 ),
                 Column(
@@ -177,29 +200,18 @@ class TrxDetailPaymentMessage extends StatelessWidget {
             child: Column(children: [
               Text(
                 "Transfer Dana Berhasil!",
-                style: TextStyle(
-                    color: Colors.green.shade700,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18),
+                style: TextStyle(color: Colors.green.shade700, fontWeight: FontWeight.bold, fontSize: 18),
               ),
               sb10,
               RichText(
-                  text: TextSpan(
-                      style: TextStyle(color: Colors.black),
-                      text:
-                          "Pembayaran anda telah diterima dan divalidasi oleh Admin ",
-                      children: [
-                    TextSpan(text: "(nama admin) "),
-                    TextSpan(text: "pada "),
-                    TextSpan(
-                        text: "20-06-2022",
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    TextSpan(text: " pukul "),
-                    TextSpan(
-                        text: "12.31 WITA",
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    TextSpan(text: "."),
-                  ]))
+                  text: TextSpan(style: TextStyle(color: Colors.black), text: "Pembayaran anda telah diterima dan divalidasi oleh Admin ", children: [
+                TextSpan(text: "(nama admin) "),
+                TextSpan(text: "pada "),
+                TextSpan(text: "20-06-2022", style: TextStyle(fontWeight: FontWeight.bold)),
+                TextSpan(text: " pukul "),
+                TextSpan(text: "12.31 WITA", style: TextStyle(fontWeight: FontWeight.bold)),
+                TextSpan(text: "."),
+              ]))
             ]),
           ),
         );
@@ -212,29 +224,18 @@ class TrxDetailPaymentMessage extends StatelessWidget {
             child: Column(children: [
               Text(
                 "Dana anda telah kami terima!",
-                style: TextStyle(
-                    color: Colors.green.shade700,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18),
+                style: TextStyle(color: Colors.green.shade700, fontWeight: FontWeight.bold, fontSize: 18),
               ),
               sb10,
               RichText(
-                  text: TextSpan(
-                      style: TextStyle(color: Colors.black),
-                      text:
-                          "Pembayaran anda telah diterima dan divalidasi oleh Admin ",
-                      children: [
-                    TextSpan(text: "(nama admin) "),
-                    TextSpan(text: "pada "),
-                    TextSpan(
-                        text: "20-06-2022",
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    TextSpan(text: " pukul "),
-                    TextSpan(
-                        text: "12.31 WITA",
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    TextSpan(text: "."),
-                  ]))
+                  text: TextSpan(style: TextStyle(color: Colors.black), text: "Pembayaran anda telah diterima dan divalidasi oleh Admin ", children: [
+                TextSpan(text: "(nama admin) "),
+                TextSpan(text: "pada "),
+                TextSpan(text: "20-06-2022", style: TextStyle(fontWeight: FontWeight.bold)),
+                TextSpan(text: " pukul "),
+                TextSpan(text: "12.31 WITA", style: TextStyle(fontWeight: FontWeight.bold)),
+                TextSpan(text: "."),
+              ]))
             ]),
           ),
         );
@@ -245,8 +246,10 @@ class TrxDetailPaymentMessage extends StatelessWidget {
 
 // informasi cara bayar
 class TrxDetailPaymentInfoShop extends StatelessWidget {
-  const TrxDetailPaymentInfoShop({
+  final Transaction data;
+  TrxDetailPaymentInfoShop({
     Key? key,
+    required this.data,
   }) : super(key: key);
 
   @override
@@ -259,8 +262,8 @@ class TrxDetailPaymentInfoShop extends StatelessWidget {
       Get.toNamed(Routes.QRCODE);
     };
 
-    switch (type) {
-      case 1:
+    switch (data.getMethod()) {
+      case METHOD_TRANSFER:
         typeTitle = "Top Up (transfer)";
         btnText = "Saya sudah bayar";
         btnFunction = () {};
@@ -275,16 +278,14 @@ class TrxDetailPaymentInfoShop extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                          "Transfer sejumlah total harga yang tertera di atas ke rekening BRI a.n Kobermart "),
+                      Text("Transfer sejumlah total harga yang tertera di atas ke rekening BRI a.n Kobermart "),
                       sb10,
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
                             "1234567981283129318",
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                           SizedBox(
                             width: 5,
@@ -338,8 +339,7 @@ class TrxDetailPaymentInfoShop extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                          "Kolektor kami akan melakukan penjemputan dana langsung ke alamat anda."),
+                      Text("Kolektor kami akan melakukan penjemputan dana langsung ke alamat anda."),
                     ],
                   ),
                 )
@@ -355,8 +355,7 @@ class TrxDetailPaymentInfoShop extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                          "Berikan dana kepada Kolektor dan Buka QR Code agar Kolektor dapat memvalidasi transaksi anda."),
+                      Text("Berikan dana kepada Kolektor dan Buka QR Code agar Kolektor dapat memvalidasi transaksi anda."),
                       sb10,
                     ],
                   ),
@@ -387,11 +386,7 @@ class TrxDetailPaymentInfoShop extends StatelessWidget {
             content,
             Container(
               width: double.infinity,
-              child: ElevatedButton(
-                  style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(Colors.blue)),
-                  onPressed: btnFunction,
-                  child: Text(btnText)),
+              child: ElevatedButton(style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.blue)), onPressed: btnFunction, child: Text(btnText)),
             )
           ],
         ),
@@ -419,8 +414,7 @@ class TrxDetailCollector extends StatelessWidget {
           ListTile(
             contentPadding: EdgeInsets.all(0),
             leading: CircleAvatar(
-              backgroundImage: CachedNetworkImageProvider(
-                  "https://i.pravatar.cc/150?img=18"),
+              backgroundImage: CachedNetworkImageProvider("https://i.pravatar.cc/150?img=18"),
             ),
             title: Text("Robert Xemeckis"),
             onTap: () {

@@ -38,6 +38,9 @@ abstract class Routes {
   static const PPOB = _Paths.PPOB;
   static const TRXDETAIL_PREPAID = _Paths.TRXDETAIL_PREPAID;
   static const TRXDETAIL_POSTPAID = _Paths.TRXDETAIL_POSTPAID;
+  static const CASHBACK_HISTORY = _Paths.CASHBACK_HISTORY;
+  static const INPUTNUMBER = _Paths.INPUTNUMBER;
+  static const SELECTMETHOD = _Paths.SELECTMETHOD;
 }
 
 abstract class _Paths {
@@ -77,4 +80,7 @@ abstract class _Paths {
   static const PPOB = '/ppob';
   static const TRXDETAIL_PREPAID = '/trxdetail-prepaid';
   static const TRXDETAIL_POSTPAID = '/trxdetail-postpaid';
+  static const CASHBACK_HISTORY = '/cashback-history';
+  static const INPUTNUMBER = '/inputnumber';
+  static const SELECTMETHOD = '/selectmethod';
 }

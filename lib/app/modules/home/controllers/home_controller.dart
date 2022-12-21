@@ -1,32 +1,35 @@
 // ignore_for_file: invalid_use_of_protected_member
 
+import 'dart:async';
+import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:kobermart_client/app/data/setting_provider.dart';
+import 'package:kobermart_client/app/controllers/auth_controller.dart';
 import 'package:kobermart_client/app/data/user_provider.dart';
 import 'package:kobermart_client/config.dart';
-
 import '../../../../firebase.dart';
 
 class HomeController extends GetxController {
   late TextEditingController emailC;
   late TextEditingController passwordC;
 
+  final authC = Get.find<AuthController>();
+
   var isLoading = false.obs;
 
   var name = "".obs;
   var id = "".obs;
-  var user;
+  var refId = "".obs;
 
   var balance = 0.obs;
   var cashback = 0.obs;
   var anggota = 0.obs;
   var kd = 0.obs;
   var kd1count = 0.obs;
-  var upline;
+  var uplineName = "".obs;
 
   var settings;
 
@@ -36,13 +39,20 @@ class HomeController extends GetxController {
   var box = GetStorage();
   var fcmToken = "";
 
+  late StreamSubscription subscribeMemberInfo;
+
   final count = 0.obs;
   @override
   void onInit() async {
     emailC = TextEditingController();
     passwordC = TextEditingController();
-    // await getBalance();
-    // await getCashback();
+    await getInitialData();
+    super.onInit();
+  }
+
+  @override
+  Future<void> onReady() async {
+    print("home is ready");
     await getInitialData();
     await FirebaseMessaging.instance.getToken().then((value) {
       Members.doc(id.value).set({"fcmToken": value}, SetOptions(merge: true));
@@ -51,28 +61,23 @@ class HomeController extends GetxController {
       print(error.toString());
     });
 
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print('Got a message whilst in the foreground!');
-      print('Message data: ${message}');
-      Get.defaultDialog(title: "Pesan", content: Text(message.data["body"]));
-      name.value = message.data["title"];
-      this.refresh();
+    // FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    //   print('Got a message whilst in the foreground!');
+    //   print('Message data: ${message}');
+    //   Get.defaultDialog(title: "Pesan", content: Text(message.data["body"]));
+    //   name.value = message.data["title"];
+    //   this.refresh();
 
-      if (message.notification != null) {
-        print('Message also contained a notification: ${message.notification}');
-      }
-    });
-    super.onInit();
-  }
-
-  @override
-  void onReady() {
-    print("home is ready");
+    //   if (message.notification != null) {
+    //     print('Message also contained a notification: ${message.notification}');
+    //   }
+    // });
     super.onReady();
   }
 
   @override
-  void onClose() {
+  Future<void> onClose() async {
+    subscribeMemberInfo.cancel();
     super.onClose();
   }
 
@@ -134,58 +139,89 @@ class HomeController extends GetxController {
   }
 
   Future<void> getInitialData() async {
-    if (devMode) print("starting getInitialData");
+    devLog("starting getInitialData");
 
     isLoading.value = true;
     final stopwatch = Stopwatch();
     stopwatch.start();
 
-    await UserProvider().getInitialData().then((value) {
-      if (value.body["user"] != null) {
-        name.value = value.body["user"]["name"];
+    if (Auth.currentUser != null) {
+      try {
+        subscribeMemberInfo = await MembersInfo.doc(Auth.currentUser!.uid).snapshots().listen((event) {
+          print("changed");
+          var data = event.data()!;
+          name.value = data["name"];
+          refId.value = event.id;
+          id.value = Auth.currentUser!.uid;
+          uplineName.value = data["uplineName"];
+          kd1count.value = data["kd1count"];
+          cashback.value = data["cashback"];
+          balance.value = int.parse(data["balance"].toString());
+          anggota.value = int.parse(data["memberCount"].toString());
+          kd.value = data["downlines"]["kd"];
+          downlines.value = jsonDecode(data["downlines"]["data"]);
+        }, onError: (error) {
+          print(error);
+        }, onDone: () => print("Subscribtion to memberInfo canceled"));
+        await AppSettings.orderBy("createdAt", descending: true).limit(1).get().then((value) {
+          if (value.size > 0) {
+            settings = value.docs.first.data();
+            devLog("get settings done");
+          }
+        });
+      } on FirebaseException catch (e) {
+        print(e.message);
       }
+    }
 
-      if (value.body["user"] != null) {
-        user = value.body["user"];
-      }
+    // await UserProvider().getInitialData().then((value) {
+    //   // print(value.body);
+    //   if (value.body["user"] != null) {
+    //     name.value = value.body["user"]["name"];
+    //   }
 
-      if (value.body["id"] != null) {
-        id.value = value.body["id"];
-      }
+    //   if (value.body["user"] != null) {
+    //     refId = value.body["refId"];
+    //   }
 
-      if (value.body["upline"] != null) {
-        upline = value.body["upline"];
-      }
+    //   if (value.body["id"] != null) {
+    //     id.value = value.body["id"];
+    //   }
 
-      if (value.body["kd1count"] != null) {
-        kd1count.value = int.parse(value.body["kd1count"].toString());
-      }
+    //   if (value.body["upline"] != null) {
+    //     uplineName = value.body["uplineName"];
+    //   }
 
-      if (value.body["cashback"] != null) {
-        cashback.value = int.parse(value.body["cashback"].toString());
-      }
+    //   if (value.body["kd1count"] != null) {
+    //     kd1count.value = int.parse(value.body["kd1count"].toString());
+    //   }
 
-      if (value.body["balance"] != null) {
-        balance.value = int.parse(value.body["balance"].toString());
-      }
+    //   if (value.body["cashback"] != null) {
+    //     cashback.value = int.parse(value.body["cashback"].toString());
+    //   }
 
-      if (value.body["downlines"] != null) {
-        anggota.value = int.parse(value.body["memberCount"].toString());
-      }
+    //   if (value.body["balance"] != null) {
+    //     balance.value = int.parse(value.body["balance"].toString());
+    //   }
 
-      if (value.body["downlines"] != null) {
-        kd.value = int.parse(value.body["downlines"]["kd"].toString());
-        downlines.value = value.body['downlines']['data'];
-      }
-    }).catchError((error) {
-      print("getInitialData error: " + error.toString());
-    });
+    //   if (value.body["downlines"] != null) {
+    //     anggota.value = int.parse(value.body["memberCount"].toString());
+    //   }
 
-    await SettingProvider().getLatestSetting().then((value) {
-      if (value.statusCode == 200) {
-        settings = value.body;
-      }
-    });
+    //   if (value.body["downlines"] != null) {
+    //     kd.value = int.parse(value.body["downlines"]["kd"].toString());
+    //     downlines.value = value.body['downlines']['data'];
+    //   }
+    // }).catchError((error) {
+    //   print("getInitialData error: " + error.toString());
+    // });
+
+    // await SettingProvider().getLatestSetting().then((value) {
+    //   print(value.body);
+    //   if (value.statusCode == 200) {
+    //     settings = value.body;
+    //   }
+    // });
 
     sortDownlines();
 

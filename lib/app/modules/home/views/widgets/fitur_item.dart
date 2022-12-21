@@ -38,11 +38,11 @@ class FiturItem extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) => TextButton(
         style: ButtonStyle(
-          elevation: MaterialStateProperty.all(2),
+          elevation: MaterialStateProperty.all(1),
           backgroundColor: MaterialStateProperty.all(Colors.white),
           shape: MaterialStateProperty.all(
             RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15.0),
+              borderRadius: BorderRadius.circular(10),
             ),
           ),
         ),

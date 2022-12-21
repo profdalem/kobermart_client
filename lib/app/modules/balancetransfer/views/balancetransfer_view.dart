@@ -1,15 +1,17 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
+import 'package:kobermart_client/app/modules/home/controllers/home_controller.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
+import 'package:kobermart_client/constants.dart';
 import 'package:kobermart_client/style.dart';
 import 'package:username_gen/username_gen.dart';
-
 import '../controllers/balancetransfer_controller.dart';
 
 class BalancetransferView extends GetView<BalancetransferController> {
-  const BalancetransferView({Key? key}) : super(key: key);
+  BalancetransferView({Key? key}) : super(key: key);
+  final homeC = Get.find<HomeController>();
+
   @override
   Widget build(BuildContext context) {
     var todo = () {
@@ -28,9 +30,7 @@ class BalancetransferView extends GetView<BalancetransferController> {
             SizedBox(
               height: 25,
             ),
-            Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [PanelTitle(title: "Pilih anggota")]),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [PanelTitle(title: "Pilih tujuan")]),
             sb20,
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -44,65 +44,62 @@ class BalancetransferView extends GetView<BalancetransferController> {
             Expanded(
               child: ListView(
                 children: [
-                  Container(
-                    alignment: Alignment.centerLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 15),
-                      child: PanelTitle(title: "KD 1"),
-                    ),
-                  ),
-                  sb10,
-                  Column(
-                    children: List.generate(
-                      5,
-                      (index) => Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: Container(
-                          decoration: Shadow1(),
-                          child: ListTile(
-                            onTap: todo,
-                            leading: CircleAvatar(
-                                backgroundImage: CachedNetworkImageProvider(
-                                    "https://i.pravatar.cc/150?img=${index + 5}")),
-                            title:
-                                PanelTitle(title: UsernameGen.generateWith()),
-                            subtitle: Text("Upline: Margor Robbie"),
-                          ),
+                  homeC.downlines.isEmpty
+                      ? Center(child: Text("Anggota tidak ditemukan"))
+                      : Column(
+                          children: List.generate(homeC.downlines.value.length, (index) {
+                            var showTitle = false;
+                            for (var i = 0; i < homeC.downlines[index].length; i++) {
+                              if (homeC.downlines[index][i]['memberData']['tokenUsed']) {
+                                showTitle = true;
+                              }
+                            }
+                            return Column(
+                              children: [
+                                if (showTitle)
+                                  Container(
+                                    alignment: Alignment.centerLeft,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 15),
+                                      child: PanelTitle(title: "KD ${index + 1}"),
+                                    ),
+                                  ),
+                                sb10,
+                                Column(
+                                  children: List.generate(
+                                      homeC.downlines[index].length,
+                                      (kdindex) => homeC.downlines[index][kdindex]['memberData']['tokenUsed']
+                                          ? Padding(
+                                              padding: const EdgeInsets.only(bottom: 5),
+                                              child: Card(
+                                                elevation: 1,
+                                                child: ListTile(
+                                                  onTap: () {
+                                                    Get.toNamed(Routes.INPUTNUMBER, arguments: {"title": TRANSFER, "recipient": {
+                                                      "name": homeC.downlines[index][kdindex]['memberData']['name'],
+                                                      "id": homeC.downlines[index][kdindex]['memberData']['tokenCode'],
+                                                    }});
+                                                  },
+                                                  leading: CircleAvatar(
+                                                    child: Icon(Icons.person),
+                                                    // backgroundImage:
+                                                    //     CachedNetworkImageProvider(
+                                                    //         "https://i.pravatar.cc/150?img=${index + 5}"),
+                                                  ),
+                                                  title: PanelTitle(
+                                                      title: homeC.downlines[index][kdindex]['memberData']['name'] != null
+                                                          ? homeC.downlines[index][kdindex]['memberData']['name']
+                                                          : homeC.downlines[index][kdindex]['memberData']['tokenCode']),
+                                                  subtitle: Text("Upline: ${homeC.downlines[index][kdindex]['uplineData']['name']}"),
+                                                ),
+                                              ),
+                                            )
+                                          : SizedBox()),
+                                )
+                              ],
+                            );
+                          }, growable: false),
                         ),
-                      ),
-                    ),
-                  ),
-                  sb15,
-                  Container(
-                    alignment: Alignment.centerLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 15),
-                      child: PanelTitle(title: "KD 2"),
-                    ),
-                  ),
-                  sb10,
-                  Column(
-                    children: List.generate(
-                      5,
-                      (index) => Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: Container(
-                          decoration: Shadow1(),
-                          child: ListTile(
-                            onTap: () {
-                              print("klik");
-                            },
-                            leading: CircleAvatar(
-                                backgroundImage: CachedNetworkImageProvider(
-                                    "https://i.pravatar.cc/150?img=${index + 10}")),
-                            title:
-                                PanelTitle(title: UsernameGen.generateWith()),
-                            subtitle: Text("Upline: Margor Robbie"),
-                          ),
-                        ),
-                      ),
-                    ),
-                  )
                 ],
               ),
             ),

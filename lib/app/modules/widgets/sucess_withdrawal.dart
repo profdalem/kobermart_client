@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:kobermart_client/style.dart';
 
 import '../../routes/app_pages.dart';
@@ -38,7 +39,7 @@ class SuccessWithdrawalPage extends StatelessWidget {
                   height: 20,
                 ),
                 Text(
-                  "Permintaan Penarikan Dana berhasil!",
+                  "Permintaan Penarikan Dana sebesar Rp ${NumberFormat("#,##0", "id_ID").format(int.parse(Get.arguments[0]))} berhasil dibuat!",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: Colors.white,
@@ -52,7 +53,9 @@ class SuccessWithdrawalPage extends StatelessWidget {
                   width: Get.width - 30,
                   height: 50,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Get.offNamed(Routes.TRANSACTIONS, arguments: {"refresh": true});
+                    },
                     child: PanelTitle(title: "Lihat Transaksi"),
                     style: ButtonStyle(
                         backgroundColor:

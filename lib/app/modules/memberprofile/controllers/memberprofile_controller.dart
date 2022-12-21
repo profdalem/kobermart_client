@@ -1,6 +1,11 @@
+// ignore_for_file: invalid_use_of_protected_member
+
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
-import 'package:kobermart_client/app/data/user_provider.dart';
+import 'package:kobermart_client/config.dart';
+import 'package:kobermart_client/firebase.dart';
 
 class MemberprofileController extends GetxController {
   late List<DaftarKedalaman> kd;
@@ -43,38 +48,44 @@ class MemberprofileController extends GetxController {
   }
 
   Future<void> getMemberProfile(String id) async {
+    final stopwatch = Stopwatch();
     isLoading.value = true;
-    await UserProvider().getMemberProfile(id).then((value) {
-      print(value.body);
-      memberCount.value = value.body["memberCount"];
-      kdstatus.value = value.body["downlines"]["kd"];
-      active.value = value.body["user"]["active"];
-      refid.value = value.body["user"]["refid"];
-      email.value = value.body["user"]["email"];
-      whatsapp.value = value.body["user"]["whatsapp"];
-      birthday.value = Timestamp(value.body["user"]["birthdate"]["_seconds"],
-          value.body["user"]["birthdate"]["_nanoseconds"]);
-      address.value =
-          "${value.body["user"]["address"]["jalan"]}, ${value.body["user"]["address"]["desa"]}, Kec. ${value.body["user"]["address"]["kec"]}, Kab. ${value.body["user"]["address"]["kab"]}, ${value.body["user"]["address"]["prov"]} ${value.body["user"]["address"]["kodepos"]}";
-      rek.value = value.body["user"]["bankAcc"];
-      bank.value = value.body["user"]["bank"];
-      uplineName.value = value.body["upline"]["name"];
-      uplineId.value = value.body["user"]["upline"];
-      kd1count.value = int.parse(value.body["kd1count"].toString());
+    stopwatch.start();
+    try {
+      var member = (await Members.doc(id).get()).data()!;
+      var memberInfo = (await MembersInfo.doc(id).get()).data()!;
 
-      downlines.value = value.body["downlines"]["data"];
-      // ignore: invalid_use_of_protected_member
+      memberCount.value = memberInfo["memberCount"];
+      kdstatus.value = memberInfo["downlines"]["kd"];
+      active.value = member["active"];
+      refid.value = member["tokenCode"];
+      email.value = member["email"];
+      whatsapp.value = member["whatsapp"];
+      // print(member["birthdate"] as Timestamp);
+      birthday.value = member["birthdate"] as Timestamp;
+      address.value =
+          "${member["address"]["jalan"]}, ${member["address"]["desa"]}, Kec. ${member["address"]["kec"]}, Kab. ${member["address"]["kab"]}, ${member["address"]["prov"]} ${member["address"]["kodepos"]}";
+      rek.value = member["bankAcc"];
+      bank.value = member["bank"];
+      uplineName.value = memberInfo["uplineName"];
+      uplineId.value = member["upline"];
+      kd1count.value = int.parse(memberInfo["kd1count"].toString());
+
+      downlines.value = jsonDecode(memberInfo["downlines"]["data"]);
       kd = generateItems(downlines.value.length, downlines.value);
-    });
+    } on FirebaseException catch (e) {
+      print(e.message);
+    }
+
+    if (devMode) Get.snackbar("Waktu", stopwatch.elapsed.toString());
     isLoading.value = false;
+    stopwatch.stop();
+    stopwatch.reset();
   }
 
   List<DaftarKedalaman> generateItems(int numberOfItems, List downlines) {
     return List.generate(numberOfItems, (int index) {
-      return DaftarKedalaman(
-          header: "Kedalaman ${index}",
-          isExpanded: index == 0 ? true.obs : false.obs,
-          members: downlines[index]);
+      return DaftarKedalaman(header: "Kedalaman ${index}", isExpanded: index == 0 ? true.obs : false.obs, members: downlines[index]);
     });
   }
 }

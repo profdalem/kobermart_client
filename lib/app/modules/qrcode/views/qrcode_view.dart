@@ -24,17 +24,21 @@ class QrcodeView extends GetView<QrcodeController> {
               SizedBox(
                 height: 100,
               ),
-              QrImage(
-                data: "halo",
-                version: QrVersions.auto,
-                size: Get.width * 0.7,
-              ),
+              Obx(() => QrImage(
+                    data: controller.qrcode.value,
+                    version: QrVersions.auto,
+                    size: Get.width * 0.7,
+                  )),
               sb15,
               Text(
                 'QR Code Validation',
                 style: TextStyle(fontSize: 20),
               ),
-              TextButton(onPressed: () {}, child: Icon(Icons.refresh))
+              TextButton(
+                  onPressed: () {
+                    controller.generateCodes();
+                  },
+                  child: Icon(Icons.refresh))
             ],
           ),
         ),
@@ -51,9 +55,7 @@ class QrcodeView extends GetView<QrcodeController> {
                       Get.offAllNamed(Routes.HOME);
                     },
                     child: Text("Ke Beranda"),
-                    style: ButtonStyle(
-                        backgroundColor:
-                            MaterialStateProperty.all(Colors.blue))),
+                    style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.blue))),
               ),
             ],
           ),

@@ -17,7 +17,7 @@ class MemberProvider extends GetConnect {
         ?.getIdToken(true)
         .then((value) => {token = value});
 
-    return post(
+  return post(
       "${mainUrl}api/member/member",
       body,
       headers: {
@@ -34,8 +34,8 @@ class MemberProvider extends GetConnect {
         .then((value) => {token = value});
 
     final body = json.encode({
-      "upline": upline,
       "ref": ref,
+      "upline": upline,
     });
 
     return post(

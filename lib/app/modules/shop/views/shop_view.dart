@@ -23,115 +23,107 @@ class ShopView extends GetView<ShopController> {
             pageTitle: "Belanja",
           ),
         ),
-        body: ListView(
-            padding: EdgeInsets.only(left: 0, right: 0, top: 15),
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: Row(
-                  children: [
-                    CariButton(),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    UrutkanButton(),
-                  ],
+        body: ListView(padding: EdgeInsets.only(left: 0, right: 0, top: 15), children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: Row(
+              children: [
+                CariButton(),
+                SizedBox(
+                  width: 10,
                 ),
-              ),
-              sb15,
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: PanelTitle(title: "Kategori"),
-              ),
-              sb15,
-              Container(
-                height: MediaQuery.of(context).size.width * 0.22,
-                child: ListView.separated(
-                    padding: EdgeInsets.only(left: 15, top: 3, bottom: 3),
-                    scrollDirection: Axis.horizontal,
-                    itemCount: 10,
-                    separatorBuilder: (BuildContext context, int numbers) {
-                      return SizedBox(width: 10);
-                    },
-                    itemBuilder: ((context, index) {
-                      return Container(
-                        width: MediaQuery.of(context).size.width * 0.22,
-                        child: TextButton(
-                          style: ButtonStyle(
-                              shape: MaterialStateProperty.all(
-                                  RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15),
-                              )),
-                              elevation: MaterialStateProperty.all(3),
-                              backgroundColor:
-                                  MaterialStateProperty.all(Colors.white)),
-                          onPressed: () {
-                            print(index);
-                          },
-                          child: Center(
-                              child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SvgPicture.asset(
-                                "assets/images/cat-kebun.svg",
-                                fit: BoxFit.scaleDown,
-                                color: Colors.grey[700],
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Text(
-                                "Kategori ${index + 1}",
-                                style: TextStyle(
-                                  color: Colors.grey[700],
-                                  fontSize:
-                                      MediaQuery.of(context).size.width * 0.03,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                textAlign: TextAlign.center,
-                              )
-                            ],
-                          )),
-                        ),
-                      );
-                    })),
-              ),
-              sb15,
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: PanelTitle(title: "Produk Terlaris"),
-              ),
-              sb15,
-              // Produk Terlaris
-              ProductHorizontalList(),
-              sb20,
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: PanelTitle(title: "Semua Troduk"),
-              ),
-              sb15,
-              GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 52 / 100,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10),
-                physics: NeverScrollableScrollPhysics(),
-                padding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                UrutkanButton(),
+              ],
+            ),
+          ),
+          sb15,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: PanelTitle(title: "Kategori"),
+          ),
+          sb15,
+          Container(
+            height: MediaQuery.of(context).size.width * 0.22,
+            child: ListView.separated(
+                padding: EdgeInsets.only(left: 15, top: 3, bottom: 3),
+                scrollDirection: Axis.horizontal,
                 itemCount: 10,
-                itemBuilder: (BuildContext ctx, int index) {
-                  return ProductItem(
-                    name: "Barang",
-                    price: 12000,
-                    cashback: 2,
-                    stock: 50,
-                  );
+                separatorBuilder: (BuildContext context, int numbers) {
+                  return SizedBox(width: 10);
                 },
-                // to disable GridView's scrolling
-                shrinkWrap: true, // You won't see infinite size error
-              ),
-            ]),
+                itemBuilder: ((context, index) {
+                  return Container(
+                    width: MediaQuery.of(context).size.width * 0.22,
+                    child: TextButton(
+                      style: ButtonStyle(
+                          shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          )),
+                          elevation: MaterialStateProperty.all(3),
+                          backgroundColor: MaterialStateProperty.all(Colors.white)),
+                      onPressed: () {
+                        print(index);
+                      },
+                      child: Center(
+                          child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SvgPicture.asset(
+                            "assets/images/cat-kebun.svg",
+                            fit: BoxFit.scaleDown,
+                            color: Colors.grey[700],
+                          ),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                            "Kategori ${index + 1}",
+                            style: TextStyle(
+                              color: Colors.grey[700],
+                              fontSize: MediaQuery.of(context).size.width * 0.03,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
+                          )
+                        ],
+                      )),
+                    ),
+                  );
+                })),
+          ),
+          sb15,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: PanelTitle(title: "Produk Terlaris"),
+          ),
+          sb15,
+          // Produk Terlaris
+          ProductHorizontalList(),
+          sb20,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: PanelTitle(title: "Semua Troduk"),
+          ),
+          sb15,
+          GridView.builder(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2, childAspectRatio: 52 / 100, crossAxisSpacing: 10, mainAxisSpacing: 10),
+            physics: NeverScrollableScrollPhysics(),
+            padding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+            itemCount: 10,
+            itemBuilder: (BuildContext ctx, int index) {
+              return ProductItem(
+                name: "Barang",
+                price: 12000,
+                cashback: 2,
+                stock: 50,
+              );
+            },
+            // to disable GridView's scrolling
+            shrinkWrap: true, // You won't see infinite size error
+          ),
+        ]),
         bottomNavigationBar: BottomNav(
           context: context,
           menu1: false,
@@ -235,7 +227,6 @@ class UrutkanButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(15),
             side: BorderSide(width: 1, color: Colors.grey),
           ),
-          enableDrag: false,
         );
       },
       child: Padding(

@@ -1,12 +1,17 @@
 // ignore_for_file: invalid_use_of_protected_member
 
+import 'dart:convert';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
-import 'package:kobermart_client/app/data/transaction_provider.dart';
+import 'package:kobermart_client/app/models/Transactions.dart' as Trx;
+import 'package:kobermart_client/firebase.dart';
 
 import '../../../../config.dart';
 
 class TransactionsController extends GetxController {
   RxList transactions = [].obs;
+  RxList<Trx.Transaction> globaltrx = <Trx.Transaction>[].obs;
   var isLoading = false.obs;
 
   var filters = [
@@ -23,8 +28,8 @@ class TransactionsController extends GetxController {
   var days = 7.obs;
 
   @override
-  void onInit() {
-    getUserTransactions();
+  void onInit() async {
+    await getUserTransactions();
     super.onInit();
   }
 
@@ -38,48 +43,43 @@ class TransactionsController extends GetxController {
     super.onClose();
   }
 
-  List filteredTransaction(String code) {
-    var result = [];
+  List<Trx.Transaction> filteredTransaction(String code) {
+    List<Trx.Transaction> result = [];
     // print(transactions.value[0]);
 
     switch (code) {
       case "all":
-        result = transactions.value;
+        result = globaltrx.value;
         break;
       case "now":
-        transactions.value.forEach((element) {
-          if (element["type"] == "topup" || element["type"] == "withdraw") {
-            var history = element['history'];
-            if (element['history'][history.length - 1]['code'] != 4) {
+        globaltrx.value.forEach((element) {
+          if (element.type == "topup" || element.type == "withdraw") {
+            var history = element.data["transactionData"]['history'];
+            if (element.data["transactionData"]['history'][history.length - 1]['code'] != 4) {
               result.add(element);
             }
           }
         });
         break;
       case "blc":
-        transactions.value.forEach((element) {
-          if (element["type"] == "topup" ||
-              element["type"] == "withdraw" ||
-              element["type"] == "transfer-in" ||
-              element["type"] == "transfer-out") {
+        globaltrx.value.forEach((element) {
+          if (element.type == "topup" || element.type == "withdraw" || element.type == "transfer-in" || element.type == "transfer-out") {
             result.add(element);
           }
         });
         break;
       case "cb":
-        transactions.value.forEach((element) {
-          if (element["type"] == "ref" ||
-              element["type"] == "plan-a" ||
-              element["type"] == "plan-b") {
+        globaltrx.value.forEach((element) {
+          if (element.type == "ref" || element.type == "plan-a" || element.type == "plan-b") {
             result.add(element);
           }
         });
         break;
       case "done":
-        transactions.value.forEach((element) {
-          if (element["type"] == "topup" || element["type"] == "withdraw") {
-            var history = element['history'];
-            if (element['history'][history.length - 1]['code'] == 4) {
+        globaltrx.value.forEach((element) {
+          if (element.type == "topup" || element.type == "withdraw") {
+            var history = element.data["transactionData"]['history'];
+            if (element.data["transactionData"]['history'][history.length - 1]['code'] == 4) {
               result.add(element);
             }
           } else {
@@ -88,31 +88,31 @@ class TransactionsController extends GetxController {
         });
         break;
       default:
-        result = transactions.value;
+        result = globaltrx.value;
     }
     return result;
   }
 
-  void getUserTransactions() async {
+  Future<void> getUserTransactions() async {
     if (devMode) print("starting getUserTransaction");
     isLoading.value = true;
-    transactions.clear();
+    globaltrx.clear();
     final stopwatch = Stopwatch();
     stopwatch.start();
-    transactions.clear();
+
     try {
-      await TransactionProvider().getUserTransactions(days.value).then((value) {
-        if (value.body != null) {
-          transactions.value = value.body;
-        } else {
-          Get.snackbar("Error", "Gagal mendapatkan data transaksi");
-        }
-        isLoading.value = false;
+      await GlobalTrx.where("id", isEqualTo: Auth.currentUser!.uid).where("createdAt", isGreaterThanOrEqualTo: Timestamp.fromDate(DateTime.now().subtract(Duration(days: days.value)))).get().then((value) {
+        value.docs.forEach((element) {
+          globaltrx.value.add(new Trx.Transaction.fromFirebase(element));
+        });
       });
-    } catch (e) {
-      print("getUserTransaction error: " + e.toString());
+    } on FirebaseException catch (e) {
+      print(e.message);
+      print(e.stackTrace);
     }
-    if (devMode) Get.snackbar("Waktu", stopwatch.elapsed.toString());
+
+    isLoading.value = false;
+    if (devMode) print("getTransactions " + stopwatch.elapsed.toString());
     stopwatch.stop();
     stopwatch.reset();
   }

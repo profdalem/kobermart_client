@@ -1,9 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:kobermart_client/app/models/Transactions.dart';
 import 'package:kobermart_client/app/modules/widgets/trx_status.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/style.dart';
@@ -14,7 +14,7 @@ class TrxdetailTokenView extends GetView<TrxdetailTokenController> {
   const TrxdetailTokenView({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    Timestamp createdAt = Get.arguments["createdAt"];
+    Transaction data = Get.arguments["data"];
     return SafeArea(
       top: false,
       child: Scaffold(
@@ -32,13 +32,7 @@ class TrxdetailTokenView extends GetView<TrxdetailTokenController> {
                 Get.offAllNamed(Routes.TRANSACTIONS);
               },
               icon: Icon(Icons.close)),
-          actions: [
-            IconButton(
-                onPressed: () {
-                  Get.toNamed(Routes.CART);
-                },
-                icon: Icon(Icons.shopping_cart))
-          ],
+          
         ),
         body: SingleChildScrollView(
           child: Column(
@@ -56,12 +50,12 @@ class TrxdetailTokenView extends GetView<TrxdetailTokenController> {
               Container(
                 alignment: Alignment.center,
                 child: Text(
-                  "Dibuat ${DateFormat.yMMMd("id_ID").format(createdAt.toDate())} ${DateFormat.Hm().format(createdAt.toDate())} WITA",
+                  "Dibuat ${DateFormat.yMMMd("id_ID").format(data.createdAt)} ${DateFormat.Hm().format(data.createdAt)} WITA",
                   style: TextStyle(color: Colors.grey),
                 ),
               ),
               sb15,
-              TrxDetailMainPanel(arguments: Get.arguments),
+              TrxDetailMainPanel(data: data),
               Container(
                 width: Get.width,
                 child: Padding(
@@ -83,20 +77,20 @@ class TrxdetailTokenView extends GetView<TrxdetailTokenController> {
 }
 
 class TrxDetailMainPanel extends StatelessWidget {
-  final dynamic arguments;
+  final Transaction data;
 
   TrxDetailMainPanel({
     Key? key,
-    required this.arguments,
+    required this.data,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    String notrx = "TRX88432389293";
+    String notrx = data.id;
     String method = "Potong Saldo";
     int status = 4;
-    int nominal = arguments["nominal"];
-    String tokenCode = arguments["tokenCode"];
+    int nominal = data.nominal;
+    String tokenCode = data.data["transactionData"]["tokenCode"];
 
     return Container(
       decoration: Shadow1(),
@@ -126,8 +120,7 @@ class TrxDetailMainPanel extends StatelessWidget {
                     ),
                     sb15,
                     PanelTitle(title: "Nominal"),
-                    Text(
-                        "Rp ${NumberFormat("#,##0", "id_ID").format(nominal)}"),
+                    Text("Rp ${NumberFormat("#,##0", "id_ID").format(nominal)}"),
                   ],
                 ),
                 Column(

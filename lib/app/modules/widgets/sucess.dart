@@ -38,13 +38,13 @@ class SuccessPage extends StatelessWidget {
                 SizedBox(
                   height: 20,
                 ),
-                Text(
-                  "Permintaan Top Up sebesar Rp ${NumberFormat("#,##0", "id_ID").format(int.parse(Get.arguments[0]))} berhasil!",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: Get.width * 0.08),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: Text(
+                    "Permintaan Top Up sebesar Rp ${NumberFormat("#,##0", "id_ID").format(int.parse(Get.arguments[0]))} berhasil!",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: Get.width * 0.08),
+                  ),
                 ),
                 SizedBox(
                   height: 50,
@@ -54,13 +54,10 @@ class SuccessPage extends StatelessWidget {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: () {
-                      Get.offNamed(Routes.TRANSACTIONS,
-                          arguments: {"refresh": true});
+                      Get.offNamed(Routes.TRANSACTIONS, arguments: {"refresh": true});
                     },
                     child: PanelTitle(title: "Lihat Transaksi"),
-                    style: ButtonStyle(
-                        backgroundColor:
-                            MaterialStateProperty.all(Colors.blue.shade700)),
+                    style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.blue.shade700)),
                   ),
                 ),
                 SizedBox(

@@ -139,9 +139,9 @@ class TindakanMember extends StatelessWidget {
       child: TextButton(
         style: ButtonStyle(
             shape: MaterialStateProperty.all(RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.circular(10),
             )),
-            elevation: MaterialStateProperty.all(3),
+            elevation: MaterialStateProperty.all(1),
             backgroundColor: MaterialStateProperty.all(Colors.white)),
         onPressed: todo,
         child: Center(
@@ -186,7 +186,7 @@ class PanelKedalaman extends StatelessWidget {
           ? Center(
               child: CircularProgressIndicator(),
             )
-          : ExpansionPanelList(
+          : ExpansionPanelList(elevation: 1, expandedHeaderPadding: EdgeInsets.zero,
               expansionCallback: (panelIndex, isExpanded) {
                 memberC.kd[panelIndex].isExpanded.value = !isExpanded;
               },
@@ -196,8 +196,7 @@ class PanelKedalaman extends StatelessWidget {
                     (DaftarKedalaman item) => ExpansionPanel(
                         canTapOnHeader: true,
                         headerBuilder: (context, isExpanded) {
-                          num slotSize =
-                              pow(10, (memberC.kd.indexOf(item) + 1));
+                          num slotSize = pow(10, (memberC.kd.indexOf(item) + 1));
 
                           return ListTile(
                             title: Row(children: [
@@ -212,9 +211,7 @@ class PanelKedalaman extends StatelessWidget {
                                 visualDensity: VisualDensity.compact,
                                 padding: EdgeInsets.all(0),
                                 backgroundColor: Color(0xFFFF9800),
-                                label: Text('${item.members.length} terisi',
-                                    style: TextStyle(
-                                        fontSize: 12, color: Colors.white)),
+                                label: Text('${item.members.length} terisi', style: TextStyle(fontSize: 12, color: Colors.white)),
                               ),
                               SizedBox(
                                 width: 10,
@@ -223,10 +220,8 @@ class PanelKedalaman extends StatelessWidget {
                                 visualDensity: VisualDensity.compact,
                                 padding: EdgeInsets.all(0),
                                 backgroundColor: Colors.blue,
-                                label: Text(
-                                    '${slotSize - item.members.length} kosong',
-                                    style: TextStyle(
-                                        fontSize: 12, color: Colors.white)),
+                                label:
+                                    Text('${slotSize - item.members.length} kosong', style: TextStyle(fontSize: 12, color: Colors.white)),
                               ),
                             ]),
                           );
@@ -237,8 +232,7 @@ class PanelKedalaman extends StatelessWidget {
                           child: ListView.separated(
                               scrollDirection: Axis.horizontal,
                               itemBuilder: (context, index) {
-                                var tokenUsed =
-                                    item.members[index]["tokenUsed"];
+                                var tokenUsed = item.members[index]["tokenUsed"];
                                 return Container(
                                   width: 100,
                                   child: Card(
@@ -246,73 +240,44 @@ class PanelKedalaman extends StatelessWidget {
                                       child: TextButton(
                                         onPressed: () {
                                           if (tokenUsed) {
-                                            Get.toNamed(Routes.MEMBERPROFILE,
-                                                arguments: {
-                                                  "id": item.members[index]
-                                                      ["id"],
-                                                  "name": item.members[index]
-                                                      ["memberData"]["name"],
-                                                });
+                                            Get.toNamed(Routes.MEMBERPROFILE, arguments: {
+                                              "id": item.members[index]["id"],
+                                              "name": item.members[index]["memberData"]["name"],
+                                            });
                                           } else {
-                                            Get.toNamed(Routes.TOKENDETAIL,
-                                                arguments: {
-                                                  "data": item.members[index]
-                                                });
+                                            Get.toNamed(Routes.TOKENDETAIL, arguments: {"data": item.members[index]});
                                           }
                                         },
                                         child: Column(
                                           children: [
                                             CircleAvatar(
                                               radius: 30.0,
-                                              backgroundColor: tokenUsed
-                                                  ? Colors.blue
-                                                  : Colors.grey.shade200,
-                                              child: tokenUsed
-                                                  ? Icon(Icons.person)
-                                                  : Text("token"),
+                                              backgroundColor: tokenUsed ? Colors.blue : Colors.grey.shade200,
+                                              child: tokenUsed ? Icon(Icons.person) : Text("token"),
                                             ),
                                             Text(
                                               tokenUsed
-                                                  ? item.members[index]
-                                                      ["memberData"]["name"]
-                                                  : (FirebaseAuth
-                                                                  .instance
-                                                                  .currentUser!
-                                                                  .uid ==
-                                                              item.members[index]
-                                                                      ["memberData"][
-                                                                  "tokenCreator"] ||
-                                                          FirebaseAuth
-                                                                  .instance
-                                                                  .currentUser!
-                                                                  .uid ==
-                                                              item.members[index]
-                                                                      ["memberData"]
-                                                                  ["upline"]
-                                                      ? item.members[index]
-                                                          ["memberData"]["tokenCode"]
+                                                  ? item.members[index]["memberData"]["name"]
+                                                  : (FirebaseAuth.instance.currentUser!.uid ==
+                                                              item.members[index]["memberData"]["tokenCreator"] ||
+                                                          FirebaseAuth.instance.currentUser!.uid ==
+                                                              item.members[index]["memberData"]["upline"]
+                                                      ? item.members[index]["memberData"]["tokenCode"]
                                                       : "?"),
                                               overflow: TextOverflow.ellipsis,
                                               maxLines: 1,
-                                              style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 12),
+                                              style: TextStyle(color: Colors.black, fontSize: 12),
                                             ),
                                             if (tokenUsed)
                                               RichText(
                                                 text: TextSpan(
-                                                  style: TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: 14),
+                                                  style: TextStyle(color: Colors.black, fontSize: 14),
                                                   children: [
                                                     WidgetSpan(
-                                                      child: Icon(Icons.person,
-                                                          size: 14),
+                                                      child: Icon(Icons.person, size: 14),
                                                     ),
                                                     TextSpan(
-                                                      text: item.members[index]
-                                                              ["kd1count"]
-                                                          .toString(),
+                                                      text: item.members[index]["kd1count"].toString(),
                                                     ),
                                                   ],
                                                 ),

@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 
 class BalancetransferController extends GetxController {
   final count = 0.obs;
+  var isLoading = false.obs;
   @override
   void onInit() {
     super.onInit();

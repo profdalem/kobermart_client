@@ -3,7 +3,9 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'package:get_cli/common/utils/json_serialize/json_ast/utils/grapheme_splitter.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:kobermart_client/app/controllers/auth_controller.dart';
 import 'package:kobermart_client/firebase.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -20,14 +22,13 @@ import 'package:kobermart_client/style.dart';
 
 class PpobController extends GetxController with GetSingleTickerProviderStateMixin {
   final List<Tab> myTabs = <Tab>[
-    const Tab(text: 'Listrik'),
     const Tab(text: 'Paket Data'),
     const Tab(text: 'Pulsa'),
+    const Tab(text: 'Listrik'),
     const Tab(text: 'Internet/Wifi'),
     const Tab(text: 'PDAM'),
   ];
 
-  final homeC = Get.find<HomeController>();
   final box = GetStorage();
 
   late TabController tabC;
@@ -45,13 +46,21 @@ class PpobController extends GetxController with GetSingleTickerProviderStateMix
   var pricelistPln = [].obs;
 
   // Paket Data
+  var paketDataNameSelected = "".obs;
+  var paketDataCodeSelected = "".obs;
+  var paketDataNominalSelected = "0".obs;
   var paketDataOperator = "".obs;
   var paketDataIcon = "".obs;
-  var paketDataNominalSelected = "0".obs;
-  var paketDataCodeSelected = "".obs;
-  var paketDataNameSelected = "".obs;
   var paketDataPhoneNumberError = false.obs;
   var pricelistPaketData = [].obs;
+
+  // Pulsa
+  var pulsaNameSelected = "".obs;
+  var pulsaCodeSelected = "".obs;
+  var pulsaNominalSelected = "0".obs;
+  var pulsaOperator = "".obs;
+  var pulsaIcon = "".obs;
+  var pricelistPulsa = [].obs;
 
   @override
   void onInit() async {
@@ -59,6 +68,7 @@ class PpobController extends GetxController with GetSingleTickerProviderStateMix
     customerId = TextEditingController();
     phoneNumber = TextEditingController();
     if (preFilled) customerId.text = "530000000002";
+    if (preFilled) phoneNumber.text = "085313924122";
     getProductData();
     super.onInit();
   }
@@ -90,7 +100,6 @@ class PpobController extends GetxController with GetSingleTickerProviderStateMix
   }
 
   void getProductData() async {
-    if (devMode) print("Starting getPlnProduct");
     var timer = new Stopwatch();
     timer.start();
     isGetDataLoading.value = true;
@@ -98,22 +107,134 @@ class PpobController extends GetxController with GetSingleTickerProviderStateMix
     final directory = await getApplicationDocumentsDirectory();
     final File productPrepaidPlnFile = File('${directory.path}/productPrepaidPln.json');
     final File productPrepaidDataFile = File('${directory.path}/productPrepaidData.json');
+    final File productPrepaidPulsaFile = File('${directory.path}/productPrepaidPulsa.json');
 
     // get lastupdate data from database
-    final paketDataLastUpdate = (await UpdateRef.doc("paketdata").get()).data()!["lastUpdate"] as Timestamp;
+    final paketDataLastUpdate = (await UpdateRef.doc("paketdata").get().then((value) {
+      if (devMode) print((value.data()!["lastUpdate"] as Timestamp).toDate());
+      return value;
+    }))
+        .data()!["lastUpdate"] as Timestamp;
     final milliseconds = paketDataLastUpdate.millisecondsSinceEpoch;
 
     // box.remove("paketDataLastUpdate");
-
     if (box.read("paketDataLastUpdate") == null) {
       //write it on the device so it can be used to compare
       box.write("paketDataLastUpdate", milliseconds);
-      print(box.read("paketDataLastUpdate"));
-
+      // print(box.read("paketDataLastUpdate"));
       // Get first batch of data
-      await IakprepaidProvider().getPaketDataPricelist().then((value) => pricelistPaketData.value = value.body);
+
+      print("start get sellpricess from firebase");
+      List prepaidPricelist = await IakprepaidProvider().getPrepaidPricelist("", "").then((value) {
+        print("get prepaid Pricelist done");
+        return value.body["data"]["pricelist"] as List;
+      });
+
+      print("start get sellpricess from firebase");
+      var sellPrices = await Prepaid.get().then((value) {
+        print("get sellprices done");
+        return value;
+      }).catchError((err) {
+        print(err);
+        Get.snackbar("ERROR", err.toString());
+      });
+
+      isGetDataLoading.value = false;
+
+      print("start get paketdata");
+      // await IakprepaidProvider().getPaketDataPricelist().then((value) => pricelistPaketData.value = value.body);
+      // await IakprepaidProvider().getPrepaidPricelist("data", "").then((value) async {
+      //   var temp = value.body["data"]["pricelist"] as List;
+      //   for (var i = 0; i < temp.length; i++) {
+      //     var productPriceData = sellPrices.docs.firstWhereOrNull((element) => element.id == temp[i]["product_code"]);
+      //     if (productPriceData == null) {
+      //       temp[i]["sell_price"] = temp[i]["product_price"] + 2000;
+      //       temp[i]["margin"] = 2000;
+      //     } else {
+      //       temp[i]["sell_price"] = productPriceData.data()["sell_price"];
+      //       temp[i]["margin"] = productPriceData.data()["margin"];
+      //     }
+      //   }
+      //   pricelistPaketData.value = temp;
+      // });
+      {
+        var temp = prepaidPricelist.where((element) => element["product_type"] == "data").toList();
+        for (var i = 0; i < temp.length; i++) {
+          var productPriceData = sellPrices.docs.firstWhereOrNull((element) => element.id == temp[i]["product_code"]);
+          if (productPriceData == null) {
+            temp[i]["sell_price"] = temp[i]["product_price"] + 2000;
+            temp[i]["margin"] = 2000;
+          } else {
+            temp[i]["sell_price"] = productPriceData.data()["sell_price"];
+            temp[i]["margin"] = productPriceData.data()["margin"];
+          }
+        }
+        pricelistPaketData.value = temp;
+      }
       productPrepaidDataFile.writeAsString(json.encode(pricelistPaketData.value));
-      await IakprepaidProvider().getPlnProduct().then((value) => pricelistPln.value = value.body);
+
+      print("start get pulsa");
+      // await IakprepaidProvider().getPulsaPricelist().then((value) => pricelistPulsa.value = value.body);
+      // await IakprepaidProvider().getPrepaidPricelist("pulsa", "").then((value) async {
+      //   var temp = value.body["data"]["pricelist"] as List;
+      //   for (var i = 0; i < temp.length; i++) {
+      //     var productPriceData = sellPrices.docs.firstWhereOrNull((element) => element.id == temp[i]["product_code"]);
+      //     if (productPriceData == null) {
+      //       temp[i]["sell_price"] = temp[i]["product_price"] + 2000;
+      //       temp[i]["margin"] = 2000;
+      //     } else {
+      //       temp[i]["sell_price"] = productPriceData.data()["sell_price"];
+      //       temp[i]["margin"] = productPriceData.data()["margin"];
+      //     }
+      //   }
+      //   pricelistPulsa.value = temp;
+      // });
+      {
+        var temp = prepaidPricelist.where((element) => element["product_type"] == "pulsa").toList();
+        for (var i = 0; i < temp.length; i++) {
+          var productPriceData = sellPrices.docs.firstWhereOrNull((element) => element.id == temp[i]["product_code"]);
+          if (productPriceData == null) {
+            temp[i]["sell_price"] = temp[i]["product_price"] + 2000;
+            temp[i]["margin"] = 2000;
+          } else {
+            temp[i]["sell_price"] = productPriceData.data()["sell_price"];
+            temp[i]["margin"] = productPriceData.data()["margin"];
+          }
+        }
+        pricelistPulsa.value = temp;
+      }
+      productPrepaidPulsaFile.writeAsString(json.encode(pricelistPulsa.value));
+
+      print("start get pln");
+      // await IakprepaidProvider().getPlnProduct().then((value) => pricelistPln.value = value.body);
+      // await IakprepaidProvider().getPrepaidPricelist("pln", "").then((value) async {
+      //   var temp = value.body["data"]["pricelist"] as List;
+      //   for (var i = 0; i < temp.length; i++) {
+      //     var productPriceData = sellPrices.docs.firstWhereOrNull((element) => element.id == temp[i]["product_code"]);
+      //     if (productPriceData == null) {
+      //       temp[i]["sell_price"] = temp[i]["product_price"] + 2000;
+      //       temp[i]["margin"] = 2000;
+      //     } else {
+      //       temp[i]["sell_price"] = productPriceData.data()["sell_price"];
+      //       temp[i]["margin"] = productPriceData.data()["margin"];
+      //     }
+      //   }
+      //   pricelistPln.value = temp;
+      // });
+      {
+        var temp = prepaidPricelist.where((element) => element["product_type"] == "pln").toList();
+        for (var i = 0; i < temp.length; i++) {
+          var productPriceData = sellPrices.docs.firstWhereOrNull((element) => element.id == temp[i]["product_code"]);
+          if (productPriceData == null) {
+            temp[i]["sell_price"] = temp[i]["product_price"] + 2000;
+            temp[i]["margin"] = 2000;
+          } else {
+            temp[i]["sell_price"] = productPriceData.data()["sell_price"];
+            temp[i]["margin"] = productPriceData.data()["margin"];
+          }
+        }
+        pricelistPln.value = temp;
+      }
       productPrepaidPlnFile.writeAsString(json.encode(pricelistPln.value));
     } else {
       if (milliseconds > box.read("paketDataLastUpdate")) {
@@ -122,22 +243,36 @@ class PpobController extends GetxController with GetSingleTickerProviderStateMix
         await IakprepaidProvider().getPaketDataPricelist().then((value) => pricelistPaketData.value = value.body);
         productPrepaidDataFile.writeAsString(json.encode(pricelistPaketData.value));
 
+        await IakprepaidProvider().getPulsaPricelist().then((value) => pricelistPulsa.value = value.body);
+        productPrepaidPulsaFile.writeAsString(json.encode(pricelistPulsa.value));
+
         await IakprepaidProvider().getPlnProduct().then((value) => pricelistPln.value = value.body);
         productPrepaidPlnFile.writeAsString(json.encode(pricelistPln.value));
 
         box.write("paketDataLastUpdate", milliseconds);
       } else {
         if (devMode) print("data is the newest");
+
         if (await productPrepaidDataFile.exists()) {
           pricelistPaketData.value = json.decode(await productPrepaidDataFile.readAsString());
         } else {
+          if (devMode) print("Load PaketData data from server");
           await IakprepaidProvider().getPaketDataPricelist().then((value) => pricelistPaketData.value = value.body);
           productPrepaidDataFile.writeAsString(json.encode(pricelistPaketData.value));
+        }
+
+        if (await productPrepaidPulsaFile.exists()) {
+          pricelistPulsa.value = json.decode(await productPrepaidPulsaFile.readAsString());
+        } else {
+          if (devMode) print("Load Pulsa data from server");
+          await IakprepaidProvider().getPulsaPricelist().then((value) => pricelistPulsa.value = value.body);
+          productPrepaidPulsaFile.writeAsString(json.encode(pricelistPulsa.value));
         }
 
         if (await productPrepaidPlnFile.exists()) {
           pricelistPln.value = json.decode(await productPrepaidPlnFile.readAsString());
         } else {
+          if (devMode) print("Load Pln data from server");
           await IakprepaidProvider().getPlnProduct().then((value) => pricelistPln.value = value.body);
           productPrepaidPlnFile.writeAsString(json.encode(pricelistPln.value));
         }
@@ -147,7 +282,9 @@ class PpobController extends GetxController with GetSingleTickerProviderStateMix
     isGetDataLoading.value = false;
     pricelistPaketData.refresh();
     pricelistPln.refresh();
-    if (devMode) Get.snackbar("Waktu getPlnProduct:", timer.elapsed.toString(), duration: Duration(seconds: 1));
+    pricelistPulsa.refresh();
+
+    if (devMode) Get.snackbar("Waktu getPPOB Products:", timer.elapsed.toString(), duration: Duration(seconds: 1));
     timer.stop();
     timer.reset();
   }
@@ -304,61 +441,107 @@ class PpobController extends GetxController with GetSingleTickerProviderStateMix
     switch (op) {
       case "axis":
         paketDataOperator.value = "Axis Paket Internet";
+        pulsaOperator.value = "AXIS";
         paketDataIcon.value = "assets/images/operator/axis.png";
+        pulsaIcon.value = "assets/images/operator/axis.png";
         break;
       case "byu":
         paketDataOperator.value = "axis_paket_internet";
+        pulsaOperator.value = "By.U";
         paketDataIcon.value = "assets/images/operator/byu.png";
+        pulsaIcon.value = "assets/images/operator/byu.png";
         break;
       case "indosat":
         paketDataOperator.value = "Indosat Paket Internet";
+        pulsaOperator.value = "Indosat";
         paketDataIcon.value = "assets/images/operator/indosat.png";
+        pulsaIcon.value = "assets/images/operator/indosat.png";
         break;
       case "smartfren":
         paketDataOperator.value = "Smartfren Paket Internet";
+        pulsaOperator.value = "Smart";
         paketDataIcon.value = "assets/images/operator/smart.png";
+        pulsaIcon.value = "assets/images/operator/smart.png";
         break;
       case "tsel":
         paketDataOperator.value = "Telkomsel Paket Internet";
+        pulsaOperator.value = "Telkomsel";
         paketDataIcon.value = "assets/images/operator/telkomsel.png";
+        pulsaIcon.value = "assets/images/operator/telkomsel.png";
         break;
       case "three":
-        paketDataOperator.value = "Three Paket Internet";
+        paketDataOperator.value = "Tri Paket Internet";
+        pulsaOperator.value = "Three";
         paketDataIcon.value = "assets/images/operator/three.png";
+        pulsaIcon.value = "assets/images/operator/three.png";
         break;
       case "xl":
         paketDataOperator.value = "XL Paket Internet";
+        pulsaOperator.value = "XL";
         paketDataIcon.value = "assets/images/operator/xl.png";
+        pulsaIcon.value = "assets/images/operator/xl.png";
         break;
       default:
     }
   }
 
-  List<dynamic> getPaketDataProductList(List pricelist, String operator) {
+  List<dynamic> getProductList(List pricelist, String operator) {
     List result = [];
     pricelist.forEach((element) {
       if (element["product_description"] == operator) {
         result.add(element);
       }
     });
+
+    result.sort(
+      (a, b) {
+        return (a["sell_price"] as int).compareTo(b["sell_price"] as int);
+      },
+    );
     return result;
   }
 
-  void setPrepaidTopupPaketData() async {
-    if (paketDataPhoneNumberError.isFalse && phoneNumber.text.isNotEmpty && phoneNumber.text.length >= 10 && paketDataCodeSelected.isNotEmpty) {
+  void setPrepaidTopupPaketData(productData) async {
+    if (paketDataPhoneNumberError.isFalse &&
+        phoneNumber.text.isNotEmpty &&
+        phoneNumber.text.length >= 10 &&
+        paketDataCodeSelected.isNotEmpty) {
       // setTopUp
       // print("beli paket data");
       var refId = generateRandomString(6, "PREDAT");
-      IakprepaidProvider().setTopUpPaketData(phoneNumber.text, refId, paketDataCodeSelected.value, paketDataNominalSelected.value).then((value) {
+      await IakprepaidProvider()
+          .setTopUpPaketData(phoneNumber.text, refId, paketDataCodeSelected.value, paketDataNominalSelected.value, productData)
+          .then((value) {
         print(value.body);
       }).catchError((err) {
         print(err);
       });
+      Get.offNamed(Routes.TRANSACTIONS, arguments: {"refresh": true});
     } else {
       if (phoneNumber.text.length < 10) {
         Get.defaultDialog(title: "Peringatan", content: Text("Nomor minimal 10 angka"));
       } else {
         Get.defaultDialog(title: "Peringatan", content: Text("Pilih paket terlebih dahulu"));
+      }
+    }
+  }
+
+  void setPrepaidTopupPulsa() async {
+    if (paketDataPhoneNumberError.isFalse && phoneNumber.text.isNotEmpty && phoneNumber.text.length >= 10 && pulsaCodeSelected.isNotEmpty) {
+      // setTopUp
+      // print("beli paket data");
+      var refId = generateRandomString(6, "PREPUL");
+      await IakprepaidProvider().setTopUpPulsa(phoneNumber.text, refId, pulsaCodeSelected.value, pulsaNominalSelected.value).then((value) {
+        print(value.body);
+      }).catchError((err) {
+        print(err);
+      });
+      Get.offNamed(Routes.TRANSACTIONS, arguments: {"refresh": true});
+    } else {
+      if (phoneNumber.text.length < 10) {
+        Get.defaultDialog(title: "Peringatan", content: Text("Nomor minimal 10 angka"));
+      } else {
+        Get.defaultDialog(title: "Peringatan", content: Text("Pilih nominal terlebih dahulu"));
       }
     }
   }
@@ -459,7 +642,8 @@ class PpobController extends GetxController with GetSingleTickerProviderStateMix
                             isProceedLoading.value = true;
                             if (await HomeController().getBalance() < int.parse(nominalSelected.value)) {
                               isProceedLoading.value = false;
-                              Get.defaultDialog(title: "Saldo tidak cukup", content: Text("Pastikan saldo anda cukup sebelum melakukan transaksi"));
+                              Get.defaultDialog(
+                                  title: "Saldo tidak cukup", content: Text("Pastikan saldo anda cukup sebelum melakukan transaksi"));
                             } else {
                               var refId = generateRandomString(6, "PREPLN");
                               await IakprepaidProvider()
@@ -477,7 +661,7 @@ class PpobController extends GetxController with GetSingleTickerProviderStateMix
                                   Get.defaultDialog(title: "Gagal", content: Text("Terjadi kesalahan, mohon ulangi transaksi kembali"));
                                 }
                               });
-                              homeC.balance.value = await homeC.getBalance();
+
                               isProceedLoading.value = false;
                             }
                           },

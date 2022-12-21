@@ -27,9 +27,7 @@ class TopupView extends GetView<TopupController> {
               SizedBox(
                 height: 25,
               ),
-              Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [PanelTitle(title: "Tulis nominal Top Up")]),
+              Row(mainAxisAlignment: MainAxisAlignment.center, children: [PanelTitle(title: "Tulis nominal Top Up")]),
               sb20,
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -39,49 +37,44 @@ class TopupView extends GetView<TopupController> {
                     width: Get.width,
                     decoration: Shadow1(),
                     child: Padding(
-                      padding: EdgeInsets.only(
-                          left: 15, top: 15, bottom: 15, right: 15),
-                      child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Nominal"),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            TextField(
-                              controller: controller.nominal,
-                              keyboardType: TextInputType.number,
-                              decoration: InputDecoration(
-                                  prefix: Text("Rp "),
-                                  border: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Colors.grey,
-                                      ),
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(5))),
-                                  // isDense: true,
-                                  contentPadding: EdgeInsets.all(12)),
-                              inputFormatters: <TextInputFormatter>[
-                                FilteringTextInputFormatter.digitsOnly,
-                              ],
-                              onChanged: (value) {
-                                if (value.isNotEmpty) {
-                                  controller.jumlah.value =
-                                      int.parse(controller.nominal.text);
-                                } else {
-                                  controller.jumlah.value = 0;
-                                }
-                              },
-                              onTap: () {
-                                controller.nominal.text = "";
-                              },
-                            ),
-                            sb15,
-                            Text("Metode"),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            DropdownSearch<String>(
+                      padding: EdgeInsets.only(left: 15, top: 15, bottom: 15, right: 15),
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text("Nominal"),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        TextField(
+                          controller: controller.nominal,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                              prefix: Text("Rp "),
+                              border: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.grey,
+                                  ),
+                                  borderRadius: BorderRadius.all(Radius.circular(5))),
+                              // isDense: true,
+                              contentPadding: EdgeInsets.all(12)),
+                          inputFormatters: <TextInputFormatter>[
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
+                          onChanged: (value) {
+                            if (value.isNotEmpty) {
+                              controller.jumlah.value = int.parse(controller.nominal.text);
+                            } else {
+                              controller.jumlah.value = 0;
+                            }
+                          },
+                          onTap: () {
+                            controller.nominal.text = "";
+                          },
+                        ),
+                        sb15,
+                        Text("Metode"),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Obx(() => DropdownSearch<String>(
                               popupProps: PopupProps.dialog(
                                 fit: FlexFit.loose,
                                 showSelectedItems: true,
@@ -91,28 +84,25 @@ class TopupView extends GetView<TopupController> {
                                 "transfer",
                               ],
                               onChanged: (value) {
-                                controller.selectedMethod = value.toString();
+                                controller.selectedMethod.value = value.toString();
                                 print(controller.selectedMethod);
                                 print(controller.nominal.text);
                               },
-                              selectedItem: "cash",
-                            ),
-                            sb20,
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text("Jumlah"),
-                                  Obx(() => Text(
-                                      "Rp ${NumberFormat("#,##0", "id_ID").format(controller.jumlah.value)}",
-                                      style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold))),
-                                ],
-                              ),
-                            )
-                          ]),
+                              selectedItem: controller.selectedMethod.value,
+                            )),
+                        sb20,
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text("Jumlah"),
+                              Obx(() => Text("Rp ${NumberFormat("#,##0", "id_ID").format(controller.jumlah.value)}",
+                                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold))),
+                            ],
+                          ),
+                        )
+                      ]),
                     ),
                   )
                 ],
@@ -165,38 +155,19 @@ class TopupView extends GetView<TopupController> {
                       Get.back();
                     },
                     child: Text("Batal"),
-                    style: ButtonStyle(
-                        backgroundColor:
-                            MaterialStateProperty.all(Colors.grey))),
+                    style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.grey))),
               ),
               Expanded(flex: 2, child: SizedBox()),
               Expanded(
                 flex: 5,
-                child: ElevatedButton(
-                    onPressed: () {
-                      if (controller.nominal.text.isEmpty ||
-                          controller.nominal.text == '0') {
-                        Get.snackbar("Peringatan", "Nominal wajib diisi");
-                      } else {
-                        if (int.parse(controller.nominal.text) < 100000) {
-                          Get.snackbar(
-                              "Peringatan", "Minimal topup Rp 100.000");
-                        } else {
-                          BalanceProvider()
-                              .newTopup(controller.nominal.text,
-                                  controller.selectedMethod)
-                              .then((value) {
-                            print(value.body);
-                            Get.off(() => SuccessPage(),
-                                arguments: [controller.nominal.text]);
-                          });
-                        }
-                      }
-                    },
-                    child: Text("Kirim"),
-                    style: ButtonStyle(
-                        backgroundColor:
-                            MaterialStateProperty.all(Colors.amber.shade700))),
+                child: Obx(() => controller.isLoading.value
+                    ? LinearProgressIndicator()
+                    : ElevatedButton(
+                        onPressed: () async {
+                          controller.setNewTopUp();
+                        },
+                        child: Text("Kirim"),
+                        style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.amber.shade700)))),
               ),
               Expanded(flex: 2, child: SizedBox()),
             ],

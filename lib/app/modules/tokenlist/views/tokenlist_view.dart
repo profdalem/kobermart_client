@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:get/get.dart';
+import 'package:kobermart_client/app/models/Member.dart';
+import 'package:kobermart_client/app/models/Tokens.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/style.dart';
 
@@ -15,33 +17,21 @@ class TokenlistView extends GetView<TokenlistController> {
   const TokenlistView({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    List getTokens(String keyword) {
-      return controller.homeC.sortedDownlines.value
+    List<Tokens> getTokens(String keyword) {
+      return controller.datalist.value
           .where((e) =>
-              e["tokenUsed"] == false &&
-              (e["uplineData"]["name"]
-                      .toString()
-                      .toLowerCase()
-                      .contains(controller.keyword.value.toLowerCase()) ||
-                  e["memberData"]["tokenCode"]
-                      .toString()
-                      .toLowerCase()
-                      .contains(controller.keyword.value.toLowerCase())))
+              e.tokenUsed == false &&
+              (e.upline.toString().toLowerCase().contains(controller.keyword.value.toLowerCase()) ||
+                  e.tokenCode.toString().toLowerCase().contains(controller.keyword.value.toLowerCase())))
           .toList();
     }
 
-    List getRegisteredTokens(String keyword) {
-      return controller.homeC.sortedDownlines.value
+    List<Member> getRegisteredTokens(String keyword) {
+      return controller.registeredDataList.value
           .where((e) =>
-              e["tokenUsed"] == true &&
-              (e["memberData"]["name"]
-                      .toString()
-                      .toLowerCase()
-                      .contains(controller.keyword.value.toLowerCase()) ||
-                  e["uplineData"]["name"]
-                      .toString()
-                      .toLowerCase()
-                      .contains(controller.keyword.value.toLowerCase())))
+              e.tokenUsed == true &&
+              (e.tokenCode.toString().toLowerCase().contains(controller.keyword.value.toLowerCase()) ||
+                  e.upline.toString().toLowerCase().contains(controller.keyword.value.toLowerCase())))
           .toList();
     }
 
@@ -71,11 +61,11 @@ class TokenlistView extends GetView<TokenlistController> {
                 onRefresh: () {
                   return controller.homeC.getDownlines();
                 },
-                child: Obx(() => controller.homeC.sortedDownlines.value.isEmpty
+                child: Obx(() => controller.datalist.isEmpty
                     ? Center(
                         child: Text("Token Kosong"),
                       )
-                    : ListView(
+                    : (controller.isLoading.value? Center(child: CircularProgressIndicator(),): ListView(
                         children: [
                           Container(
                             alignment: Alignment.centerLeft,
@@ -91,87 +81,52 @@ class TokenlistView extends GetView<TokenlistController> {
                                   children: List.generate(
                                     getTokens(controller.keyword.value).length,
                                     (index) => Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 12),
-                                      child: Container(
-                                        decoration: Shadow1(),
+                                      padding: const EdgeInsets.only(bottom: 5),
+                                      child: Card(
+                                        elevation: 1,
                                         child: ListTile(
-                                          contentPadding: EdgeInsets.symmetric(
-                                              vertical: 0, horizontal: 15),
+                                          contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
                                           onTap: () async {
-                                            if (!(getTokens(controller
-                                                    .keyword.value))[index]
-                                                ["memberData"]["opened"]) {
+                                            if (!(getTokens(controller.keyword.value))[index].opened) {
                                               await FirebaseFirestore.instance
                                                   .collection("members")
-                                                  .doc((getTokens(controller.keyword.value))[index]
-                                                      ["id"])
-                                                  .set({
-                                                "opened": true
-                                              }, SetOptions(merge: true)).then(
-                                                      (value) => Get.toNamed(
-                                                              Routes.TOKENDETAIL,
-                                                              arguments: {
-                                                                "data": (getTokens(
-                                                                    controller
-                                                                        .keyword
-                                                                        .value))[index]
-                                                              }));
-                                              controller.homeC.getDownlines();
+                                                  .doc((getTokens(controller.keyword.value))[index].tokenCode)
+                                                  .set({"opened": true}, SetOptions(merge: true));
+                                              Get.toNamed(Routes.TOKENDETAIL, arguments: {"data": (getTokens(controller.keyword.value))[index]});
                                             } else {
-                                              Get.toNamed(Routes.TOKENDETAIL,
-                                                  arguments: {
-                                                    "data": (getTokens(
-                                                        controller.keyword
-                                                            .value))[index]
-                                                  });
+                                              Get.toNamed(
+                                                Routes.TOKENDETAIL,
+                                                arguments: {"data": (getTokens(controller.keyword.value))[index]},
+                                              );
                                             }
                                           },
                                           leading: Badge(
                                             badgeColor: Colors.amber,
-                                            showBadge: !(getTokens(controller
-                                                        .keyword.value))[index]
-                                                    ["memberData"]["opened"]
-                                                ? true
-                                                : false,
+                                            showBadge: !(getTokens(controller.keyword.value))[index].opened ? true : false,
                                             padding: EdgeInsets.all(8),
                                             child: CircleAvatar(
-                                              child: Text("token"),
-                                              backgroundColor:
-                                                  Colors.grey.shade200,
+                                              child: Text("token", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),),
+                                              backgroundColor: Colors.grey.shade200,
                                               // backgroundImage: AssetImage(
                                               //     "assets/images/user-placeholder.png"),
                                             ),
                                           ),
                                           title: Text(
-                                            (getTokens(controller
-                                                    .keyword.value))[index]
-                                                ["memberData"]["tokenCode"],
+                                            (getTokens(controller.keyword.value))[index].tokenCode,
                                             style: TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: !(getTokens(
-                                                            controller.keyword
-                                                                .value))[index]
-                                                        ["memberData"]["opened"]
-                                                    ? FontWeight.bold
-                                                    : FontWeight.normal),
+                                                fontSize: 18,
+                                                fontWeight: !(getTokens(controller.keyword.value))[index].opened ? FontWeight.bold : FontWeight.normal),
                                           ),
                                           subtitle: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
                                               // Text("16 Juni 2022 13.45 WITA"),
-                                              Text(
-                                                  "Upline: ${(getTokens(controller.keyword.value))[index]["uplineData"]["name"]}"),
+                                              Text("Upline: ${(getTokens(controller.keyword.value))[index].uplineData["name"]}"),
                                             ],
                                           ),
                                           trailing: ItemMenu(
-                                            tokenCode: getTokens(controller
-                                                    .keyword.value)[index]
-                                                ["memberData"]["tokenCode"],
-                                            tokenUsed: getTokens(controller
-                                                .keyword
-                                                .value)[index]["tokenUsed"],
+                                            tokenCode: getTokens(controller.keyword.value)[index].tokenCode,
+                                            tokenUsed: getTokens(controller.keyword.value)[index].tokenUsed,
                                           ),
                                         ),
                                       ),
@@ -187,34 +142,22 @@ class TokenlistView extends GetView<TokenlistController> {
                             ),
                           ),
                           sb10,
-                          Obx(() => getRegisteredTokens(
-                                      controller.keyword.value)
-                                  .isEmpty
+                          Obx(() => getRegisteredTokens(controller.keyword.value).isEmpty
                               ? Center(child: Text("Kosong"))
                               : Column(
                                   children: List.generate(
-                                    getRegisteredTokens(
-                                            controller.keyword.value)
-                                        .length,
+                                    getRegisteredTokens(controller.keyword.value).length,
                                     (index) => Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 12),
-                                      child: Container(
-                                        decoration: Shadow1(),
+                                      padding: const EdgeInsets.only(bottom: 5),
+                                      child: Card(
+                                        elevation: 1,
                                         child: ListTile(
-                                          contentPadding: EdgeInsets.symmetric(
-                                              vertical: 0, horizontal: 15),
+                                          contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
                                           onTap: () {
-                                            Get.toNamed(Routes.MEMBERPROFILE,
-                                                arguments: {
-                                                  "name": getRegisteredTokens(
-                                                          controller.keyword
-                                                              .value)[index]
-                                                      ["memberData"]["name"],
-                                                  "id": getRegisteredTokens(
-                                                      controller.keyword
-                                                          .value)[index]["id"]
-                                                });
+                                            Get.toNamed(Routes.MEMBERPROFILE, arguments: {
+                                              "name": getRegisteredTokens(controller.keyword.value)[index].name,
+                                              "id": getRegisteredTokens(controller.keyword.value)[index].id
+                                            });
                                           },
                                           leading: Badge(
                                             badgeColor: Colors.amber,
@@ -228,30 +171,21 @@ class TokenlistView extends GetView<TokenlistController> {
                                             ),
                                           ),
                                           title: Text(
-                                            getRegisteredTokens(controller
-                                                    .keyword.value)[index]
-                                                ["memberData"]["name"],
+                                            getRegisteredTokens(controller.keyword.value)[index].name,
                                             style: TextStyle(
-                                              fontSize: 20,
+                                              fontSize: 18,
                                             ),
                                           ),
                                           subtitle: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
                                               // Text("16 Juni 2022 13.45 WITA"),
-                                              Text(
-                                                  "Upline: ${getRegisteredTokens(controller.keyword.value)[index]["uplineData"]["name"]}"),
+                                              Text("Upline: ${getRegisteredTokens(controller.keyword.value)[index].uplineData["name"]}"),
                                             ],
                                           ),
                                           trailing: ItemMenu(
-                                            tokenCode: getRegisteredTokens(
-                                                    controller
-                                                        .keyword.value)[index]
-                                                ["memberData"]["tokenCode"],
-                                            tokenUsed: getRegisteredTokens(
-                                                controller.keyword
-                                                    .value)[index]["tokenUsed"],
+                                            tokenCode: getRegisteredTokens(controller.keyword.value)[index].tokenCode,
+                                            tokenUsed: getRegisteredTokens(controller.keyword.value)[index].tokenUsed,
                                           ),
                                         ),
                                       ),
@@ -260,6 +194,7 @@ class TokenlistView extends GetView<TokenlistController> {
                                 )),
                         ],
                       )),
+                      ),
               ),
             ),
           ],
@@ -270,8 +205,7 @@ class TokenlistView extends GetView<TokenlistController> {
 }
 
 class ItemMenu extends StatelessWidget {
-  ItemMenu({Key? key, required this.tokenCode, required this.tokenUsed})
-      : super(key: key);
+  ItemMenu({Key? key, required this.tokenCode, required this.tokenUsed}) : super(key: key);
 
   final String tokenCode;
   final bool tokenUsed;
@@ -285,8 +219,7 @@ class ItemMenu extends StatelessWidget {
       itemBuilder: (context) => <PopupMenuEntry<String>>[
         PopupMenuItem<String>(
           onTap: () {
-            Clipboard.setData(ClipboardData(text: tokenCode)).then(
-                (value) => Get.snackbar("Berhasil", "Token berhasil disalin"));
+            Clipboard.setData(ClipboardData(text: tokenCode)).then((value) => Get.snackbar("Berhasil", "Token berhasil disalin"));
           },
           value: "salin",
           child: ListTile(
@@ -352,17 +285,10 @@ class CariButton extends StatelessWidget {
               color: Colors.black,
             ),
             focusedBorder: OutlineInputBorder(
-                gapPadding: 0,
-                borderSide: BorderSide(
-                    color: Color(0xFFE4E4E4), style: BorderStyle.solid),
-                borderRadius: BorderRadius.all(Radius.circular(25))),
+                gapPadding: 0, borderSide: BorderSide(color: Color(0xFFE4E4E4), style: BorderStyle.solid), borderRadius: BorderRadius.all(Radius.circular(25))),
             enabledBorder: OutlineInputBorder(
-                gapPadding: 0,
-                borderSide: BorderSide(
-                    color: Color(0xFFE4E4E4), style: BorderStyle.solid),
-                borderRadius: BorderRadius.all(Radius.circular(25))),
-            contentPadding:
-                EdgeInsets.only(left: 2, right: 2, bottom: 3, top: 3)),
+                gapPadding: 0, borderSide: BorderSide(color: Color(0xFFE4E4E4), style: BorderStyle.solid), borderRadius: BorderRadius.all(Radius.circular(25))),
+            contentPadding: EdgeInsets.only(left: 2, right: 2, bottom: 3, top: 3)),
         onChanged: (value) {
           tokenlistC.keyword.value = value.toString();
         },

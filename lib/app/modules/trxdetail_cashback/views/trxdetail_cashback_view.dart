@@ -1,9 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:kobermart_client/app/models/Transactions.dart';
 import 'package:kobermart_client/app/modules/widgets/trx_status.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/style.dart';
@@ -14,13 +14,11 @@ class TrxdetailCashbackView extends GetView<TrxdetailCashbackController> {
   const TrxdetailCashbackView({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    var createdAt = Timestamp.now();
-    Color? iconColor = Colors.blue;
+    final Transaction data = Get.arguments["data"];
+    DateTime createdAt = data.createdAt;
+    Color? iconColor = Get.arguments["iconColor"];
+    String jenis = Get.arguments["jenis"];
 
-    if (Get.arguments != null) {
-      createdAt = Get.arguments["createdAt"];
-      iconColor = Get.arguments["iconColor"];
-    }
     return SafeArea(
       top: false,
       child: Scaffold(
@@ -38,13 +36,7 @@ class TrxdetailCashbackView extends GetView<TrxdetailCashbackController> {
                 Get.offAllNamed(Routes.TRANSACTIONS);
               },
               icon: Icon(Icons.close)),
-          actions: [
-            IconButton(
-                onPressed: () {
-                  Get.toNamed(Routes.CART);
-                },
-                icon: Icon(Icons.shopping_cart))
-          ],
+         
         ),
         body: SingleChildScrollView(
           child: Column(
@@ -63,12 +55,12 @@ class TrxdetailCashbackView extends GetView<TrxdetailCashbackController> {
               Container(
                 alignment: Alignment.center,
                 child: Text(
-                  "Dibuat ${DateFormat.yMMMd("id_ID").format(createdAt.toDate())} ${DateFormat.Hm().format(createdAt.toDate())} WITA",
+                  "Dibuat ${DateFormat.yMMMd("id_ID").format(createdAt)} ${DateFormat.Hm().format(createdAt)} WITA",
                   style: TextStyle(color: Colors.grey),
                 ),
               ),
               sb15,
-              TrxDetailMainPanel(arguments: Get.arguments),
+              TrxDetailMainPanel(data: data),
               Container(
                 width: Get.width,
                 child: Padding(
@@ -90,22 +82,22 @@ class TrxdetailCashbackView extends GetView<TrxdetailCashbackController> {
 }
 
 class TrxDetailMainPanel extends StatelessWidget {
-  final dynamic arguments;
+  final Transaction data;
   TrxDetailMainPanel({
     Key? key,
-    required this.arguments,
+    required this.data,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    String notrx = "TRX88432389293";
-    String type = arguments["type"];
+    String notrx = data.id;
+    String type = data.type;
     int status = 4;
-    int nominal = arguments["nominal"];
-    String message = arguments["message"];
+    int nominal = data.nominal;
+    String message = data.data["transactionData"]["message"];
 
-    switch (arguments["type"]) {
-      case "ref":
+    switch (type) {
+      case "referral":
         type = "Referral";
         break;
       case "plan-a":
@@ -115,7 +107,7 @@ class TrxDetailMainPanel extends StatelessWidget {
         type = "Plan B";
     }
 
-    if (!arguments["isCount"]) {
+    if (data.status == "FAILED") {
       status = 5;
     }
 
@@ -147,8 +139,7 @@ class TrxDetailMainPanel extends StatelessWidget {
                     ),
                     sb15,
                     PanelTitle(title: "Nominal"),
-                    Text(
-                        "Rp ${NumberFormat("#,##0", "id_ID").format(nominal)}"),
+                    Text("Rp ${NumberFormat("#,##0", "id_ID").format(nominal)}"),
                   ],
                 ),
                 Column(
@@ -172,7 +163,7 @@ class TrxDetailMainPanel extends StatelessWidget {
                 SizedBox(
                   width: 5,
                 ),
-                arguments["type"] == "ref"
+                data.type == "referral"
                     ? GestureDetector(
                         onTap: () {
                           Get.toNamed(Routes.TOKENDETAIL);

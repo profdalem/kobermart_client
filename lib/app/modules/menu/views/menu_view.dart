@@ -44,15 +44,11 @@ class MenuView extends GetView<MenuController> {
                   //     "https://i.pravatar.cc/150?img=1"),
                 ),
                 title: PanelTitle(title: homeC.name.value),
-                subtitle: homeC.user == null
-                    ? Text("Referral ID: -")
-                    : Text("Referral ID: ${homeC.user["refid"]}"),
+                subtitle: Text("Referral ID: ${homeC.refId.value}"),
                 trailing: IconButton(
                   icon: Icon(Icons.logout_rounded),
-                  onPressed: () {
-                    authC
-                        .logout()
-                        .then((value) => Get.offAllNamed(Routes.LOGIN));
+                  onPressed: () async {
+                    await authC.logout();
                   },
                 ),
               ),
@@ -63,10 +59,7 @@ class MenuView extends GetView<MenuController> {
                 title: Text("Saldo Belanja"),
                 subtitle: Text(
                   "Rp ${NumberFormat("#,##0", "id_ID").format(homeC.balance.value)}",
-                  style: TextStyle(
-                      color: Colors.blue.shade600,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16),
+                  style: TextStyle(color: Colors.blue.shade600, fontWeight: FontWeight.bold, fontSize: 16),
                 ),
               ),
               ListTile(
@@ -75,10 +68,7 @@ class MenuView extends GetView<MenuController> {
                 title: Text("Cashback"),
                 subtitle: Text(
                   "Rp ${NumberFormat("#,##0", "id_ID").format(homeC.cashback.value)}",
-                  style: TextStyle(
-                      color: Colors.blue.shade600,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16),
+                  style: TextStyle(color: Colors.blue.shade600, fontWeight: FontWeight.bold, fontSize: 16),
                 ),
               ),
               ListTile(
@@ -162,8 +152,8 @@ class MenuView extends GetView<MenuController> {
               ),
               ListTile(
                 horizontalTitleGap: 0,
-                onTap: () {
-                  authC.logout().then((value) => Get.offAllNamed(Routes.LOGIN));
+                onTap: () async {
+                  await authC.logout();
                 },
                 leading: Icon(Icons.logout_rounded),
                 title: Text("Keluar"),

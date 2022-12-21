@@ -38,6 +38,10 @@ class ItemTransaksiPrepaid extends StatelessWidget {
         product = "Paket Internet";
         icon = data["data"]["productData"]["icon_url"];
         break;
+      case 'PREPUL':
+        product = "Pulsa";
+        icon = data["data"]["productData"]["icon_url"];
+        break;
       default:
         product = "Product";
     }
@@ -49,8 +53,8 @@ class ItemTransaksiPrepaid extends StatelessWidget {
           Get.toNamed(Routes.TRXDETAIL_PREPAID, arguments: {"data": data});
         },
         style: ButtonStyle(
-            shadowColor: MaterialStateProperty.all(Colors.grey),
-            elevation: MaterialStateProperty.all(2),
+            shadowColor: MaterialStateProperty.all(Colors.grey.shade300),
+            elevation: MaterialStateProperty.all(1),
             backgroundColor: MaterialStateProperty.all(Colors.white)),
         child: Padding(
           padding: EdgeInsets.only(left: 15, right: 15),
@@ -85,50 +89,76 @@ class ItemTransaksiPrepaid extends StatelessWidget {
                               product,
                               style: TextStyle(color: Colors.black, fontSize: 14),
                             ),
-                            Text(
-                              "${DateFormat.Hm().format(createdAt.toDate())} WITA",
-                              style: TextStyle(color: Colors.grey, fontSize: 12),
-                            ),
+                            // Text(
+                            //   "${DateFormat.Hm().format(createdAt.toDate())} WITA",
+                            //   style: TextStyle(color: Colors.grey, fontSize: 12),
+                            // ),
                           ],
                         ),
-                        TrxStatus(
-                          statusCode: status,
+                        Text(
+                          "- Rp ${NumberFormat("#,##0", "id_ID").format(int.parse(nominal.toString()))}",
+                          style: TextStyle(color: Colors.red.shade400, fontWeight: FontWeight.bold, fontSize: 14),
+                        ),
+                        // TrxStatus(
+                        //   statusCode: status,
+                        // ),
+                      ],
+                    ),
+                    // Divider(
+                    //   height: 2,
+                    // ),
+                    // SizedBox(
+                    //   height: 5,
+                    // ),
+                    Row(
+                      children: [
+                        Container(
+                          width: Get.width * 0.1,
+                          child: Text(
+                            "${DateFormat.Hm().format(createdAt.toDate())}",
+                            style: TextStyle(color: Colors.grey, fontSize: 12),
+                          ),
+                        ),
+                        Expanded(
+                          child: status == 4 && product == "Token Listrik"
+                              ? Text(
+                                  "${data["data"]["customerData"]["name"]}",
+                                  style: TextStyle(color: Colors.black, fontSize: 14),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                )
+                              : (product == "Pulsa"
+                                  ? Text(
+                                      "${data["data"]["productData"]["product_nominal"]}",
+                                      style: TextStyle(color: Colors.black, fontSize: 14),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    )
+                                  : (product == "Paket Internet"
+                                      ? Text(
+                                          "${data["data"]["productData"]["product_nominal"]}",
+                                          style: TextStyle(color: Colors.black, fontSize: 14),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        )
+                                      : SizedBox())),
                         ),
                       ],
                     ),
-                    Divider(
-                      height: 2,
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    status == 4 && product == "Token Listrik"
-                        ? Column(
-                            children: [
-                              Text(
-                                "SN: ${data["data"]["transactionData"]["sn"].toString().split("/")[0]}",
-                                style: TextStyle(color: Colors.black, fontSize: 14),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              sb10,
-                            ],
-                          )
-                        : SizedBox(),
                     Row(
                       children: [
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                "Harga:",
-                                style: TextStyle(color: Colors.black, fontSize: 14),
-                              ),
-                              Text(
-                                "Rp ${NumberFormat("#,##0", "id_ID").format(int.parse(nominal.toString()))}",
-                                style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14),
-                              ),
+                              // Text(
+                              //   "Harga:",
+                              //   style: TextStyle(color: Colors.black, fontSize: 14),
+                              // ),
+                              // Text(
+                              //   "- Rp ${NumberFormat("#,##0", "id_ID").format(int.parse(nominal.toString()))}",
+                              //   style: TextStyle(color: Colors.red.shade400, fontWeight: FontWeight.bold, fontSize: 14),
+                              // ),
                             ],
                           ),
                         ),
@@ -136,14 +166,14 @@ class ItemTransaksiPrepaid extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              Text(
-                                "Metode:",
-                                style: TextStyle(color: Colors.black, fontSize: 14),
-                              ),
-                              Text(
-                                "Potong Saldo",
-                                style: TextStyle(color: Colors.black, fontSize: 14),
-                              ),
+                              // Text(
+                              //   "Metode:",
+                              //   style: TextStyle(color: Colors.black, fontSize: 14),
+                              // ),
+                              // Text(
+                              //   "Potong Saldo",
+                              //   style: TextStyle(color: Colors.black, fontSize: 14),
+                              // ),
                             ],
                           ),
                         )

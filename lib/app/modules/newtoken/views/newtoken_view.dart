@@ -6,7 +6,6 @@ import 'package:kobermart_client/app/controllers/auth_controller.dart';
 import 'package:kobermart_client/app/modules/home/controllers/home_controller.dart';
 import 'package:kobermart_client/app/modules/widgets/success_token.dart';
 import 'package:kobermart_client/style.dart';
-
 import '../controllers/newtoken_controller.dart';
 
 class NewtokenView extends GetView {
@@ -17,7 +16,6 @@ class NewtokenView extends GetView {
 
   @override
   Widget build(BuildContext context) {
-    print(homeC.kd1count.value);
     return SafeArea(
       top: false,
       child: Scaffold(
@@ -31,9 +29,7 @@ class NewtokenView extends GetView {
             SizedBox(
               height: 25,
             ),
-            Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [PanelTitle(title: "Pilih upline token")]),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [PanelTitle(title: "Pilih upline token")]),
             sb20,
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -55,16 +51,15 @@ class NewtokenView extends GetView {
                     ),
                   ),
                   sb10,
-                  Container(
-                    decoration: Shadow1(),
+                  Card(
+                    elevation: 1,
                     child: ListTile(
                       onTap: () {
                         // pastikan slot kd1 tidak penuh
-                        if (homeC.kd1count.value == authC.kd1limit.value) {
+                        if (homeC.kd1count.value == homeC.settings["kd1limit"]) {
                           Get.defaultDialog(
                             title: "Slot Penuh",
-                            content:
-                                Text("Slot di KD1 anda telah terisi semua"),
+                            content: Text("Slot di KD1 anda telah terisi semua"),
                           );
                         } else {
                           Get.defaultDialog(
@@ -84,27 +79,19 @@ class NewtokenView extends GetView {
                                     child: Text("Batal")),
                               ),
                               confirm: ElevatedButton(
-                                  onPressed: () async {
+                                  onPressed: () {
+                                    // Generate Token dibawah Saya
                                     newTokenC.isLoading.value = true;
-                                    await newTokenC
-                                        .newToken(
-                                            homeC.id.value, homeC.id.value)
-                                        .then((value) async {
-                                      if (value["success"]) {
-                                        await homeC.getInitialData();
-                                        Get.back();
-                                        newTokenC.isLoading.value = false;
-                                        Get.to(() => SuccessTokenPage(),
-                                            arguments: {
-                                              "token": value["token"]
-                                            });
-                                      } else {
-                                        Get.back();
-                                        newTokenC.isLoading.value = false;
-                                        Get.defaultDialog(
-                                            title: "Gagal",
-                                            content: Text(value["message"]));
-                                      }
+                                    newTokenC.newToken(homeC.id.value, homeC.id.value).then((value){
+                                    if (value["success"]) {
+                                      Get.back();
+                                      Get.to(() => SuccessTokenPage(), arguments: {"token": value["token"]});
+                                    } else {
+                                      Get.back();
+                                      Get.defaultDialog(title: "Gagal", content: Text(value["message"]));
+                                    }
+                                    newTokenC.isLoading.value = false;
+
                                     });
                                   },
                                   child: Text("Yakin")));
@@ -116,27 +103,21 @@ class NewtokenView extends GetView {
                         //     "https://i.pravatar.cc/150?img=1"),
                       ),
                       title: PanelTitle(title: homeC.name.value),
-                      subtitle: Text(homeC.upline["name"]),
-                      trailing: Chip(
-                        label: Text((int.parse(homeC.settings["kd1limit"]) -
-                                homeC.kd1count.value)
-                            .toString()),
+                      subtitle: Text(homeC.uplineName.value),
+                      trailing: Obx(()=> Chip(
+                        label: Text((homeC.settings["kd1limit"] - homeC.kd1count.value).toString()),
                         backgroundColor: Colors.orange.shade200,
-                      ),
+                      )),
                     ),
                   ),
                   sb15,
                   homeC.downlines.isEmpty
                       ? Center(child: Text("Anggota tidak ditemukan"))
                       : Column(
-                          children: List.generate(homeC.downlines.value.length,
-                              (index) {
+                          children: List.generate(homeC.downlines.value.length, (index) {
                             var showTitle = false;
-                            for (var i = 0;
-                                i < homeC.downlines[index].length;
-                                i++) {
-                              if (homeC.downlines[index][i]['memberData']
-                                  ['tokenUsed']) {
+                            for (var i = 0; i < homeC.downlines[index].length; i++) {
+                              if (homeC.downlines[index][i]['memberData']['tokenUsed']) {
                                 showTitle = true;
                               }
                             }
@@ -147,114 +128,66 @@ class NewtokenView extends GetView {
                                     alignment: Alignment.centerLeft,
                                     child: Padding(
                                       padding: const EdgeInsets.only(left: 15),
-                                      child:
-                                          PanelTitle(title: "KD ${index + 1}"),
+                                      child: PanelTitle(title: "KD ${index + 1}"),
                                     ),
                                   ),
                                 sb10,
                                 Column(
                                   children: List.generate(
                                       homeC.downlines.value[index].length,
-                                      (kdindex) => homeC.downlines[index]
-                                                  [kdindex]['memberData']
-                                              ['tokenUsed']
+                                      (kdindex) => homeC.downlines[index][kdindex]['memberData']['tokenUsed']
                                           ? Padding(
-                                              padding: const EdgeInsets.only(
-                                                  bottom: 12),
-                                              child: Container(
-                                                decoration: Shadow1(),
+                                              padding: const EdgeInsets.only(bottom: 5),
+                                              child: Card(
+                                                elevation: 1,
                                                 child: ListTile(
                                                   onTap: () {
                                                     // pastikan slot kd1 tidak penuh
-                                                    if (int.parse(
-                                                            homeC.settings[
-                                                                "kd1limit"]) ==
-                                                        homeC.downlines[index]
-                                                                [kdindex]
-                                                            ['kd1count']) {
+                                                    if (homeC.settings["kd1limit"] == homeC.downlines[index][kdindex]['kd1count']) {
                                                       Get.defaultDialog(
                                                         title: "Slot Penuh",
-                                                        content: Text(
-                                                            "Slot di KD1 anda telah terisi semua"),
+                                                        content: Text("Slot di KD1 anda telah terisi semua"),
                                                       );
                                                     } else {
                                                       Get.defaultDialog(
-                                                          barrierDismissible:
-                                                              true,
+                                                          barrierDismissible: true,
                                                           title: "Konfirmasi",
                                                           content: Center(
                                                               child: Obx(
-                                                            () => newTokenC
-                                                                    .isLoading
-                                                                    .value
+                                                            () => newTokenC.isLoading.value
                                                                 ? Center(
-                                                                    child:
-                                                                        CircularProgressIndicator(),
+                                                                    child: CircularProgressIndicator(),
                                                                   )
                                                                 : Text(
                                                                     "Jadikan ${homeC.downlines[index][kdindex]['memberData']['name']} sebagai upline token?"),
                                                           )),
                                                           cancel: Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                        .only(
-                                                                    right: 50),
+                                                            padding: const EdgeInsets.only(right: 50),
                                                             child: TextButton(
                                                                 onPressed: () {
                                                                   Get.back();
                                                                 },
-                                                                child: Text(
-                                                                    "Batal")),
+                                                                child: Text("Batal")),
                                                           ),
-                                                          confirm:
-                                                              ElevatedButton(
-                                                                  onPressed:
-                                                                      () async {
-                                                                    newTokenC
-                                                                        .isLoading
-                                                                        .value = true;
-                                                                    await newTokenC
-                                                                        .newToken(
-                                                                            homeC.downlines[index][kdindex][
-                                                                                'id'],
-                                                                            homeC
-                                                                                .id.value)
-                                                                        .then(
-                                                                            (value) async {
-                                                                      print(value[
-                                                                          "success"]);
-                                                                      if (value[
-                                                                          "success"]) {
-                                                                        await homeC
-                                                                            .getInitialData();
-                                                                        Get.back();
-                                                                        newTokenC
-                                                                            .isLoading
-                                                                            .value = false;
-                                                                        Get.to(
-                                                                            () =>
-                                                                                SuccessTokenPage(),
-                                                                            arguments: {
-                                                                              "token": value["token"]
-                                                                            });
-                                                                      } else {
-                                                                        Get.back();
-                                                                        newTokenC
-                                                                            .isLoading
-                                                                            .value = false;
-                                                                        Get.defaultDialog(
-                                                                            title:
-                                                                                "Gagal",
-                                                                            content:
-                                                                                Text(value["message"]));
-                                                                        newTokenC
-                                                                            .isLoading
-                                                                            .value = false;
-                                                                      }
-                                                                    });
-                                                                  },
-                                                                  child: Text(
-                                                                      "Yakin")));
+                                                          confirm: ElevatedButton(
+                                                              onPressed: () async {
+                                                                newTokenC.isLoading.value = true;
+                                                                await newTokenC
+                                                                    .newToken(homeC.downlines[index][kdindex]['id'], homeC.id.value)
+                                                                    .then((value) async {
+                                                                  
+                                                                  if (value["success"]) {
+                                                                    Get.back();
+                                                                    Get.to(() => SuccessTokenPage(), arguments: {"token": value["token"]});
+                                                                  } else {
+                                                                    Get.back();
+                                                                    newTokenC.isLoading.value = false;
+                                                                    Get.defaultDialog(title: "Gagal", content: Text(value["message"]));
+                                                                  }
+                                                                  newTokenC.isLoading.value = false;
+                                                                });
+                                                              },
+                                                              child: Text("Yakin")));
                                                     }
                                                   },
                                                   leading: CircleAvatar(
@@ -264,32 +197,13 @@ class NewtokenView extends GetView {
                                                     //         "https://i.pravatar.cc/150?img=${index + 5}"),
                                                   ),
                                                   title: PanelTitle(
-                                                      title: homeC.downlines[index]
-                                                                          [kdindex]
-                                                                      ['memberData']
-                                                                  ['name'] !=
-                                                              null
-                                                          ? homeC.downlines[index]
-                                                                      [kdindex]
-                                                                  ['memberData']
-                                                              ['name']
-                                                          : homeC.downlines[index]
-                                                                      [kdindex]
-                                                                  ['memberData']
-                                                              ['tokenCode']),
-                                                  subtitle: Text(
-                                                      "Upline: ${homeC.downlines[index][kdindex]['uplineData']['name']}"),
+                                                      title: homeC.downlines[index][kdindex]['memberData']['name'] != null
+                                                          ? homeC.downlines[index][kdindex]['memberData']['name']
+                                                          : homeC.downlines[index][kdindex]['memberData']['tokenCode']),
+                                                  subtitle: Text("Upline: ${homeC.downlines[index][kdindex]['uplineData']['name']}"),
                                                   trailing: Chip(
-                                                    label: Text((int.parse(homeC
-                                                                    .settings[
-                                                                "kd1limit"]) -
-                                                            homeC.downlines[
-                                                                        index]
-                                                                    [kdindex]
-                                                                ['kd1count'])
-                                                        .toString()),
-                                                    backgroundColor:
-                                                        Colors.orange.shade200,
+                                                    label: Text((homeC.settings["kd1limit"] - homeC.downlines[index][kdindex]['kd1count']).toString()),
+                                                    backgroundColor: Colors.orange.shade200,
                                                   ),
                                                 ),
                                               ),

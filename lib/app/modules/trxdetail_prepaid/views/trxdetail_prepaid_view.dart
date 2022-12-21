@@ -15,8 +15,7 @@ class TrxdetailPrepaidView extends GetView {
   @override
   Widget build(BuildContext context) {
     final data = Get.arguments["data"];
-    var time = Timestamp.fromMillisecondsSinceEpoch(
-        data["createdAt"]["_seconds"] * 1000);
+    var time = Timestamp.fromMillisecondsSinceEpoch(data["createdAt"]["_seconds"] * 1000);
 
     String icon = data["data"]["productData"]["icon_url"];
     return Scaffold(
@@ -120,6 +119,12 @@ class TrxDetailMainPanel extends StatelessWidget {
         case "PREPLN":
           type = "Token Listrik";
           break;
+        case "PREDAT":
+          type = "Paket Internet";
+          break;
+        case "PREPUL":
+          type = "Pulsa";
+          break;
         default:
           type = "Tipe Produk";
       }
@@ -156,8 +161,7 @@ class TrxDetailMainPanel extends StatelessWidget {
                     Text(type),
                     sb10,
                     PanelTitle(title: "Nominal"),
-                    Text(
-                        "Rp ${NumberFormat("#,##0", "id_ID").format(nominal)}"),
+                    Text("Rp ${NumberFormat("#,##0", "id_ID").format(nominal)}"),
                   ],
                 ),
                 Column(
@@ -204,10 +208,7 @@ class TrxDetailSerialNumber extends StatelessWidget {
             child: Column(children: [
               Text(
                 "Token berhasil didapatkan!",
-                style: TextStyle(
-                    color: Colors.green.shade700,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18),
+                style: TextStyle(color: Colors.green.shade700, fontWeight: FontWeight.bold, fontSize: 18),
               ),
               sb10,
               Text(
@@ -239,13 +240,8 @@ class TrxDetailSerialNumber extends StatelessWidget {
               ElevatedButton(
                 onPressed: () {
                   Clipboard.setData(
-                    ClipboardData(
-                        text: data["sn"]
-                            .toString()
-                            .split("/")[0]
-                            .replaceAll("-", "")),
-                  ).then((value) => Get.snackbar(
-                      "Berhasil", "Token listrik berhasil disalin"));
+                    ClipboardData(text: data["sn"].toString().split("/")[0].replaceAll("-", "")),
+                  ).then((value) => Get.snackbar("Berhasil", "Token listrik berhasil disalin"));
                 },
                 child: Text("Salin Token"),
               )

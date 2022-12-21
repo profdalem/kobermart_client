@@ -2,20 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 import 'package:get/get.dart';
-import 'package:kobermart_client/app/controllers/auth_controller.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
-
-import '../controllers/login_controller.dart';
-
+import 'package:kobermart_client/config.dart';
+import 'package:kobermart_client/firebase.dart';
 import 'package:kobermart_client/style.dart';
 
-class LoginView extends GetView<LoginController> {
-  const LoginView({Key? key}) : super(key: key);
+import '../../../controllers/auth_controller.dart';
+
+class LoginView extends GetView {
+  LoginView({Key? key}) : super(key: key);
+
+  final authC = Get.find<AuthController>();
 
   @override
   Widget build(BuildContext context) {
     final authC = Get.find<AuthController>();
+    if (boxStorage.read("email") != null && boxStorage.read("password") != null) {
+      authC.emailC.text = boxStorage.read("email");
+      authC.passwordC.text = boxStorage.read("password");
+    }
+    ;
     return Scaffold(
+        resizeToAvoidBottomInset: false,
         backgroundColor: Color(0xFF31AAEF),
         body: Stack(
           children: [
@@ -59,9 +67,10 @@ class LoginView extends GetView<LoginController> {
                             height: 5,
                           ),
                           DefaultTextInput(
-                            controller: controller.emailC,
+                            controller: authC.emailC,
                             inputLabel: "Email anggota",
                             obsecure: false,
+                            password: false,
                           )
                         ],
                       ),
@@ -79,87 +88,111 @@ class LoginView extends GetView<LoginController> {
                           SizedBox(
                             height: 5,
                           ),
-                          DefaultTextInput(
-                            controller: controller.passwordC,
-                            inputLabel: "Password",
-                            obsecure: true,
-                          ),
+                          Obx(() => DefaultTextInput(
+                                controller: authC.passwordC,
+                                inputLabel: "Password",
+                                obsecure: authC.isObsecure.value,
+                                password: true,
+                              )),
                         ],
                       ),
                     ),
-                    SizedBox(
-                      height: 30,
-                    ),
-                    Container(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        clipBehavior: Clip.antiAlias,
-                        onPressed: () async {
-                          if (authC.loading.value == false) {
-                            authC.loading.value = true;
-                            if (controller.emailC.text.isNotEmpty && controller.passwordC.text.isNotEmpty) {
-                              GetUtils.isEmail(controller.emailC.text)
-                                  ? await authC.login(controller.emailC.text, controller.passwordC.text).then((value) => authC.loading.value = false)
-                                  : Get.defaultDialog(title: "Error", content: Text("Email tidak valid"));
-                              authC.loading.value = false;
-                            } else {
-                              authC.loading.value = false;
-                              Get.defaultDialog(title: "Error", content: Text("Email dan password harus diisi"));
-                            }
-                          }
-                        },
-                        child: Obx(() => Container(
-                              height: 30,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "Masuk",
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  authC.loading.value
-                                      ? SizedBox(
-                                          width: 20,
-                                        )
-                                      : SizedBox(),
-                                  authC.loading.value
-                                      ? Container(
-                                          height: 25,
-                                          width: 25,
-                                          child: CircularProgressIndicator(
-                                            color: Colors.white,
-                                          ),
-                                        )
-                                      : SizedBox()
-                                ],
+                    sb10,
+                    Obx(() => Row(
+                          children: [
+                            Checkbox(
+                              value: authC.rememberMe.value,
+                              onChanged: (value) {
+                                authC.rememberMe.value = !authC.rememberMe.value;
+                                print(authC.rememberMe.value);
+                              },
+                              checkColor: Colors.blue,
+                              fillColor: MaterialStatePropertyAll(Colors.white),
+                            ),
+                            SizedBox(
+                              width: 2,
+                            ),
+                            Text(
+                              "Ingat email & password",
+                              style: TextStyle(color: Colors.white),
+                            )
+                          ],
+                        )),
+                    sb20,
+                    Obx(() => authC.loading.value
+                        ? Container(
+                            height: 25,
+                            width: 25,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                            ),
+                          )
+                        : Container(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              clipBehavior: Clip.antiAlias,
+                              onPressed: () async {
+                                if (authC.loading.value == false) {
+                                  authC.loading.value = true;
+                                  if (authC.emailC.text.isNotEmpty && authC.passwordC.text.isNotEmpty) {
+                                    GetUtils.isEmail(authC.emailC.text)
+                                        ? await authC
+                                            .login(authC.emailC.text, authC.passwordC.text)
+                                            .then((value) => authC.loading.value = false)
+                                        : Get.defaultDialog(title: "Error", content: Text("Email tidak valid"));
+                                    authC.loading.value = false;
+                                  } else {
+                                    authC.loading.value = false;
+                                    Get.defaultDialog(title: "Error", content: Text("Email dan password harus diisi"));
+                                  }
+                                }
+                              },
+                              child: Container(
+                                height: 30,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Masuk",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            )),
-                        style: TextButton.styleFrom(padding: EdgeInsets.all(15), backgroundColor: Colors.blue),
-                      ),
-                    ),
+                              style: TextButton.styleFrom(padding: EdgeInsets.all(15), backgroundColor: Colors.blue),
+                            ),
+                          )),
                     SizedBox(
-                      height: 15,
+                      height: 20,
                     ),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Get.toNamed(Routes.TOKENINPUT);
+                      },
                       child: Text(
                         "Lupa password",
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
                     SizedBox(
-                      height: 15,
+                      height: 20,
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        Get.toNamed(Routes.TOKENINPUT, preventDuplicates: true);
-                      },
-                      child: Text(
-                        "Registrasi dengan Token",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                    IconButton(onPressed: () {}, icon: Icon(Icons.refresh))
+                    // GestureDetector(
+                    //   onTap: () {
+                    //     Get.toNamed(Routes.TOKENINPUT, preventDuplicates: true);
+                    //   },
+                    //   child: Text(
+                    //     "Registrasi dengan Token",
+                    //     style: TextStyle(color: Colors.white),
+                    //   ),
+                    // ),
+                    if (devMode)
+                      IconButton(
+                          onPressed: () {
+                            authC.emailC.text = "kobermart@gmail.com";
+                            authC.passwordC.text = "123456";
+                          },
+                          icon: Icon(Icons.refresh))
                   ],
                 ),
               ),
@@ -170,16 +203,19 @@ class LoginView extends GetView<LoginController> {
 }
 
 class DefaultTextInput extends StatelessWidget {
-  const DefaultTextInput({
+  DefaultTextInput({
     Key? key,
     required this.controller,
     required this.inputLabel,
     required this.obsecure,
+    required this.password,
   }) : super(key: key);
 
   final TextEditingController controller;
   final String inputLabel;
   final bool obsecure;
+  final bool password;
+  final authC = Get.find<AuthController>();
 
   @override
   Widget build(BuildContext context) {
@@ -192,8 +228,24 @@ class DefaultTextInput extends StatelessWidget {
           autocorrect: false,
           obscureText: obsecure,
           keyboardType: TextInputType.text,
-          decoration: InputDecoration(hintText: inputLabel, border: InputBorder.none),
-          textAlign: TextAlign.center,
+          decoration: InputDecoration(
+              contentPadding: EdgeInsets.all(12),
+              hintText: inputLabel,
+              border: InputBorder.none,
+              suffixIcon: password
+                  ? (obsecure
+                      ? GestureDetector(
+                          onTap: () {
+                            authC.isObsecure.value = false;
+                          },
+                          child: Icon(Icons.remove_red_eye))
+                      : GestureDetector(
+                          onTap: () {
+                            authC.isObsecure.value = true;
+                          },
+                          child: Icon(Icons.remove_red_eye_outlined)))
+                  : Icon(Icons.email)),
+          textAlign: TextAlign.left,
         ),
       ),
     );

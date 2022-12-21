@@ -5,14 +5,17 @@ import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:kobermart_client/app/modules/ppob/controllers/ppob_controller.dart';
 import 'app/controllers/auth_controller.dart';
 import 'app/modules/widgets/splashscreen.dart';
 import 'app/routes/app_pages.dart';
 import 'package:flutter/services.dart';
+import '../../../../extensions.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Firebase.initializeApp();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await GetStorage.init();
   FirebaseMessaging messaging = FirebaseMessaging.instance;
 
@@ -25,6 +28,7 @@ void main() async {
     provisional: false,
     sound: true,
   );
+
   print('User granted permission: ${settings.authorizationStatus}');
 
   FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) {
@@ -34,7 +38,9 @@ void main() async {
   });
 
   await initializeDateFormatting('id_ID', null)
-      .then((value) => SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then((value) => runApp(MyApp())));
+      .then((value) => SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then((value) {
+            runApp(MyApp());
+          }));
 }
 
 class MyApp extends StatelessWidget {
@@ -58,6 +64,10 @@ class MyApp extends StatelessWidget {
                 getPages: AppPages.routes,
               ));
         }
+
+        // if (snapshot.connectionState == ConnectionState.done) {
+        //   return NoInternetPage();
+        // }
         return FutureBuilder(
           future: authC.firstInitialized(),
           builder: (context, snapshot) => SplashScreen(),

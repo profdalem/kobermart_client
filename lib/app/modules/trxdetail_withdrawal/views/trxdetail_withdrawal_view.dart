@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
+import 'package:kobermart_client/constants.dart';
 import 'package:kobermart_client/style.dart';
 
+import '../../../models/Transactions.dart';
 import '../controllers/trxdetail_withdrawal_controller.dart';
 import '../../widgets/trx_status.dart';
 
@@ -13,6 +16,7 @@ class TrxdetailWithdrawalView extends GetView<TrxdetailWithdrawalController> {
   const TrxdetailWithdrawalView({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
+    Transaction data = Get.arguments["data"] as Transaction;
     return SafeArea(
       top: false,
       child: Scaffold(
@@ -54,18 +58,33 @@ class TrxdetailWithdrawalView extends GetView<TrxdetailWithdrawalController> {
               Container(
                 alignment: Alignment.center,
                 child: Text(
-                  "Dibuat 19-06-2022  12.30 WITA",
+                 "Dibuat ${DateFormat.yMMMd("id_ID").format(data.createdAt)} ${DateFormat.Hm().format(data.createdAt)} WITA",
                   style: TextStyle(color: Colors.grey),
                 ),
               ),
               sb15,
-              TrxDetailMainPanel(),
-              sb15,
-              TrxDetailPaymentMessage(),
-              sb15,
-              TrxDetailPaymentInfoShop(),
-              sb15,
-              TrxDetailCollector(),
+              TrxDetailMainPanel(data: data),
+              if (data.status == "ACTIVE")
+                Column(
+                  children: [
+                    sb15,
+                    TrxDetailPaymentMessage(),
+                  ],
+                ),
+                if (data.status == "PENDING")
+                Column(
+                  children: [
+                    sb15,
+                    TrxDetailPaymentInfoShop(data: data),
+                  ],
+                ),
+              if (data.data["collectorData"] != null)
+                Column(
+                  children: [
+                    sb15,
+                    TrxDetailCollector(),
+                  ],
+                ),
               Container(
                 width: Get.width,
                 child: Padding(
@@ -86,53 +105,19 @@ class TrxdetailWithdrawalView extends GetView<TrxdetailWithdrawalController> {
   }
 }
 
-class TrxDetailCollector extends StatelessWidget {
-  const TrxDetailCollector({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: Get.width,
-      decoration: Shadow1(),
-      child: Padding(
-        padding: EdgeInsets.all(15),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          PanelTitle(title: "Pengantar"),
-          sb10,
-          ListTile(
-            contentPadding: EdgeInsets.all(0),
-            leading: CircleAvatar(
-              backgroundImage: CachedNetworkImageProvider(
-                  "https://i.pravatar.cc/150?img=18"),
-            ),
-            title: Text("Robert Xemeckis"),
-            onTap: () {
-              print("liht anggota");
-            },
-            trailing: IconButton(
-              icon: Icon(Icons.call),
-              onPressed: () {},
-            ),
-          )
-        ]),
-      ),
-    );
-  }
-}
-
 class TrxDetailMainPanel extends StatelessWidget {
-  const TrxDetailMainPanel({
+  final Transaction data;
+  TrxDetailMainPanel({
     Key? key,
+    required this.data,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    String notrx = "TRX88432389293";
+   String notrx = data.id;
     String type = "Withdrawal";
-    String method = "Transfer";
-    int status = 2;
+    String method = data.getMethod();
+    int status = data.getStatus();
 
     return Container(
       decoration: Shadow1(),
@@ -165,7 +150,7 @@ class TrxDetailMainPanel extends StatelessWidget {
                     Text(type),
                     sb15,
                     PanelTitle(title: "Nominal"),
-                    Text("Rp 500.000"),
+                    Text("Rp ${NumberFormat("#,##0", "id_ID").format(data.nominal)}"),
                   ],
                 ),
                 Column(
@@ -189,8 +174,10 @@ class TrxDetailMainPanel extends StatelessWidget {
 }
 
 class TrxDetailPaymentInfoShop extends StatelessWidget {
-  const TrxDetailPaymentInfoShop({
+   final Transaction data;
+  TrxDetailPaymentInfoShop({
     Key? key,
+    required this.data,
   }) : super(key: key);
 
   @override
@@ -203,8 +190,8 @@ class TrxDetailPaymentInfoShop extends StatelessWidget {
       Get.toNamed(Routes.QRCODE);
     };
 
-    switch (type) {
-      case 1:
+    switch (data.getMethod()) {
+      case METHOD_TRANSFER:
         typeTitle = "Withdrawal (transfer)";
         btnText = "Saya sudah bayar";
         btnFunction = () {};
@@ -395,6 +382,42 @@ class TrxDetailPaymentMessage extends StatelessWidget {
                     style: TextStyle(fontWeight: FontWeight.bold)),
                 TextSpan(text: "."),
               ]))
+        ]),
+      ),
+    );
+  }
+}
+
+class TrxDetailCollector extends StatelessWidget {
+  const TrxDetailCollector({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: Get.width,
+      decoration: Shadow1(),
+      child: Padding(
+        padding: EdgeInsets.all(15),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          PanelTitle(title: "Pengantar"),
+          sb10,
+          ListTile(
+            contentPadding: EdgeInsets.all(0),
+            leading: CircleAvatar(
+              backgroundImage: CachedNetworkImageProvider(
+                  "https://i.pravatar.cc/150?img=18"),
+            ),
+            title: Text("Robert Xemeckis"),
+            onTap: () {
+              print("liht anggota");
+            },
+            trailing: IconButton(
+              icon: Icon(Icons.call),
+              onPressed: () {},
+            ),
+          )
         ]),
       ),
     );

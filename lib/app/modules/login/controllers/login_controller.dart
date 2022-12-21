@@ -19,7 +19,7 @@ class LoginController extends GetxController {
   void onInit() {
     emailC = TextEditingController();
     passwordC = TextEditingController();
-    checkToken();
+    // checkToken();
     if (preFilled) emailC.text = "kobermart@gmail.com";
     if (preFilled) passwordC.text = "123456";
     super.onInit();

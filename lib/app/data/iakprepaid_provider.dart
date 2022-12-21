@@ -48,13 +48,33 @@ class IakprepaidProvider extends GetConnect {
     );
   }
 
-  Future<Response> setTopUpPaketData(var customerId, var refId, var productCode, var nominal) async {
+  Future<Response> setTopUpPaketData(var customerId, var refId, var productCode, var nominal, var productData) async {
     var token;
 
     await FirebaseAuth.instance.currentUser?.getIdToken(true).then((value) => {token = value});
 
     return post(
       "${mainUrl}api/ppob/prepaid/topup/data",
+      {
+        "customerId": customerId,
+        "refId": refId,
+        "productCode": productCode,
+        "nominal": nominal,
+        "productData": productData,
+      },
+      headers: {
+        "Authorization": "Bearer ${token}",
+      },
+    );
+  }
+
+  Future<Response> setTopUpPulsa(var customerId, var refId, var productCode, var nominal) async {
+    var token;
+
+    await FirebaseAuth.instance.currentUser?.getIdToken(true).then((value) => {token = value});
+
+    return post(
+      "${mainUrl}api/ppob/prepaid/topup/pulsa",
       {
         "customerId": customerId,
         "refId": refId,
@@ -96,6 +116,21 @@ class IakprepaidProvider extends GetConnect {
     );
   }
 
+  Future<Response> getPulsaPricelist() async {
+    var token;
+    httpClient.timeout = Duration(seconds: 30);
+
+    await FirebaseAuth.instance.currentUser?.getIdToken(true).then((value) => {token = value});
+
+    return post(
+      "${mainUrl}api/ppob/prepaid/pulsa/operator",
+      {},
+      headers: {
+        "Authorization": "Bearer ${token}",
+      },
+    );
+  }
+
   Future<Response> getStatus(String ref) async {
     var token = await FirebaseAuth.instance.currentUser?.getIdToken(true).then((value) {
       return value;
@@ -105,6 +140,17 @@ class IakprepaidProvider extends GetConnect {
       "${mainUrl}api/ppob/prepaid/status/${ref}",
       headers: {
         "Authorization": "Bearer ${token}",
+      },
+    );
+  }
+
+  Future<Response> getPrepaidPricelist(var type, var operator) async {
+   return post(
+      "https://prepaid.iak.id/api/pricelist/${type}${"/"+operator}",
+      {
+        "username":"085237721290",
+        "sign": iakSignPricelist,
+        "status": "active"
       },
     );
   }

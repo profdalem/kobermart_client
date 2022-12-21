@@ -13,22 +13,9 @@ import '../controllers/tokendetail_controller.dart';
 
 class TokendetailView extends GetView<TokendetailController> {
   TokendetailView({Key? key}) : super(key: key);
-  final homeC = Get.find<HomeController>();
 
   @override
   Widget build(BuildContext context) {
-    String tokenCode = "-";
-    String creator = "tidak ditemukan";
-    Timestamp createdAt = Timestamp.now();
-
-    if (Get.arguments != null) {
-      tokenCode = Get.arguments["data"]["memberData"]["tokenCode"];
-      creator = Get.arguments["data"]["memberData"]["tokenCreator"];
-      createdAt = Timestamp(
-          Get.arguments["data"]["memberData"]["tokenCreatedAt"]["_seconds"],
-          Get.arguments["data"]["memberData"]["tokenCreatedAt"]
-              ["_nanoseconds"]);
-    }
 
     return Scaffold(
         backgroundColor: Color(0xFFF4F4F4),
@@ -55,7 +42,7 @@ class TokendetailView extends GetView<TokendetailController> {
                   width: Get.width * 0.2,
                 ),
                 sb15,
-                Container(
+                Obx(()=> Container(
                   width: Get.width,
                   decoration: Shadow1(),
                   child: Padding(
@@ -69,7 +56,7 @@ class TokendetailView extends GetView<TokendetailController> {
                               Row(
                                 children: [
                                   Text(
-                                    tokenCode,
+                                    controller.tokenCode.value,
                                     style: TextStyle(fontSize: 18),
                                   ),
                                   SizedBox(
@@ -78,7 +65,7 @@ class TokendetailView extends GetView<TokendetailController> {
                                   GestureDetector(
                                       onTap: () {
                                         Clipboard.setData(
-                                          ClipboardData(text: tokenCode),
+                                          ClipboardData(text: controller.tokenCode.value),
                                         ).then((value) => Get.snackbar(
                                             "Berhasil",
                                             "Token berhasil disalin"));
@@ -98,7 +85,7 @@ class TokendetailView extends GetView<TokendetailController> {
                                 print("klik");
                               },
                               child: Text(
-                                creator,
+                                controller.creator.value,
                                 style:
                                     TextStyle(color: Colors.blue, fontSize: 18),
                               )),
@@ -109,24 +96,22 @@ class TokendetailView extends GetView<TokendetailController> {
                                 print("klik");
                               },
                               child: Text(
-                                "${DateFormat.yMMMd("id_ID").format(createdAt.toDate())} ${DateFormat.Hm().format(createdAt.toDate())} WITA",
+                                "${DateFormat.yMMMd("id_ID").format(controller.createdAt.value)} ${DateFormat.Hm().format(controller.createdAt.value)} WITA",
                                 style: TextStyle(fontSize: 18),
                               )),
                           sb15,
-                          if (creator == homeC.id.value ||
-                              Get.arguments["data"]["upline"] == homeC.id.value)
                             Container(
                               width: double.infinity,
                               child: ElevatedButton(
                                   onPressed: () {
                                     Get.toNamed(Routes.REGISTRATION,
-                                        arguments: {"tokenCode": tokenCode});
+                                        arguments: {"tokenCode": controller.tokenCode.value});
                                   },
                                   child: Text("Isi Data Anggota")),
                             )
                         ]),
                   ),
-                ),
+                )),
                 sb15,
                 if (Get.arguments != null)
                   Container(
@@ -145,8 +130,7 @@ class TokendetailView extends GetView<TokendetailController> {
                                 // backgroundImage: CachedNetworkImageProvider(
                                 //     "https://i.pravatar.cc/150?img=18"),
                               ),
-                              title: Text(
-                                  Get.arguments["data"]["uplineData"]["name"]),
+                              title: Obx(()=>Text(controller.upline.value)),
                               onTap: () {
                                 print("lihat anggota");
                               },

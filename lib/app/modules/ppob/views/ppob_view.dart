@@ -1,13 +1,10 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:kobermart_client/app/modules/home/controllers/home_controller.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
-
 import '../../../../style.dart';
 import '../controllers/ppob_controller.dart';
 
@@ -35,13 +32,20 @@ class PpobView extends GetView<PpobController> {
             ? Center(
                 child: CircularProgressIndicator(),
               )
-            : TabBarView(controller: controller.tabC, children: [
-                ListrikView(),
-                PaketDataView(),
-                Center(child: Text("Segera hadir")),
-                Center(child: Text("Segera hadir")),
-                Center(child: Text("Segera hadir")),
-              ]),
+            : Column(
+                children: [
+                  Expanded(
+                    flex: 9,
+                    child: TabBarView(controller: controller.tabC, children: [
+                      PaketDataView(),
+                      PulsaView(),
+                      ListrikView(),
+                      Center(child: Text("Segera hadir")),
+                      Center(child: Text("Segera hadir")),
+                    ]),
+                  ),
+                ],
+              ),
       ),
     );
   }
@@ -63,8 +67,10 @@ class ListrikView extends StatelessWidget {
           SizedBox(
             height: 25,
           ),
-          Card(
-            child: CachedNetworkImage(imageUrl: "https://cdn.mobilepulsa.net/img/logo/pulsa/small/listrik.png"),
+          Icon(
+            Icons.electric_bolt_rounded,
+            color: Colors.amber.shade700,
+            size: 30,
           ),
           sb5,
           Row(mainAxisAlignment: MainAxisAlignment.center, children: [PanelTitle(title: "Beli Token & Bayar Listrik")]),
@@ -375,7 +381,6 @@ class PaketDataView extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              sb20,
               Container(
                 width: Get.width,
                 decoration: Shadow1(),
@@ -444,88 +449,46 @@ class PaketDataView extends StatelessWidget {
                                     sb15,
                                     Text("Pilih Paket Data"),
                                     Container(
-                                      height: 150,
+                                      // height: 150,
                                       width: double.infinity,
-                                      child: ListView(
-                                        children: List.generate(
-                                            controller
-                                                .getPaketDataProductList(controller.pricelistPaketData, controller.paketDataOperator.value)
-                                                .length,
-                                            (index) => Padding(
-                                                  padding: const EdgeInsets.symmetric(vertical: 5),
-                                                  child: GestureDetector(
-                                                    onTap: () {
-                                                      onTapProductMethod(index);
-                                                    },
-                                                    child: Card(
-                                                      margin: EdgeInsets.only(right: 10),
-                                                      color: controller.paketDataCodeSelected.value ==
-                                                              controller
-                                                                  .getPaketDataProductList(controller.pricelistPaketData,
-                                                                      controller.paketDataOperator.value)[index]["product_code"]
-                                                                  .toString()
-                                                          ? Colors.blue.shade100
-                                                          : Colors.white,
-                                                      elevation: 2,
-                                                      child: Container(
-                                                        padding: EdgeInsets.all(10),
-                                                        width: Get.width * 0.4,
-                                                        child: Column(
-                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                                          children: [
-                                                            Column(
-                                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                                              children: [
-                                                                Text(
-                                                                  controller.getPaketDataProductList(
-                                                                          controller.pricelistPaketData, controller.paketDataOperator.value)[index]
-                                                                      ["product_description"],
-                                                                  maxLines: 2,
-                                                                  overflow: TextOverflow.ellipsis,
-                                                                  style: TextStyle(fontWeight: FontWeight.w300, fontSize: 8),
-                                                                ),
-                                                                Text(
-                                                                  controller.getPaketDataProductList(
-                                                                          controller.pricelistPaketData, controller.paketDataOperator.value)[index]
-                                                                      ["product_nominal"],
-                                                                  maxLines: 2,
-                                                                  overflow: TextOverflow.ellipsis,
-                                                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-                                                                ),
-                                                                Text(
-                                                                  controller.getPaketDataProductList(
-                                                                          controller.pricelistPaketData, controller.paketDataOperator.value)[index]
-                                                                      ["product_details"],
-                                                                  maxLines: 2,
-                                                                  overflow: TextOverflow.ellipsis,
-                                                                  style: TextStyle(fontSize: 10),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            Column(
-                                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                                              children: [
-                                                                Text(
-                                                                  "Rp ${NumberFormat("#,##0", "id_ID").format(controller.getPaketDataProductList(controller.pricelistPaketData, controller.paketDataOperator.value)[index]["sell_price"])}",
-                                                                  textAlign: TextAlign.left,
-                                                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue.shade800),
-                                                                ),
-                                                                Text(
-                                                                  "Masa aktif: ${controller.getPaketDataProductList(controller.pricelistPaketData, controller.paketDataOperator.value)[index]["active_period"]} hari",
-                                                                  maxLines: 1,
-                                                                  overflow: TextOverflow.ellipsis,
-                                                                  style: TextStyle(fontSize: 10),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                )),
-                                        scrollDirection: Axis.horizontal,
+                                      child: ListView.builder(
+                                        physics: NeverScrollableScrollPhysics(),
+                                        shrinkWrap: true,
+                                        itemCount: controller
+                                            .getProductList(controller.pricelistPaketData, controller.paketDataOperator.value)
+                                            .length,
+                                        itemBuilder: (context, index) => Card(
+                                          elevation: 2,
+                                          child: ListTile(
+                                            onTap: () {
+                                              onTapProductMethod(
+                                                  index,
+                                                  controller.getProductList(
+                                                      controller.pricelistPaketData, controller.paketDataOperator.value)[index]);
+                                            },
+                                            title: Text(
+                                              controller.getProductList(
+                                                      controller.pricelistPaketData, controller.paketDataOperator.value)[index]
+                                                  ["product_nominal"],
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                            ),
+                                            // subtitle: Text(
+                                            //   controller.getProductList(
+                                            //           controller.pricelistPaketData, controller.paketDataOperator.value)[index]
+                                            //       ["product_details"],
+                                            //   maxLines: 2,
+                                            //   overflow: TextOverflow.ellipsis,
+                                            //   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
+                                            // ),
+                                            trailing: Text(
+                                              "Rp ${NumberFormat("#,##0", "id_ID").format(int.parse(controller.getProductList(controller.pricelistPaketData, controller.paketDataOperator.value)[index]["sell_price"].toString()))}",
+                                              textAlign: TextAlign.left,
+                                              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue.shade800),
+                                            ),
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -555,58 +518,9 @@ class PaketDataView extends StatelessWidget {
                                       ],
                                     )
                                   : SizedBox()),
-                              Obx(
-                                () => controller.paketDataNameSelected.isNotEmpty
-                                    ? Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          sb10,
-                                          Text("Paket Pilihan:"),
-                                          PanelTitle(title: controller.paketDataNameSelected.value),
-                                        ],
-                                      )
-                                    : SizedBox(),
-                              ),
-                              Obx(
-                                () => controller.paketDataOperator.isEmpty
-                                    ? SizedBox()
-                                    : Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          sb10,
-                                          Text("Harga:"),
-                                          PanelTitle(
-                                              title:
-                                                  "Rp ${NumberFormat("#,##0", "id_ID").format(int.parse(controller.paketDataNominalSelected.value.toString()))}"),
-                                        ],
-                                      ),
-                              ),
                             ],
                           ),
                         ],
-                      ),
-                      sb20,
-                      Container(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            controller.setPrepaidTopupPaketData();
-                          },
-                          style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.blue)),
-                          child: Container(
-                            alignment: Alignment.center,
-                            height: 50,
-                            child: controller.isLoading.value
-                                ? Container(
-                                    height: 30,
-                                    width: 30,
-                                    child: CircularProgressIndicator(
-                                      color: Colors.white,
-                                    ),
-                                  )
-                                : Text("Beli Paket Data"),
-                          ),
-                        ),
                       ),
                     ],
                   ),
@@ -620,19 +534,62 @@ class PaketDataView extends StatelessWidget {
     );
   }
 
-  void onTapProductMethod(int index) {
+  void onTapProductMethod(int index, var productData) {
     controller.paketDataCodeSelected.value =
-        controller.getPaketDataProductList(controller.pricelistPaketData, controller.paketDataOperator.value)[index]["product_code"].toString();
+        controller.getProductList(controller.pricelistPaketData, controller.paketDataOperator.value)[index]["product_code"].toString();
     controller.paketDataCodeSelected.refresh();
 
     controller.paketDataNominalSelected.value =
-        controller.getPaketDataProductList(controller.pricelistPaketData, controller.paketDataOperator.value)[index]["sell_price"].toString();
+        controller.getProductList(controller.pricelistPaketData, controller.paketDataOperator.value)[index]["sell_price"].toString();
     controller.paketDataNominalSelected.refresh();
 
     controller.paketDataNameSelected.value =
-        controller.getPaketDataProductList(controller.pricelistPaketData, controller.paketDataOperator.value)[index]["product_nominal"].toString();
+        controller.getProductList(controller.pricelistPaketData, controller.paketDataOperator.value)[index]["product_nominal"].toString();
 
     print(controller.paketDataCodeSelected.value);
+    Get.defaultDialog(
+        title: "Konfirmasi Pembelian",
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Obx(
+              () => controller.paketDataNameSelected.isNotEmpty
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        sb10,
+                        Text("Paket Pilihan:"),
+                        PanelTitle(title: controller.paketDataNameSelected.value),
+                      ],
+                    )
+                  : SizedBox(),
+            ),
+            Obx(
+              () => controller.paketDataOperator.isEmpty
+                  ? SizedBox()
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        sb10,
+                        Text("Harga:"),
+                        PanelTitle(
+                            title:
+                                "Rp ${NumberFormat("#,##0", "id_ID").format(int.parse(controller.paketDataNominalSelected.value.toString()))}"),
+                      ],
+                    ),
+            ),
+          ],
+        ),
+        confirm: ElevatedButton(
+            onPressed: () {
+              controller.setPrepaidTopupPaketData(productData);
+            },
+            child: Text("Beli")),
+        cancel: TextButton(
+            onPressed: () {
+              Get.back();
+            },
+            child: Text("Kembali")));
   }
 
   void onChangedMethod(String value) {
@@ -699,4 +656,376 @@ class PaketDataView extends StatelessWidget {
       controller.paketDataPhoneNumberError.value = false;
     }
   }
+}
+
+class PulsaView extends StatelessWidget {
+  PulsaView({
+    Key? key,
+  }) : super(key: key);
+
+  final controller = Get.find<PpobController>();
+  final homeC = Get.find<HomeController>();
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          SizedBox(
+            height: 25,
+          ),
+          Icon(
+            Icons.phone_android,
+            color: Colors.cyan.shade700,
+            size: 30,
+          ),
+          sb5,
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [PanelTitle(title: "Beli Paket Data")]),
+          sb20,
+          Container(
+            alignment: Alignment.centerLeft,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 15, right: 15),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("Saldo anda: "),
+                  Text(
+                    "Rp ${NumberFormat("#,##0", "id_ID").format(homeC.balance.value)}",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          sb10,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: Get.width,
+                decoration: Shadow1(),
+                child: Padding(
+                  padding: EdgeInsets.only(left: 15, top: 15, bottom: 15, right: 15),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Nomor handphone"),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      TextField(
+                        controller: controller.phoneNumber,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                            suffixIcon: Container(
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 5),
+                                child: Obx(() => controller.pulsaIcon.value.isNotEmpty
+                                    ? Image.asset(
+                                        controller.pulsaIcon.value,
+                                        fit: BoxFit.contain,
+                                      )
+                                    : SizedBox()),
+                              ),
+                            ),
+                            suffixIconConstraints: BoxConstraints.expand(width: 50, height: 35),
+                            isDense: true,
+                            hintText: "08xx xxxx xxxx",
+                            focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.grey,
+                                ),
+                                borderRadius: BorderRadius.all(Radius.circular(5))),
+                            border: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.grey,
+                                ),
+                                borderRadius: BorderRadius.all(Radius.circular(5))),
+                            // isDense: true,
+                            contentPadding: EdgeInsets.all(10)),
+                        textAlignVertical: TextAlignVertical.center,
+                        inputFormatters: <TextInputFormatter>[FilteringTextInputFormatter.digitsOnly],
+                        onEditingComplete: () {
+                          onEditingCompleteMethodPulsa();
+                        },
+                        onChanged: (value) {
+                          onChangedMethodPulsa(value);
+                        },
+                      ),
+                      Obx(() => controller.paketDataPhoneNumberError.value
+                          ? Text(
+                              "*Penulisan nomor harus diawali '08'",
+                              style: TextStyle(color: Colors.red.shade600),
+                            )
+                          : SizedBox()),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Obx(() => controller.pulsaOperator.isEmpty
+                              ? SizedBox()
+                              : Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    sb15,
+                                    Text("Pilih Nominal"),
+                                    Column(
+                                      children: List.generate(
+                                          controller.getProductList(controller.pricelistPulsa, controller.pulsaOperator.value).length,
+                                          (index) => GetUtils.isNumericOnly(controller.getProductList(
+                                                          controller.pricelistPulsa, controller.pulsaOperator.value)[index]
+                                                      ["product_nominal"]) &&
+                                                  controller.getProductList(
+                                                          controller.pricelistPulsa, controller.pulsaOperator.value)[index]["status"] ==
+                                                      "active"
+                                              ? Padding(
+                                                  padding: const EdgeInsets.symmetric(vertical: 5),
+                                                  child: Card(
+                                                    elevation: 2,
+                                                    child: ListTile(
+                                                      onTap: () {
+                                                        onTapProductMethodPulsa(index);
+                                                      },
+                                                      title: Text(
+                                                        GetUtils.isNumericOnly(controller.getProductList(
+                                                                    controller.pricelistPulsa, controller.pulsaOperator.value)[index]
+                                                                ["product_nominal"])
+                                                            ? "Pulsa ${NumberFormat("#,##0", "id_ID").format(int.parse(controller.getProductList(controller.pricelistPulsa, controller.pulsaOperator.value)[index]["product_nominal"].toString()))}"
+                                                            : controller.getProductList(
+                                                                    controller.pricelistPulsa, controller.pulsaOperator.value)[index]
+                                                                ["product_nominal"],
+                                                        maxLines: 2,
+                                                        overflow: TextOverflow.ellipsis,
+                                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                                      ),
+                                                      trailing: Text(
+                                                        "Rp ${NumberFormat("#,##0", "id_ID").format(controller.getProductList(controller.pricelistPulsa, controller.pulsaOperator.value)[index]["sell_price"])}",
+                                                        textAlign: TextAlign.left,
+                                                        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue.shade800),
+                                                      ),
+                                                    ),
+                                                  )
+
+                                                  
+                                                  )
+                                              : SizedBox()),
+                                    ),
+                                  ],
+                                )),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Obx(() => homeC.balance.value < int.parse(controller.pulsaNominalSelected.value)
+                                  ? Column(
+                                      children: [
+                                        sb10,
+                                        Container(
+                                          alignment: Alignment.center,
+                                          width: double.infinity,
+                                          decoration: BoxDecoration(
+                                              border: Border.all(color: Colors.amber, style: BorderStyle.solid),
+                                              borderRadius: BorderRadius.all(
+                                                Radius.circular(5),
+                                              ),
+                                              color: Colors.amber.shade100),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(5.0),
+                                            child: Text("Saldo anda tidak cukup"),
+                                          ),
+                                        ),
+                                        sb10
+                                      ],
+                                    )
+                                  : SizedBox()),
+                              // Obx(
+                              //   () => controller.pulsaNameSelected.isNotEmpty
+                              //       ? Column(
+                              //           crossAxisAlignment: CrossAxisAlignment.start,
+                              //           children: [
+                              //             sb10,
+                              //             Text("Paket Pilihan:"),
+                              //             PanelTitle(title: controller.pulsaNameSelected.value),
+                              //           ],
+                              //         )
+                              //       : SizedBox(),
+                              // ),
+                              // Obx(
+                              //   () => controller.pulsaOperator.isEmpty
+                              //       ? SizedBox()
+                              //       : Column(
+                              //           crossAxisAlignment: CrossAxisAlignment.start,
+                              //           children: [
+                              //             sb10,
+                              //             Text("Harga:"),
+                              //             PanelTitle(
+                              //                 title:
+                              //                     "Rp ${NumberFormat("#,##0", "id_ID").format(int.parse(controller.pulsaNominalSelected.value.toString()))}"),
+                              //           ],
+                              //         ),
+                              // ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      // sb20,
+                      // Container(
+                      //   width: double.infinity,
+                      //   child: ElevatedButton(
+                      //     onPressed: () {
+                      //       controller.setPrepaidTopupPulsa();
+                      //     },
+                      //     style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.blue)),
+                      //     child: Container(
+                      //       alignment: Alignment.center,
+                      //       height: 50,
+                      //       child: controller.isLoading.value
+                      //           ? Container(
+                      //               height: 30,
+                      //               width: 30,
+                      //               child: CircularProgressIndicator(
+                      //                 color: Colors.white,
+                      //               ),
+                      //             )
+                      //           : Text("Beli Paket Data"),
+                      //     ),
+                      //   ),
+                      // ),
+                    ],
+                  ),
+                ),
+              )
+            ],
+          ),
+          sb20
+        ],
+      ),
+    );
+  }
+
+  void onTapProductMethodPulsa(int index) {
+    controller.pulsaCodeSelected.value =
+        controller.getProductList(controller.pricelistPulsa, controller.pulsaOperator.value)[index]["product_code"].toString();
+    controller.pulsaCodeSelected.refresh();
+
+    controller.pulsaNominalSelected.value =
+        controller.getProductList(controller.pricelistPulsa, controller.pulsaOperator.value)[index]["sell_price"].toString();
+    controller.pulsaNominalSelected.refresh();
+
+    controller.pulsaNameSelected.value =
+        controller.getProductList(controller.pricelistPulsa, controller.pulsaOperator.value)[index]["product_nominal"].toString();
+
+    print(controller.pulsaCodeSelected.value);
+    Get.defaultDialog(
+        title: "Konfirmasi Pembelian",
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Obx(
+              () => controller.pulsaNameSelected.isNotEmpty
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        sb10,
+                        Text("Nominal:"),
+                        PanelTitle(title: controller.pulsaNameSelected.value),
+                      ],
+                    )
+                  : SizedBox(),
+            ),
+            Obx(
+              () => controller.pulsaOperator.isEmpty
+                  ? SizedBox()
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        sb10,
+                        Text("Harga:"),
+                        PanelTitle(
+                            title:
+                                "Rp ${NumberFormat("#,##0", "id_ID").format(int.parse(controller.pulsaNominalSelected.value.toString()))}"),
+                      ],
+                    ),
+            ),
+          ],
+        ),
+        confirm: ElevatedButton(
+            onPressed: () {
+              // controller.setPrepaidTopupPaketData(productData);
+              controller.setPrepaidTopupPulsa();
+            },
+            child: Text("Beli")),
+        cancel: TextButton(
+            onPressed: () {
+              Get.back();
+            },
+            child: Text("Kembali")));
+  }
+
+  void onChangedMethodPulsa(String value) {
+    if (value.length > 3) {
+      controller.getOperator(4, value);
+      controller.pulsaNominalSelected.value = "0";
+      controller.pulsaCodeSelected.value = "";
+      controller.pulsaNameSelected.value = "";
+    } else if (value.length > 6) {
+      controller.getOperator(6, value);
+      controller.pulsaNominalSelected.value = "0";
+      controller.pulsaCodeSelected.value = "";
+      controller.pulsaNameSelected.value = "";
+    } else if (value.isEmpty) {
+      controller.pulsaIcon.value = "";
+      controller.pulsaOperator.value = "";
+      controller.pulsaNominalSelected.value = "0";
+      controller.pulsaCodeSelected.value = "";
+      controller.pulsaNameSelected.value = "";
+    }
+
+    if (value.length > 1) {
+      if (value.substring(0, 2) != "08" && value.length > 1) {
+        controller.paketDataPhoneNumberError.value = true;
+      } else {
+        controller.paketDataPhoneNumberError.value = false;
+      }
+    }
+    if (value.length < 2) {
+      controller.paketDataPhoneNumberError.value = false;
+    }
+  }
+
+  void onEditingCompleteMethodPulsa() {
+    FocusManager.instance.primaryFocus?.unfocus();
+    print(controller.phoneNumber.text);
+    if (controller.phoneNumber.text.length > 3) {
+      print("length > 3");
+      if (controller.phoneNumber.text.substring(0, 2) != "08" && controller.phoneNumber.text.length > 1) {
+        controller.paketDataPhoneNumberError.value = true;
+      } else {
+        controller.paketDataPhoneNumberError.value = false;
+      }
+      controller.getOperator(4, controller.phoneNumber.text.substring(0, 4));
+      controller.pulsaNominalSelected.value = "0";
+      controller.pulsaCodeSelected.value = "";
+      controller.pulsaNameSelected.value = "";
+    } else if (controller.phoneNumber.text.length > 6) {
+      print("length > 6");
+      controller.getOperator(6, controller.phoneNumber.text.substring(0, 6));
+      controller.pulsaNominalSelected.value = "0";
+      controller.pulsaCodeSelected.value = "";
+      controller.pulsaNameSelected.value = "";
+    } else if (controller.phoneNumber.text.isEmpty) {
+      print("length 0");
+      controller.pulsaIcon.value = "";
+      controller.pulsaOperator.value = "";
+      controller.pulsaNominalSelected.value = "0";
+      controller.pulsaCodeSelected.value = "";
+      controller.pulsaNameSelected.value = "";
+    }
+
+    if (controller.phoneNumber.text.length < 2) {
+      controller.paketDataPhoneNumberError.value = false;
+    }
+  }
+
+  // Pulsa method
+
 }

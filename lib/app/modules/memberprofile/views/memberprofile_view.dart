@@ -16,7 +16,6 @@ class MemberprofileView extends StatelessWidget {
   Widget build(BuildContext context) {
     if (Get.arguments != null) {
       profileC.getMemberProfile(Get.arguments["id"]);
-      print(Get.arguments);
       profileC.name.value = Get.arguments["name"];
     }
 
@@ -81,38 +80,29 @@ class MemberprofileView extends StatelessWidget {
                                     "Bergabung sejak ${DateFormat.yMMMMd("id_ID").format(DateTime.fromMillisecondsSinceEpoch(profileC.memberCreatedAt.value.millisecondsSinceEpoch))}"),
                                 sb20,
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 15),
+                                  padding: const EdgeInsets.symmetric(horizontal: 15),
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           PanelTitle(title: "Anggota"),
-                                          Text(
-                                              "${profileC.memberCount.value.toString()} orang"),
+                                          Text("${profileC.memberCount.value.toString()} orang"),
                                         ],
                                       ),
                                       Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
                                         children: [
                                           PanelTitle(title: "Kedalaman"),
-                                          Text(
-                                              "KD${profileC.kdstatus.value.toString()}"),
+                                          Text("KD${profileC.kdstatus.value.toString()}"),
                                         ],
                                       ),
                                       Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
+                                        crossAxisAlignment: CrossAxisAlignment.end,
                                         children: [
                                           PanelTitle(title: "Status"),
-                                          profileC.active.value
-                                              ? Text("Aktif")
-                                              : Text("Non-aktif"),
+                                          profileC.active.value ? Text("Aktif") : Text("Non-aktif"),
                                         ],
                                       )
                                     ],
@@ -124,67 +114,54 @@ class MemberprofileView extends StatelessWidget {
                                   decoration: Shadow1(),
                                   child: Padding(
                                     padding: EdgeInsets.all(15),
-                                    child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          PanelTitle(title: "Referal ID"),
-                                          Text(
-                                            profileC.refid.value,
-                                            style: TextStyle(fontSize: 18),
-                                          ),
-                                          sb15,
-                                          PanelTitle(title: "Email"),
-                                          GestureDetector(
-                                              onTap: () {
-                                                print("klik");
-                                              },
-                                              child: Text(
-                                                profileC.email.value,
-                                                style: TextStyle(
-                                                    color: Colors.blue,
-                                                    fontSize: 18),
-                                              )),
-                                          sb15,
-                                          PanelTitle(title: "Whatsapp"),
-                                          GestureDetector(
-                                              onTap: () {
-                                                print("klik");
-                                              },
-                                              child: Text(
-                                                profileC.whatsapp.value,
-                                                style: TextStyle(
-                                                    color: Colors.blue,
-                                                    fontSize: 18),
-                                              )),
-                                          sb15,
-                                          PanelTitle(title: "Tanggal lahir"),
-                                          Text(
-                                            DateFormat.yMMMMd("id_ID").format(
-                                                DateTime.fromMillisecondsSinceEpoch(
-                                                    profileC.birthday.value
-                                                        .millisecondsSinceEpoch)),
-                                            style: TextStyle(fontSize: 18),
-                                          ),
-                                          sb15,
-                                          PanelTitle(title: "Alamat"),
-                                          Text(
-                                            profileC.address.value,
-                                            style: TextStyle(fontSize: 18),
-                                          ),
-                                          if (profileC.rek.value.isNotEmpty &&
-                                              profileC.bank.value.isNotEmpty)
-                                            sb15,
-                                          if (profileC.rek.value.isNotEmpty &&
-                                              profileC.bank.value.isNotEmpty)
-                                            PanelTitle(title: "Nomor Rekening"),
-                                          if (profileC.rek.value.isNotEmpty &&
-                                              profileC.bank.value.isNotEmpty)
-                                            Text(
-                                              "${profileC.rek.value} (${profileC.bank.value})",
-                                              style: TextStyle(fontSize: 18),
-                                            ),
-                                        ]),
+                                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                      PanelTitle(title: "Referal ID"),
+                                      Text(
+                                        profileC.refid.value,
+                                        style: TextStyle(fontSize: 18),
+                                      ),
+                                      sb15,
+                                      PanelTitle(title: "Email"),
+                                      GestureDetector(
+                                          onTap: () {
+                                            print("klik");
+                                          },
+                                          child: Text(
+                                            profileC.email.value,
+                                            style: TextStyle(color: Colors.blue, fontSize: 18),
+                                          )),
+                                      sb15,
+                                      PanelTitle(title: "Whatsapp"),
+                                      GestureDetector(
+                                          onTap: () {
+                                            print("klik");
+                                          },
+                                          child: Text(
+                                            profileC.whatsapp.value,
+                                            style: TextStyle(color: Colors.blue, fontSize: 18),
+                                          )),
+                                      sb15,
+                                      PanelTitle(title: "Tanggal lahir"),
+                                      Text(
+                                        DateFormat.yMMMMd("id_ID")
+                                            .format(DateTime.fromMillisecondsSinceEpoch(profileC.birthday.value.millisecondsSinceEpoch)),
+                                        style: TextStyle(fontSize: 18),
+                                      ),
+                                      sb15,
+                                      PanelTitle(title: "Alamat"),
+                                      Text(
+                                        profileC.address.value,
+                                        style: TextStyle(fontSize: 18),
+                                      ),
+                                      if (profileC.rek.value.isNotEmpty && profileC.bank.value.isNotEmpty) sb15,
+                                      if (profileC.rek.value.isNotEmpty && profileC.bank.value.isNotEmpty)
+                                        PanelTitle(title: "Nomor Rekening"),
+                                      if (profileC.rek.value.isNotEmpty && profileC.bank.value.isNotEmpty)
+                                        Text(
+                                          "${profileC.rek.value} (${profileC.bank.value})",
+                                          style: TextStyle(fontSize: 18),
+                                        ),
+                                    ]),
                                   ),
                                 ),
                                 sb15,
@@ -193,25 +170,21 @@ class MemberprofileView extends StatelessWidget {
                                   decoration: Shadow1(),
                                   child: Padding(
                                     padding: EdgeInsets.all(15),
-                                    child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          PanelTitle(title: "Upline"),
-                                          ListTile(
-                                            contentPadding: EdgeInsets.all(0),
-                                            leading: CircleAvatar(
-                                              child: Icon(Icons.person),
-                                              // backgroundImage: CachedNetworkImageProvider(
-                                              //     "https://i.pravatar.cc/150?img=18"),
-                                            ),
-                                            title:
-                                                Text(profileC.uplineName.value),
-                                            onTap: () {
-                                              print("lihat anggota");
-                                            },
-                                          )
-                                        ]),
+                                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                      PanelTitle(title: "Upline"),
+                                      ListTile(
+                                        contentPadding: EdgeInsets.all(0),
+                                        leading: CircleAvatar(
+                                          child: Icon(Icons.person),
+                                          // backgroundImage: CachedNetworkImageProvider(
+                                          //     "https://i.pravatar.cc/150?img=18"),
+                                        ),
+                                        title: Text(profileC.uplineName.value),
+                                        onTap: () {
+                                          print("lihat anggota");
+                                        },
+                                      )
+                                    ]),
                                   ),
                                 ),
                                 sb15,
@@ -220,31 +193,21 @@ class MemberprofileView extends StatelessWidget {
                                   child: Padding(
                                     padding: const EdgeInsets.all(15),
                                     child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         Expanded(
                                           flex: 6,
                                           child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
-                                              PanelTitle(
-                                                  title: "Buat token disini"),
-                                              Text(
-                                                  "Slot KD1 tersedia: ${(10 - profileC.kd1count.value).toString()}")
+                                              PanelTitle(title: "Buat token disini"),
+                                              Text("Slot KD1 tersedia: ${(10 - profileC.kd1count.value).toString()}")
                                             ],
                                           ),
                                         ),
-                                        Expanded(
-                                            flex: 4,
-                                            child: ElevatedButton(
-                                                onPressed: () {},
-                                                child: Text("+ Token")))
+                                        Expanded(flex: 4, child: ElevatedButton(onPressed: () {}, child: Text("+ Token")))
                                       ],
                                     ),
                                   ),
@@ -291,8 +254,7 @@ class PanelKedalaman extends StatelessWidget {
                     (DaftarKedalaman item) => ExpansionPanel(
                         canTapOnHeader: true,
                         headerBuilder: (context, isExpanded) {
-                          num slotSize =
-                              pow(10, (memberC.kd.indexOf(item) + 1));
+                          num slotSize = pow(10, (memberC.kd.indexOf(item) + 1));
                           return ListTile(
                             title: Row(children: [
                               Text(
@@ -306,9 +268,7 @@ class PanelKedalaman extends StatelessWidget {
                                 visualDensity: VisualDensity.compact,
                                 padding: EdgeInsets.all(0),
                                 backgroundColor: Color(0xFFFF9800),
-                                label: Text('${item.members.length} terisi',
-                                    style: TextStyle(
-                                        fontSize: 12, color: Colors.white)),
+                                label: Text('${item.members.length} terisi', style: TextStyle(fontSize: 12, color: Colors.white)),
                               ),
                               SizedBox(
                                 width: 10,
@@ -317,10 +277,8 @@ class PanelKedalaman extends StatelessWidget {
                                 visualDensity: VisualDensity.compact,
                                 padding: EdgeInsets.all(0),
                                 backgroundColor: Colors.blue,
-                                label: Text(
-                                    '${slotSize - item.members.length} kosong',
-                                    style: TextStyle(
-                                        fontSize: 12, color: Colors.white)),
+                                label:
+                                    Text('${slotSize - item.members.length} kosong', style: TextStyle(fontSize: 12, color: Colors.white)),
                               ),
                             ]),
                           );
@@ -331,8 +289,7 @@ class PanelKedalaman extends StatelessWidget {
                           child: ListView.separated(
                               scrollDirection: Axis.horizontal,
                               itemBuilder: (context, index) {
-                                var tokenUsed =
-                                    item.members[index]["tokenUsed"];
+                                var tokenUsed = item.members[index]["tokenUsed"];
                                 return Container(
                                   width: 100,
                                   child: Card(
@@ -340,67 +297,42 @@ class PanelKedalaman extends StatelessWidget {
                                       child: TextButton(
                                         onPressed: () {
                                           if (tokenUsed) {
-                                            Get.to(() => MemberprofileView(),
-                                                arguments: {
-                                                  "id": item.members[index]
-                                                      ["id"],
-                                                  "name": item.members[index]
-                                                      ["memberData"]["name"],
-                                                });
+                                            Get.to(() => MemberprofileView(), arguments: {
+                                              "id": item.members[index]["id"],
+                                              "name": item.members[index]["memberData"]["name"],
+                                            });
                                           } else {
-                                            Get.toNamed(Routes.TOKENDETAIL,
-                                                arguments: {
-                                                  "data": item.members[index]
-                                                });
+                                            Get.toNamed(Routes.TOKENDETAIL, arguments: {"data": item.members[index]});
                                           }
                                         },
                                         child: Column(
                                           children: [
                                             CircleAvatar(
                                               radius: 30.0,
-                                              backgroundColor: tokenUsed
-                                                  ? Colors.blue
-                                                  : Colors.grey.shade200,
-                                              child: tokenUsed
-                                                  ? Icon(Icons.person)
-                                                  : Text("token"),
+                                              backgroundColor: tokenUsed ? Colors.blue : Colors.grey.shade200,
+                                              child: tokenUsed ? Icon(Icons.person) : Text("token"),
                                             ),
                                             Text(
                                               tokenUsed
-                                                  ? item.members[index]
-                                                      ["memberData"]["name"]
-                                                  : (FirebaseAuth
-                                                              .instance
-                                                              .currentUser!
-                                                              .uid ==
-                                                          item.members[index]
-                                                                  ["memberData"]
-                                                              ["tokenCreator"]
-                                                      ? item.members[index]
-                                                              ["memberData"]
-                                                          ["tokenCode"]
+                                                  ? item.members[index]["memberData"]["name"]
+                                                  : (FirebaseAuth.instance.currentUser!.uid ==
+                                                          item.members[index]["memberData"]["tokenCreator"]
+                                                      ? item.members[index]["memberData"]["tokenCode"]
                                                       : "?"),
                                               overflow: TextOverflow.ellipsis,
                                               maxLines: 1,
-                                              style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 12),
+                                              style: TextStyle(color: Colors.black, fontSize: 12),
                                             ),
                                             if (tokenUsed)
                                               RichText(
                                                 text: TextSpan(
-                                                  style: TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: 14),
+                                                  style: TextStyle(color: Colors.black, fontSize: 14),
                                                   children: [
                                                     WidgetSpan(
-                                                      child: Icon(Icons.person,
-                                                          size: 14),
+                                                      child: Icon(Icons.person, size: 14),
                                                     ),
                                                     TextSpan(
-                                                      text: item.members[index]
-                                                              ["kd1count"]
-                                                          .toString(),
+                                                      text: item.members[index]["kd1count"].toString(),
                                                     ),
                                                   ],
                                                 ),

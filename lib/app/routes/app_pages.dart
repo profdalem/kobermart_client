@@ -6,8 +6,12 @@ import '../modules/buynow/bindings/buynow_binding.dart';
 import '../modules/buynow/views/buynow_view.dart';
 import '../modules/cart/bindings/cart_binding.dart';
 import '../modules/cart/views/cart_view.dart';
+import '../modules/cashback_history/bindings/cashback_history_binding.dart';
+import '../modules/cashback_history/views/cashback_history_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
+import '../modules/inputnumber/bindings/inputnumber_binding.dart';
+import '../modules/inputnumber/views/inputnumber_view.dart';
 import '../modules/investment/bindings/investment_binding.dart';
 import '../modules/investment/views/investment_view.dart';
 import '../modules/login/bindings/login_binding.dart';
@@ -34,6 +38,8 @@ import '../modules/qrcode/bindings/qrcode_binding.dart';
 import '../modules/qrcode/views/qrcode_view.dart';
 import '../modules/registration/bindings/registration_binding.dart';
 import '../modules/registration/views/registration_view.dart';
+import '../modules/selectmethod/bindings/selectmethod_binding.dart';
+import '../modules/selectmethod/views/selectmethod_view.dart';
 import '../modules/shop/bindings/shop_binding.dart';
 import '../modules/shop/views/shop_view.dart';
 import '../modules/tokendetail/bindings/tokendetail_binding.dart';
@@ -85,7 +91,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.LOGIN,
-      page: () => const LoginView(),
+      page: () => LoginView(),
       binding: LoginBinding(),
     ),
     GetPage(
@@ -168,7 +174,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.BALANCETRANSFER,
-      page: () => const BalancetransferView(),
+      page: () => BalancetransferView(),
       binding: BalancetransferBinding(),
     ),
     GetPage(
@@ -250,6 +256,21 @@ class AppPages {
       name: _Paths.TRXDETAIL_POSTPAID,
       page: () => TrxdetailPostpaidView(),
       binding: TrxdetailPostpaidBinding(),
+    ),
+    GetPage(
+      name: _Paths.CASHBACK_HISTORY,
+      page: () => const CashbackHistoryView(),
+      binding: CashbackHistoryBinding(),
+    ),
+    GetPage(
+      name: _Paths.INPUTNUMBER,
+      page: () => InputnumberView(),
+      binding: InputnumberBinding(),
+    ),
+    GetPage(
+      name: _Paths.SELECTMETHOD,
+      page: () => SelectmethodView(),
+      binding: SelectmethodBinding(),
     ),
   ];
 }

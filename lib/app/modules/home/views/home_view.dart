@@ -6,6 +6,8 @@ import 'package:intl/intl.dart';
 import 'package:kobermart_client/app/controllers/auth_controller.dart';
 import 'package:kobermart_client/app/controllers/product_controller.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
+import 'package:kobermart_client/constants.dart';
+import 'package:kobermart_client/firebase.dart';
 import 'package:kobermart_client/style.dart';
 import '../../widgets/main_appbar.dart';
 import '../controllers/home_controller.dart';
@@ -14,12 +16,20 @@ import './widgets/info_item.dart';
 import './widgets/product_item.dart';
 import '../../widgets/bottom_menu.dart';
 
-class HomeView extends GetView {
-  final authC = Get.find<AuthController>();
-  final homeC = Get.put(HomeController(), permanent: true);
+class HomeView extends GetView<HomeController> {
   final productC = Get.put(MainProductController(), permanent: true);
+  final authC = Get.find<AuthController>();
   @override
   Widget build(BuildContext context) {
+    final homeC = controller;
+    if (authC.userCredential.value != null) {
+      homeC.name.value = authC.userCredential.value!.displayName!;
+      homeC.id.value = authC.userCredential.value!.uid;
+    }
+    if (Get.arguments != null) {
+      Future.delayed(Duration(milliseconds: 500), (() => controller.getInitialData()));
+    }
+
     return SafeArea(
       top: false,
       child: Scaffold(
@@ -41,7 +51,10 @@ class HomeView extends GetView {
                     () => ClipRRect(
                       borderRadius: BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30)),
                       child: Container(
-                          height: authC.isAuth.value ? 130 : 100, width: MediaQuery.of(context).size.width, color: Colors.blue, child: SizedBox()),
+                          height: authC.isAuth.value ? 130 : 100,
+                          width: MediaQuery.of(context).size.width,
+                          color: Colors.blue,
+                          child: SizedBox()),
                     ),
                   ),
                   Column(
@@ -57,13 +70,21 @@ class HomeView extends GetView {
                                     onTap: () async {
                                       Get.toNamed(Routes.PROFILE);
                                     },
-                                    child: homeC.isLoading.value
+                                    child: homeC.name.isEmpty
                                         ? SizedBox()
-                                        : RichText(
-                                            text: TextSpan(
-                                                text: "Halo, ",
-                                                children: [TextSpan(text: "${homeC.name.value}", style: TextStyle(fontWeight: FontWeight.bold))],
-                                                style: TextStyle(fontSize: 20)),
+                                        : Padding(
+                                            padding: const EdgeInsets.only(left: 3),
+                                            child: context.isPhone
+                                                ? RichText(
+                                                    text: TextSpan(
+                                                        text: "Halo, ",
+                                                        children: [
+                                                          TextSpan(
+                                                              text: "${homeC.name.value}", style: TextStyle(fontWeight: FontWeight.bold))
+                                                        ],
+                                                        style: TextStyle(fontSize: 20)),
+                                                  )
+                                                : Text("Halo, ${homeC.name.value}", style: TextStyle(fontSize: 20)),
                                           ),
                                   )
                                 : SizedBox(
@@ -239,7 +260,7 @@ class HomeView extends GetView {
                                 text1: "Top Up",
                                 text2: "Saldo",
                                 todo: () {
-                                  Get.toNamed(Routes.TOPUP);
+                                  Get.toNamed(Routes.SELECTMETHOD, arguments: {"title": TOPUP});
                                 })),
                         SizedBox(
                           width: 15,
@@ -247,19 +268,26 @@ class HomeView extends GetView {
                         Expanded(
                             child: FiturItem(
                                 imgUrl: "withdraw",
-                                text1: "Withdraw",
-                                text2: "Dana",
+                                text1: "Tarik",
+                                text2: "Tunai",
                                 todo: () {
                                   if (homeC.balance.value == 0) {
                                     Get.snackbar("Saldo kosong", "Anda tidak memiliki saldo atau data saldo anda sedang dimuat");
                                   } else {
-                                    Get.toNamed(Routes.WITHDRAWAL);
+                                    Get.toNamed(Routes.SELECTMETHOD, arguments: {"title": WITHDRAWAL});
                                   }
                                 })),
                         SizedBox(
                           width: 15,
                         ),
-                        Expanded(child: FiturItem(imgUrl: "riwayat", text1: "Riwayat", text2: "Cashback", todo: () {})),
+                        Expanded(
+                            child: FiturItem(
+                                imgUrl: "riwayat",
+                                text1: "Riwayat",
+                                text2: "Bagian",
+                                todo: () {
+                                  Get.toNamed(Routes.CASHBACK_HISTORY);
+                                })),
                       ],
                     ),
                     sb15,
@@ -319,25 +347,27 @@ class HomeView extends GetView {
                 ),
               ),
               // Produk Terkini
-              Obx(() => GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3, childAspectRatio: 45 / 100, crossAxisSpacing: 5, mainAxisSpacing: 5),
-                    physics: NeverScrollableScrollPhysics(),
-                    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-                    itemCount: getAllActiveProducts().length,
-                    itemBuilder: (BuildContext ctx, int index) {
-                      return ProductItem(
-                        id: getAllActiveProducts()[index]["id"],
-                        name: getAllActiveProducts()[index]["name"],
-                        price: getAllActiveProducts()[index]["sell_price"],
-                        cashback: getAllActiveProducts()[index]["bagian"][0],
-                        stock: getAllActiveProducts()[index]["stockQty"],
-                        imgurl: getAllActiveProducts()[index]["imgurl"],
-                      );
-                    },
-                    // to disable GridView's scrolling
-                    shrinkWrap: true, // You won't see infinite size error
-                  )),
+              Obx(
+                () => GridView.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3, childAspectRatio: 45 / 100, crossAxisSpacing: 5, mainAxisSpacing: 5),
+                  physics: NeverScrollableScrollPhysics(),
+                  padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                  itemCount: getAllActiveProducts().length,
+                  itemBuilder: (BuildContext ctx, int index) {
+                    return ProductItem(
+                      id: getAllActiveProducts()[index]["id"],
+                      name: getAllActiveProducts()[index]["name"],
+                      price: getAllActiveProducts()[index]["sell_price"],
+                      cashback: getAllActiveProducts()[index]["bagian"][0],
+                      stock: getAllActiveProducts()[index]["stockQty"],
+                      imgurl: getAllActiveProducts()[index]["imgurl"],
+                    );
+                  },
+                  // to disable GridView's scrolling
+                  shrinkWrap: true, // You won't see infinite size error
+                ),
+              ),
             ],
           ),
         ),
@@ -388,7 +418,7 @@ class InfoCepat extends StatelessWidget {
                         Container(
                           child: InfoItem(
                             imgUrl: "cashback",
-                            title: "Cashback",
+                            title: "Bagian",
                             content: "Rp ${NumberFormat("#,##0", "id_ID").format(controller.cashback.value)}",
                           ),
                         ),

@@ -1,5 +1,6 @@
 // ignore_for_file: invalid_use_of_protected_member
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:kobermart_client/app/modules/home/controllers/home_controller.dart';
 import 'package:kobermart_client/config.dart';
@@ -32,18 +33,23 @@ class MembersController extends GetxController {
   }
 
   Future<void> generateKd() async {
-    if (devMode) print("generate kd start");
+    devLog("generate kd start");
     isLoading.value = true;
-    kd = await generateItems(homeC.downlines.length, homeC.downlines.value).obs;
+    if (homeC.downlines.isEmpty) {
+      try {
+        await homeC.getInitialData().then((value) async => kd = await generateItems(homeC.downlines.length, homeC.downlines.value).obs);
+      } on FirebaseException catch (e) {
+        print(e.message);
+      }
+    } else {
+      kd = await generateItems(homeC.downlines.length, homeC.downlines.value).obs;
+    }
     isLoading.value = false;
   }
 
   List<DaftarKedalaman> generateItems(int numberOfItems, List downlines) {
     return List.generate(numberOfItems, (int index) {
-      return DaftarKedalaman(
-          header: "Kedalaman ${index}",
-          isExpanded: index == 0 ? true.obs : false.obs,
-          members: downlines[index]);
+      return DaftarKedalaman(header: "Kedalaman ${index}", isExpanded: index == 0 ? true.obs : false.obs, members: downlines[index]);
     });
   }
 }
