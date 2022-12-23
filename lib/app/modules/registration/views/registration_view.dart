@@ -133,11 +133,11 @@ class RegistrationView extends GetView<RegistrationController> {
                               ));
                         } else {
                           controller.isLoading.value = true;
-                          await homeC.getInitialData().then((value) {
+                          
                             Get.snackbar("Registrasi berhasil!",
                                 "Anggota baru berhasil didaftarkan");
                             Get.offAllNamed(Routes.HOME);
-                          });
+                          
                           controller.isLoading.value = false;
                         }
                       });

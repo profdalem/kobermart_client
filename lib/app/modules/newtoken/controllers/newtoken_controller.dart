@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../data/member_provider.dart';
@@ -5,8 +6,11 @@ import '../../../data/member_provider.dart';
 class NewtokenController extends GetxController {
   final count = 0.obs;
   var isLoading = false.obs;
+  var keyword = "".obs;
+  late TextEditingController searchC;
   @override
   void onInit() {
+    searchC = TextEditingController();
     super.onInit();
   }
 
@@ -17,6 +21,7 @@ class NewtokenController extends GetxController {
 
   @override
   void onClose() {
+    searchC.dispose();
     super.onClose();
   }
 

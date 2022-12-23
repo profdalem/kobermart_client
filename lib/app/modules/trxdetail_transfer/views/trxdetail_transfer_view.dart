@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import 'package:kobermart_client/app/models/Transactions.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/style.dart';
 
@@ -12,6 +14,7 @@ class TrxdetailTransferView extends GetView<TrxdetailTransferController> {
   const TrxdetailTransferView({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
+    Transaction data = Get.arguments["data"];
     return SafeArea(
       top: false,
       child: Scaffold(
@@ -29,13 +32,6 @@ class TrxdetailTransferView extends GetView<TrxdetailTransferController> {
                 Get.offAllNamed(Routes.TRANSACTIONS);
               },
               icon: Icon(Icons.close)),
-          actions: [
-            IconButton(
-                onPressed: () {
-                  Get.toNamed(Routes.CART);
-                },
-                icon: Icon(Icons.shopping_cart))
-          ],
         ),
         body: SingleChildScrollView(
           child: Column(
@@ -53,12 +49,12 @@ class TrxdetailTransferView extends GetView<TrxdetailTransferController> {
               Container(
                 alignment: Alignment.center,
                 child: Text(
-                  "Dibuat 19-06-2022  12.30 WITA",
+                  "Dibuat ${DateFormat.yMMMd("id_ID").format(data.createdAt)} ${DateFormat.Hm().format(data.createdAt)} WITA",
                   style: TextStyle(color: Colors.grey),
                 ),
               ),
               sb15,
-              TrxDetailMainPanel(),
+              TrxDetailMainPanel(data: data),
               Container(
                 width: Get.width,
                 child: Padding(
@@ -80,15 +76,28 @@ class TrxdetailTransferView extends GetView<TrxdetailTransferController> {
 }
 
 class TrxDetailMainPanel extends StatelessWidget {
-  const TrxDetailMainPanel({
+  final Transaction data;
+  TrxDetailMainPanel({
     Key? key,
+    required this.data,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    String notrx = "TRX88432389293";
+    String notrx = data.id;
     String method = "Potong Saldo";
-    int status = 0;
+    String text1 = "Tujuan";
+    String name = data.data["customerData"]["recipientName"];
+    int nominal = data.nominal;
+    int status = 4;
+
+    switch (data.type) {
+      case "transfer-in":
+        text1 = "Pengirim";
+        name = data.data["customerData"]["senderName"];
+        break;
+      default:
+    }
 
     return Container(
       decoration: Shadow1(),
@@ -117,11 +126,11 @@ class TrxDetailMainPanel extends StatelessWidget {
                       ),
                     ),
                     sb15,
-                    PanelTitle(title: "Tujuan"),
-                    Text("Nama member"),
+                    PanelTitle(title: text1),
+                    Text(name),
                     sb15,
                     PanelTitle(title: "Nominal"),
-                    Text("Rp 500.000"),
+                    Text("Rp ${NumberFormat("#,##0", "id_ID").format(nominal)}"),
                   ],
                 ),
                 Column(
@@ -132,7 +141,7 @@ class TrxDetailMainPanel extends StatelessWidget {
                     Text(method),
                     sb15,
                     PanelTitle(title: "Biaya"),
-                    Text("Rp 1.000"),
+                    Text("Rp 0,-"),
                     sb15,
                     PanelTitle(title: "Status"),
                     TrxStatus(statusCode: status),

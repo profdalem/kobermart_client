@@ -70,60 +70,7 @@ class TransactionsView extends GetView<TransactionsController> {
                 ),
               ),
             ),
-            // Row(
-            //   children: [
-            //     SizedBox(
-            //       width: 15,
-            //     ),
-            //     Text(
-            //       "Rentang: ",
-            //       style: TextStyle(fontWeight: FontWeight.bold),
-            //     ),
-            //     Expanded(
-            //       child: SingleChildScrollView(
-            //         scrollDirection: Axis.horizontal,
-            //         child: Padding(
-            //           padding: const EdgeInsets.symmetric(horizontal: 15),
-            //           child: Obx(
-            //             () => Row(
-            //               children: [
-            //                 FilterRentang(
-            //                   title: "7 hari",
-            //                   days: 7,
-            //                   selectedDays: controller.days.value,
-            //                 ),
-            //                 SizedBox(
-            //                   width: 10,
-            //                 ),
-            //                 FilterRentang(
-            //                   title: "30 hari",
-            //                   days: 30,
-            //                   selectedDays: controller.days.value,
-            //                 ),
-            //                 SizedBox(
-            //                   width: 10,
-            //                 ),
-            //                 FilterRentang(
-            //                   title: "6 bulan",
-            //                   days: 180,
-            //                   selectedDays: controller.days.value,
-            //                 ),
-            //                 SizedBox(
-            //                   width: 10,
-            //                 ),
-            //                 FilterRentang(
-            //                   title: "1 tahun",
-            //                   days: 365,
-            //                   selectedDays: controller.days.value,
-            //                 ),
-            //               ],
-            //             ),
-            //           ),
-            //         ),
-            //       ),
-            //     ),
-            //   ],
-            // ),
+            
             sb10,
             Expanded(
               child: RefreshIndicator(
@@ -171,13 +118,9 @@ class TransactionsView extends GetView<TransactionsController> {
                               //     createdAt: Timestamp.fromMillisecondsSinceEpoch(element['createdAt']['_seconds'] * 1000),
                               //   );
                               //   break;
-                              // case 'transfer-out':
-                              //   item = ItemTransaksiTransferOut(
-                              //     nominal: element.nominal,
-                              //     recipient: element['recipientData']['name'],
-                              //     createdAt: Timestamp.fromMillisecondsSinceEpoch(element['createdAt']['_seconds'] * 1000),
-                              //   );
-                              //   break;
+                              case 'transfer-out':
+                                item = ItemTransaksiTransfer(data: element);
+                                break;
                               
                               case 'prepaid':
                                 item = ItemTransaksiPrepaid(data: element);

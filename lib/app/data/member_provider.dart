@@ -28,6 +28,7 @@ class MemberProvider extends GetConnect {
 
   Future<Response> newToken(String upline, String ref) async {
     var token;
+    httpClient.timeout = Duration(seconds: 30);
 
     await FirebaseAuth.instance.currentUser
         ?.getIdToken(true)

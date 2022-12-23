@@ -1,9 +1,11 @@
 import 'dart:math';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
+import 'package:kobermart_client/constants.dart';
 import 'package:kobermart_client/style.dart';
 import '../../widgets/bottom_menu.dart';
 import '../../widgets/main_appbar.dart';
@@ -89,7 +91,7 @@ class MembersView extends StatelessWidget {
                     ? Center(
                         child: CircularProgressIndicator(),
                       )
-                    : (memberC.homeC.downlines.isNotEmpty
+                    : (memberC.authC.downlineList(memberC.keyword.value).isNotEmpty
                         ? PanelKedalaman(
                             memberC: memberC,
                           )
@@ -182,158 +184,194 @@ class PanelKedalaman extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(
-      () => memberC.homeC.isLoading.value
+      () => memberC.authC.loading.value
           ? Center(
               child: CircularProgressIndicator(),
             )
-          : ExpansionPanelList(elevation: 1, expandedHeaderPadding: EdgeInsets.zero,
+          : ExpansionPanelList(
+              elevation: 1,
+              expandedHeaderPadding: EdgeInsets.zero,
               expansionCallback: (panelIndex, isExpanded) {
                 memberC.kd[panelIndex].isExpanded.value = !isExpanded;
               },
               animationDuration: Duration(milliseconds: 500),
-              children: memberC.kd
-                  .map<ExpansionPanel>(
-                    (DaftarKedalaman item) => ExpansionPanel(
-                        canTapOnHeader: true,
-                        headerBuilder: (context, isExpanded) {
-                          num slotSize = pow(10, (memberC.kd.indexOf(item) + 1));
-
-                          return ListTile(
-                            title: Row(children: [
-                              Text(
-                                "KD ${memberC.kd.indexOf(item) + 1}",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Chip(
-                                visualDensity: VisualDensity.compact,
-                                padding: EdgeInsets.all(0),
-                                backgroundColor: Color(0xFFFF9800),
-                                label: Text('${item.members.length} terisi', style: TextStyle(fontSize: 12, color: Colors.white)),
-                              ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Chip(
-                                visualDensity: VisualDensity.compact,
-                                padding: EdgeInsets.all(0),
-                                backgroundColor: Colors.blue,
-                                label:
-                                    Text('${slotSize - item.members.length} kosong', style: TextStyle(fontSize: 12, color: Colors.white)),
-                              ),
-                            ]),
-                          );
+              children: memberC.kd.map<ExpansionPanel>(
+                (DaftarKedalaman item) {
+                  if (item.members.length == 0) {
+                    return ExpansionPanel(
+                        headerBuilder: (ctx, bool) {
+                          return SizedBox();
                         },
-                        body: Container(
-                          height: 120,
-                          width: double.infinity,
-                          child: ListView.separated(
-                              scrollDirection: Axis.horizontal,
-                              itemBuilder: (context, index) {
-                                var tokenUsed = item.members[index]["tokenUsed"];
-                                return Container(
-                                  width: 100,
-                                  child: Card(
-                                      shadowColor: Colors.transparent,
-                                      child: TextButton(
-                                        onPressed: () {
-                                          if (tokenUsed) {
-                                            Get.toNamed(Routes.MEMBERPROFILE, arguments: {
-                                              "id": item.members[index]["id"],
-                                              "name": item.members[index]["memberData"]["name"],
-                                            });
-                                          } else {
-                                            Get.toNamed(Routes.TOKENDETAIL, arguments: {"data": item.members[index]});
-                                          }
-                                        },
-                                        child: Column(
-                                          children: [
-                                            CircleAvatar(
-                                              radius: 30.0,
-                                              backgroundColor: tokenUsed ? Colors.blue : Colors.grey.shade200,
-                                              child: tokenUsed ? Icon(Icons.person) : Text("token"),
+                        body: SizedBox());
+                  } else {
+                    return ExpansionPanel(
+                      canTapOnHeader: true,
+                      isExpanded: item.isExpanded.value,
+                      headerBuilder: (context, isExpanded) {
+                        num slotSize = pow(10, (memberC.kd.indexOf(item) + 1));
+
+                        return ListTile(
+                          title: Row(children: [
+                            Text(
+                              "KD ${memberC.kd.indexOf(item) + 1}",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Chip(
+                              visualDensity: VisualDensity.compact,
+                              padding: EdgeInsets.all(0),
+                              backgroundColor: Color(0xFFFF9800),
+                              label: Text('${item.members.length} terisi', style: TextStyle(fontSize: 12, color: Colors.white)),
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Chip(
+                              visualDensity: VisualDensity.compact,
+                              padding: EdgeInsets.all(0),
+                              backgroundColor: Colors.blue,
+                              label: Text('${slotSize - item.members.length} kosong', style: TextStyle(fontSize: 12, color: Colors.white)),
+                            ),
+                          ]),
+                        );
+                      },
+                      body: Container(
+                        height: 120,
+                        width: double.infinity,
+                        child: ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            itemBuilder: (context, index) {
+                              var tokenUsed = false;
+                              if (item.members[index]["type"] == "member") {
+                                tokenUsed = true;
+                              }
+                              return Container(
+                                width: Get.width*0.25,
+                                child: Card(
+                                    shadowColor: Colors.transparent,
+                                    child: TextButton(
+                                      onPressed: () {
+                                        if (tokenUsed) {
+                                          Get.toNamed(Routes.MEMBERPROFILE, arguments: {
+                                            "id": item.members[index]["id"],
+                                            "name": item.members[index]["name"],
+                                          });
+                                        } else {
+                                          Get.toNamed(Routes.TOKENDETAIL, arguments: {"tokenCode": item.members[index]["id"]});
+                                        }
+                                      },
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          Stack(
+                                            alignment: Alignment.bottomCenter,
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(bottom: 5),
+                                                child: CircleAvatar(
+                                                radius: 30.0,
+                                                backgroundColor: tokenUsed ? Colors.transparent : Colors.grey.shade200,
+                                                backgroundImage: tokenUsed ? CachedNetworkImageProvider(PROFILE_IMG): null,
+                                                child: tokenUsed ? SizedBox() : Text("token"),
                                             ),
-                                            Text(
-                                              tokenUsed
-                                                  ? item.members[index]["memberData"]["name"]
-                                                  : (FirebaseAuth.instance.currentUser!.uid ==
-                                                              item.members[index]["memberData"]["tokenCreator"] ||
-                                                          FirebaseAuth.instance.currentUser!.uid ==
-                                                              item.members[index]["memberData"]["upline"]
-                                                      ? item.members[index]["memberData"]["tokenCode"]
-                                                      : "?"),
-                                              overflow: TextOverflow.ellipsis,
-                                              maxLines: 1,
-                                              style: TextStyle(color: Colors.black, fontSize: 12),
-                                            ),
+                                              ),
                                             if (tokenUsed)
-                                              RichText(
-                                                text: TextSpan(
-                                                  style: TextStyle(color: Colors.black, fontSize: 14),
-                                                  children: [
-                                                    WidgetSpan(
-                                                      child: Icon(Icons.person, size: 14),
-                                                    ),
-                                                    TextSpan(
-                                                      text: item.members[index]["kd1count"].toString(),
-                                                    ),
-                                                  ],
+                                            Align(
+                                              alignment: Alignment.bottomCenter,
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                color: Colors.amber.shade800,
+                                                borderRadius: BorderRadius.all(Radius.circular(15)),
+                                                boxShadow: [BoxShadow(blurRadius: 1, color: Colors.grey.shade500)]
                                                 ),
-                                              )
-                                          ],
-                                        ),
-                                      )),
-                                );
-                              },
-                              separatorBuilder: (ctx, int) {
-                                return SizedBox(
-                                  width: 5,
-                                );
-                              },
-                              itemCount: item.members.length),
-                        ),
-                        isExpanded: item.isExpanded.value),
-                  )
-                  .toList(),
+                                                child: Padding(
+                                                  padding: EdgeInsets.symmetric(vertical: 2, horizontal: 5),
+                                                  child: RichText(
+                                                    text: TextSpan(
+                                                      style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                                                      children: [
+                                                        WidgetSpan(
+                                                          child: Icon(Icons.person, size: 13, color: Colors.white,),
+                                                        ),
+                                                        TextSpan(
+                                                          text: (item.members[index]["kd1_member"] + item.members[index]["kd1_token"]).toString(),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            )
+                                            ],
+                                          ),
+                                          sb5,
+                                          Text(
+                                            tokenUsed
+                                                ? item.members[index]["name"]
+                                                : item.members[index]["id"],
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 2,
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(color: Colors.black, fontSize: Get.width*0.25*0.12, height: 1),
+                                          ),
+                                          
+                                        ],
+                                      ),
+                                    )),
+                              );
+                            },
+                            separatorBuilder: (ctx, int) {
+                              return SizedBox(
+                                width: 5,
+                              );
+                            },
+                            itemCount: item.members.length),
+                      ),
+                    );
+                  }
+                },
+              ).toList(),
             ),
     );
   }
 }
 
 class CariButton extends StatelessWidget {
-  const CariButton({
+  CariButton({
     Key? key,
   }) : super(key: key);
+
+  final controller = Get.find<MembersController>();
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: context.width - 30,
-      child: TextButton(
-        onPressed: () {},
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Cari anggota",
-                style: TextStyle(color: Colors.black),
-              ),
-              Icon(
-                Icons.search,
-                color: Colors.black,
-              )
-            ],
-          ),
-        ),
-        style: ButtonStyle(
-            shape: MaterialStateProperty.all(RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15.0),
-            )),
-            backgroundColor: MaterialStateProperty.all(Color(0xFFE4E4E4))),
+      child: TextField(
+        controller: controller.searchC,
+        textAlign: TextAlign.left,
+        decoration: InputDecoration(
+            filled: true,
+            fillColor: Color(0xFFE4E4E4),
+            hintText: "Cari anggota",
+            hintStyle: TextStyle(
+              color: Colors.black,
+            ),
+            suffixIcon: Icon(
+              Icons.search,
+              color: Colors.black,
+            ),
+            focusedBorder: OutlineInputBorder(
+                gapPadding: 0, borderSide: BorderSide(color: Color(0xFFE4E4E4), style: BorderStyle.solid), borderRadius: BorderRadius.all(Radius.circular(25))),
+            enabledBorder: OutlineInputBorder(
+                gapPadding: 0, borderSide: BorderSide(color: Color(0xFFE4E4E4), style: BorderStyle.solid), borderRadius: BorderRadius.all(Radius.circular(25))),
+            contentPadding: EdgeInsets.only(left: 16, right: 2, bottom: 3, top: 3)),
+        onChanged: (value) {
+          controller.keyword.value = value.toString();
+          controller.generateKd();
+        },
       ),
     );
   }

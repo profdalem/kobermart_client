@@ -1,11 +1,13 @@
 // ignore_for_file: invalid_use_of_protected_member
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kobermart_client/app/controllers/auth_controller.dart';
 import 'package:kobermart_client/app/modules/home/controllers/home_controller.dart';
 import 'package:kobermart_client/app/modules/widgets/success_token.dart';
 import 'package:kobermart_client/style.dart';
+import '../../../../constants.dart';
 import '../controllers/newtoken_controller.dart';
 
 class NewtokenView extends GetView {
@@ -16,6 +18,12 @@ class NewtokenView extends GetView {
 
   @override
   Widget build(BuildContext context) {
+    String name = "";
+    String id = "";
+    if (authC.userCredential.value != null) {
+      name = authC.userCredential.value!.displayName!;
+      id = authC.userCredential.value!.uid;
+    }
     return SafeArea(
       top: false,
       child: Scaffold(
@@ -29,7 +37,7 @@ class NewtokenView extends GetView {
             SizedBox(
               height: 25,
             ),
-            Row(mainAxisAlignment: MainAxisAlignment.center, children: [PanelTitle(title: "Pilih upline token")]),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [PanelTitle(title: "Pilih upline")]),
             sb20,
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -41,181 +49,175 @@ class NewtokenView extends GetView {
             ),
             sb15,
             Expanded(
-              child: ListView(
-                children: [
-                  Container(
-                    alignment: Alignment.centerLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 15),
-                      child: PanelTitle(title: "Saya"),
-                    ),
-                  ),
-                  sb10,
-                  Card(
-                    elevation: 1,
-                    child: ListTile(
-                      onTap: () {
-                        // pastikan slot kd1 tidak penuh
-                        if (homeC.kd1count.value == homeC.settings["kd1limit"]) {
-                          Get.defaultDialog(
-                            title: "Slot Penuh",
-                            content: Text("Slot di KD1 anda telah terisi semua"),
-                          );
-                        } else {
-                          Get.defaultDialog(
-                              barrierDismissible: true,
-                              title: "Konfirmasi",
-                              content: Obx(() => newTokenC.isLoading.value
-                                  ? Center(
-                                      child: CircularProgressIndicator(),
-                                    )
-                                  : Text("Buat token dibawah anda?")),
-                              cancel: Padding(
-                                padding: const EdgeInsets.only(right: 50),
-                                child: TextButton(
-                                    onPressed: () {
-                                      Get.back();
-                                    },
-                                    child: Text("Batal")),
-                              ),
-                              confirm: ElevatedButton(
-                                  onPressed: () {
-                                    // Generate Token dibawah Saya
-                                    newTokenC.isLoading.value = true;
-                                    newTokenC.newToken(homeC.id.value, homeC.id.value).then((value){
-                                    if (value["success"]) {
-                                      Get.back();
-                                      Get.to(() => SuccessTokenPage(), arguments: {"token": value["token"]});
-                                    } else {
-                                      Get.back();
-                                      Get.defaultDialog(title: "Gagal", content: Text(value["message"]));
-                                    }
-                                    newTokenC.isLoading.value = false;
-
-                                    });
-                                  },
-                                  child: Text("Yakin")));
-                        }
-                      },
-                      leading: CircleAvatar(
-                        child: Icon(Icons.person),
-                        // backgroundImage: CachedNetworkImageProvider(
-                        //     "https://i.pravatar.cc/150?img=1"),
+              child: Obx(
+                () => ListView(
+                  children: [
+                    Container(
+                      alignment: Alignment.centerLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 15),
+                        child: PanelTitle(title: "Saya"),
                       ),
-                      title: PanelTitle(title: homeC.name.value),
-                      subtitle: Text(homeC.uplineName.value),
-                      trailing: Obx(()=> Chip(
-                        label: Text((homeC.settings["kd1limit"] - homeC.kd1count.value).toString()),
-                        backgroundColor: Colors.orange.shade200,
-                      )),
                     ),
-                  ),
-                  sb15,
-                  homeC.downlines.isEmpty
-                      ? Center(child: Text("Anggota tidak ditemukan"))
-                      : Column(
-                          children: List.generate(homeC.downlines.value.length, (index) {
-                            var showTitle = false;
-                            for (var i = 0; i < homeC.downlines[index].length; i++) {
-                              if (homeC.downlines[index][i]['memberData']['tokenUsed']) {
-                                showTitle = true;
-                              }
-                            }
-                            return Column(
-                              children: [
-                                if (showTitle)
-                                  Container(
-                                    alignment: Alignment.centerLeft,
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(left: 15),
-                                      child: PanelTitle(title: "KD ${index + 1}"),
-                                    ),
-                                  ),
-                                sb10,
-                                Column(
-                                  children: List.generate(
-                                      homeC.downlines.value[index].length,
-                                      (kdindex) => homeC.downlines[index][kdindex]['memberData']['tokenUsed']
-                                          ? Padding(
-                                              padding: const EdgeInsets.only(bottom: 5),
-                                              child: Card(
-                                                elevation: 1,
-                                                child: ListTile(
-                                                  onTap: () {
-                                                    // pastikan slot kd1 tidak penuh
-                                                    if (homeC.settings["kd1limit"] == homeC.downlines[index][kdindex]['kd1count']) {
-                                                      Get.defaultDialog(
-                                                        title: "Slot Penuh",
-                                                        content: Text("Slot di KD1 anda telah terisi semua"),
-                                                      );
-                                                    } else {
-                                                      Get.defaultDialog(
-                                                          barrierDismissible: true,
-                                                          title: "Konfirmasi",
-                                                          content: Center(
-                                                              child: Obx(
-                                                            () => newTokenC.isLoading.value
-                                                                ? Center(
-                                                                    child: CircularProgressIndicator(),
-                                                                  )
-                                                                : Text(
-                                                                    "Jadikan ${homeC.downlines[index][kdindex]['memberData']['name']} sebagai upline token?"),
-                                                          )),
-                                                          cancel: Padding(
-                                                            padding: const EdgeInsets.only(right: 50),
-                                                            child: TextButton(
-                                                                onPressed: () {
-                                                                  Get.back();
-                                                                },
-                                                                child: Text("Batal")),
-                                                          ),
-                                                          confirm: ElevatedButton(
-                                                              onPressed: () async {
-                                                                newTokenC.isLoading.value = true;
-                                                                await newTokenC
-                                                                    .newToken(homeC.downlines[index][kdindex]['id'], homeC.id.value)
-                                                                    .then((value) async {
-                                                                  
-                                                                  if (value["success"]) {
-                                                                    Get.back();
-                                                                    Get.to(() => SuccessTokenPage(), arguments: {"token": value["token"]});
-                                                                  } else {
-                                                                    Get.back();
-                                                                    newTokenC.isLoading.value = false;
-                                                                    Get.defaultDialog(title: "Gagal", content: Text(value["message"]));
-                                                                  }
-                                                                  newTokenC.isLoading.value = false;
-                                                                });
-                                                              },
-                                                              child: Text("Yakin")));
-                                                    }
-                                                  },
-                                                  leading: CircleAvatar(
-                                                    child: Icon(Icons.person),
-                                                    // backgroundImage:
-                                                    //     CachedNetworkImageProvider(
-                                                    //         "https://i.pravatar.cc/150?img=${index + 5}"),
-                                                  ),
-                                                  title: PanelTitle(
-                                                      title: homeC.downlines[index][kdindex]['memberData']['name'] != null
-                                                          ? homeC.downlines[index][kdindex]['memberData']['name']
-                                                          : homeC.downlines[index][kdindex]['memberData']['tokenCode']),
-                                                  subtitle: Text("Upline: ${homeC.downlines[index][kdindex]['uplineData']['name']}"),
-                                                  trailing: Chip(
-                                                    label: Text((homeC.settings["kd1limit"] - homeC.downlines[index][kdindex]['kd1count']).toString()),
-                                                    backgroundColor: Colors.orange.shade200,
-                                                  ),
-                                                ),
-                                              ),
-                                            )
-                                          : SizedBox()),
-                                )
-                              ],
+                    sb10,
+                    Card(
+                      elevation: 1,
+                      child: ListTile(
+                        onTap: () {
+                          // pastikan slot kd1 tidak penuh
+                          if (authC.kd1_member.value + authC.kd1_token.value == authC.settings["kd1limit"]) {
+                            Get.defaultDialog(
+                              title: "Slot Penuh",
+                              content: Text("Slot di KD1 anda telah terisi semua"),
                             );
-                          }, growable: false),
+                          } else {
+                            Get.defaultDialog(
+                                barrierDismissible: true,
+                                title: "Konfirmasi",
+                                content: Obx(() => newTokenC.isLoading.value
+                                    ? Center(
+                                        child: CircularProgressIndicator(),
+                                      )
+                                    : Text("Buat token dibawah anda?")),
+                                cancel: Padding(
+                                  padding: const EdgeInsets.only(right: 50),
+                                  child: TextButton(
+                                      onPressed: () {
+                                        Get.back();
+                                      },
+                                      child: Text("Batal")),
+                                ),
+                                confirm: ElevatedButton(
+                                    onPressed: () {
+                                      // Generate Token dibawah Saya
+                                      newTokenC.isLoading.value = true;
+                                      newTokenC.newToken(id, id).then((value) {
+                                        if (value["success"]) {
+                                          Get.back();
+                                          Get.to(() => SuccessTokenPage(), arguments: {"token": value["token"]});
+                                        } else {
+                                          Get.back();
+                                          Get.defaultDialog(title: "Gagal", content: Text(value["message"]));
+                                        }
+                                        newTokenC.isLoading.value = false;
+                                      });
+                                    },
+                                    child: Text("Yakin")));
+                          }
+                        },
+                        leading: CircleAvatar(
+                          backgroundImage:CachedNetworkImageProvider(PROFILE_IMG),
                         ),
-                  sb15,
-                ],
+                        title: PanelTitle(title: name),
+                        subtitle: Text(authC.uplineName.value),
+                        trailing: Obx(() => Chip(
+                              label: Text((authC.settings["kd1limit"] - (authC.kd1_member.value + authC.kd1_token.value)).toString()),
+                              backgroundColor: Colors.orange.shade200,
+                            )),
+                      ),
+                    ),
+                    sb15,
+                    Column(
+                      children: List.generate(authC.downlineList(newTokenC.keyword.value).length, (index) {
+                        var showtitle = false;
+                        authC.downlineList(newTokenC.keyword.value)[index].forEach((el) {
+                          if (el["type"] == "member") {
+                            showtitle = true;
+                          }
+                        });
+                        return Column(
+                          children: [
+                            if(showtitle) Container(
+                              alignment: Alignment.centerLeft,
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 15),
+                                child: PanelTitle(title: "KD ${index + 1}"),
+                              ),
+                            ),
+                            if(showtitle) sb5,
+                            Column(
+                              children: List.generate(
+                                  authC.downlineList(newTokenC.keyword.value)[index].length,
+                                  (kdindex) => authC.downlineList(newTokenC.keyword.value)[index][kdindex]["type"] == "member"
+                                      ? Padding(
+                                          padding: const EdgeInsets.only(bottom: 0),
+                                          child: Card(
+                                            elevation: 1,
+                                            child: ListTile(
+                                              onTap: () {
+                                                // pastikan slot kd1 tidak penuh
+                                                if (authC.settings["kd1limit"] == authC.downlineList(newTokenC.keyword.value)[index][kdindex]['kd1count']) {
+                                                  Get.defaultDialog(
+                                                    title: "Slot Penuh",
+                                                    content: Text("Slot di KD1 anda telah terisi semua"),
+                                                  );
+                                                } else {
+                                                  Get.defaultDialog(
+                                                      barrierDismissible: true,
+                                                      title: "Konfirmasi",
+                                                      content: Center(
+                                                          child: Obx(
+                                                        () => newTokenC.isLoading.value
+                                                            ? Center(
+                                                                child: CircularProgressIndicator(),
+                                                              )
+                                                            : Text("Jadikan ${authC.downlineList(newTokenC.keyword.value)[index][kdindex]['name']} sebagai upline token?"),
+                                                      )),
+                                                      cancel: Padding(
+                                                        padding: const EdgeInsets.only(right: 50),
+                                                        child: TextButton(
+                                                            onPressed: () {
+                                                              Get.back();
+                                                            },
+                                                            child: Text("Batal")),
+                                                      ),
+                                                      confirm: ElevatedButton(
+                                                          onPressed: () async {
+                                                            newTokenC.isLoading.value = true;
+                                                            await newTokenC
+                                                                .newToken(authC.downlineList(newTokenC.keyword.value)[index][kdindex]['id'], authC.userCredential.value!.uid)
+                                                                .then((value) async {
+                                                              if (value["success"]) {
+                                                                Get.back();
+                                                                Get.to(() => SuccessTokenPage(), arguments: {"token": value["token"]});
+                                                              } else {
+                                                                Get.back();
+                                                                newTokenC.isLoading.value = false;
+                                                                Get.defaultDialog(title: "Gagal", content: Text(value["message"]));
+                                                              }
+                                                              newTokenC.isLoading.value = false;
+                                                            });
+                                                          },
+                                                          child: Text("Yakin")));
+                                                }
+                                              },
+                                              leading: CircleAvatar(
+                                                backgroundImage:CachedNetworkImageProvider(PROFILE_IMG),
+                                              ),
+                                              title: PanelTitle(
+                                                  title: authC.downlineList(newTokenC.keyword.value)[index][kdindex]['name'] != null
+                                                      ? authC.downlineList(newTokenC.keyword.value)[index][kdindex]['name']
+                                                      : authC.downlineList(newTokenC.keyword.value)[index][kdindex]['id']),
+                                              subtitle: Text("Upline: ${authC.downlineList(newTokenC.keyword.value)[index][kdindex]['uplineName']}"),
+                                              trailing: Chip(
+                                                label: Text((authC.settings["kd1limit"] -
+                                                        (authC.downlineList(newTokenC.keyword.value)[index][kdindex]['kd1_token'] +
+                                                            authC.downlineList(newTokenC.keyword.value)[index][kdindex]['kd1_member']))
+                                                    .toString()),
+                                                backgroundColor: Colors.orange.shade200,
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                      : SizedBox()),
+                            ),
+                            sb15,
+                          ],
+                        );
+                      }),
+                    )
+                  ],
+                ),
               ),
             ),
           ],
@@ -226,37 +228,39 @@ class NewtokenView extends GetView {
 }
 
 class CariButton extends StatelessWidget {
-  const CariButton({
+  CariButton({
     Key? key,
   }) : super(key: key);
+
+  final newTokenC = Get.find<NewtokenController>();
+  
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: context.width - 30,
-      child: TextButton(
-        onPressed: () {},
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Cari anggota",
-                style: TextStyle(color: Colors.black),
-              ),
-              Icon(
-                Icons.search,
-                color: Colors.black,
-              )
-            ],
-          ),
-        ),
-        style: ButtonStyle(
-            shape: MaterialStateProperty.all(RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15.0),
-            )),
-            backgroundColor: MaterialStateProperty.all(Color(0xFFE4E4E4))),
+      child: TextField(
+        controller: newTokenC.searchC,
+        textAlign: TextAlign.left,
+        decoration: InputDecoration(
+            filled: true,
+            fillColor: Color(0xFFE4E4E4),
+            hintText: "Cari anggota",
+            hintStyle: TextStyle(
+              color: Colors.black,
+            ),
+            suffixIcon: Icon(
+              Icons.search,
+              color: Colors.black,
+            ),
+            focusedBorder: OutlineInputBorder(
+                gapPadding: 0, borderSide: BorderSide(color: Color(0xFFE4E4E4), style: BorderStyle.solid), borderRadius: BorderRadius.all(Radius.circular(25))),
+            enabledBorder: OutlineInputBorder(
+                gapPadding: 0, borderSide: BorderSide(color: Color(0xFFE4E4E4), style: BorderStyle.solid), borderRadius: BorderRadius.all(Radius.circular(25))),
+            contentPadding: EdgeInsets.only(left: 16, right: 2, bottom: 3, top: 3)),
+        onChanged: (value) {
+          newTokenC.keyword.value = value.toString();
+        },
       ),
     );
   }

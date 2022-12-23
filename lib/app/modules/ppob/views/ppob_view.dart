@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:kobermart_client/app/controllers/auth_controller.dart';
 import 'package:kobermart_client/app/modules/home/controllers/home_controller.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
 import '../../../../style.dart';
@@ -57,7 +58,7 @@ class ListrikView extends StatelessWidget {
   }) : super(key: key);
 
   final controller = Get.find<PpobController>();
-  final homeC = Get.find<HomeController>();
+  final authC = Get.find<AuthController>();
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +85,7 @@ class ListrikView extends StatelessWidget {
                 children: [
                   Text("Saldo anda: "),
                   Text(
-                    "Rp ${NumberFormat("#,##0", "id_ID").format(homeC.balance.value)}",
+                    "Rp ${NumberFormat("#,##0", "id_ID").format(authC.balance.value)}",
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ],
@@ -243,7 +244,7 @@ class ListrikView extends StatelessWidget {
                                         ? Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
-                                              Obx(() => homeC.balance.value < int.parse(controller.nominalSelected.value)
+                                              Obx(() => authC.balance.value < int.parse(controller.nominalSelected.value)
                                                   ? Column(
                                                       children: [
                                                         Container(
@@ -343,7 +344,7 @@ class PaketDataView extends StatelessWidget {
   }) : super(key: key);
 
   final controller = Get.find<PpobController>();
-  final homeC = Get.find<HomeController>();
+  final authC = Get.find<AuthController>();
 
   @override
   Widget build(BuildContext context) {
@@ -370,7 +371,7 @@ class PaketDataView extends StatelessWidget {
                 children: [
                   Text("Saldo anda: "),
                   Text(
-                    "Rp ${NumberFormat("#,##0", "id_ID").format(homeC.balance.value)}",
+                    "Rp ${NumberFormat("#,##0", "id_ID").format(authC.balance.value)}",
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ],
@@ -496,7 +497,7 @@ class PaketDataView extends StatelessWidget {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Obx(() => homeC.balance.value < int.parse(controller.paketDataNominalSelected.value)
+                              Obx(() => authC.balance.value < int.parse(controller.paketDataNominalSelected.value)
                                   ? Column(
                                       children: [
                                         sb10,
@@ -664,7 +665,7 @@ class PulsaView extends StatelessWidget {
   }) : super(key: key);
 
   final controller = Get.find<PpobController>();
-  final homeC = Get.find<HomeController>();
+  final authC = Get.find<AuthController>();
 
   @override
   Widget build(BuildContext context) {
@@ -691,7 +692,7 @@ class PulsaView extends StatelessWidget {
                 children: [
                   Text("Saldo anda: "),
                   Text(
-                    "Rp ${NumberFormat("#,##0", "id_ID").format(homeC.balance.value)}",
+                    "Rp ${NumberFormat("#,##0", "id_ID").format(authC.balance.value)}",
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ],
@@ -815,7 +816,7 @@ class PulsaView extends StatelessWidget {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Obx(() => homeC.balance.value < int.parse(controller.pulsaNominalSelected.value)
+                              Obx(() => authC.balance.value < int.parse(controller.pulsaNominalSelected.value)
                                   ? Column(
                                       children: [
                                         sb10,

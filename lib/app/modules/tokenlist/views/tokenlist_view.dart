@@ -58,143 +58,149 @@ class TokenlistView extends GetView<TokenlistController> {
             sb15,
             Expanded(
               child: RefreshIndicator(
-                onRefresh: () {
-                  return controller.homeC.getDownlines();
-                },
-                child: Obx(() => controller.datalist.isEmpty
-                    ? Center(
-                        child: Text("Token Kosong"),
-                      )
-                    : (controller.isLoading.value? Center(child: CircularProgressIndicator(),): ListView(
-                        children: [
-                          Container(
-                            alignment: Alignment.centerLeft,
-                            child: Padding(
-                              padding: const EdgeInsets.only(left: 15),
-                              child: PanelTitle(title: "Token"),
-                            ),
-                          ),
-                          sb10,
-                          Obx(() => getTokens(controller.keyword.value).isEmpty
-                              ? Center(child: Text("Kosong"))
-                              : Column(
-                                  children: List.generate(
-                                    getTokens(controller.keyword.value).length,
-                                    (index) => Padding(
-                                      padding: const EdgeInsets.only(bottom: 5),
-                                      child: Card(
-                                        elevation: 1,
-                                        child: ListTile(
-                                          contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
-                                          onTap: () async {
-                                            if (!(getTokens(controller.keyword.value))[index].opened) {
-                                              await FirebaseFirestore.instance
-                                                  .collection("members")
-                                                  .doc((getTokens(controller.keyword.value))[index].tokenCode)
-                                                  .set({"opened": true}, SetOptions(merge: true));
-                                              Get.toNamed(Routes.TOKENDETAIL, arguments: {"data": (getTokens(controller.keyword.value))[index]});
-                                            } else {
-                                              Get.toNamed(
-                                                Routes.TOKENDETAIL,
-                                                arguments: {"data": (getTokens(controller.keyword.value))[index]},
-                                              );
-                                            }
-                                          },
-                                          leading: Badge(
-                                            badgeColor: Colors.amber,
-                                            showBadge: !(getTokens(controller.keyword.value))[index].opened ? true : false,
-                                            padding: EdgeInsets.all(8),
-                                            child: CircleAvatar(
-                                              child: Text("token", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),),
-                                              backgroundColor: Colors.grey.shade200,
-                                              // backgroundImage: AssetImage(
-                                              //     "assets/images/user-placeholder.png"),
+                onRefresh: () => Future.delayed(Duration(seconds: 5), () {}),
+                child: Obx(
+                  () => controller.datalist.isEmpty
+                      ? Center(
+                          child: Text("Token Kosong"),
+                        )
+                      : (controller.isLoading.value
+                          ? Center(
+                              child: CircularProgressIndicator(),
+                            )
+                          : ListView(
+                              children: [
+                                Container(
+                                  alignment: Alignment.centerLeft,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 15),
+                                    child: PanelTitle(title: "Token"),
+                                  ),
+                                ),
+                                sb10,
+                                Obx(() => getTokens(controller.keyword.value).isEmpty
+                                    ? Center(child: Text("Kosong"))
+                                    : Column(
+                                        children: List.generate(
+                                          getTokens(controller.keyword.value).length,
+                                          (index) => Padding(
+                                            padding: const EdgeInsets.only(bottom: 5),
+                                            child: Card(
+                                              elevation: 1,
+                                              child: ListTile(
+                                                contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                                                onTap: () async {
+                                                  if (!(getTokens(controller.keyword.value))[index].opened) {
+                                                    await FirebaseFirestore.instance
+                                                        .collection("members")
+                                                        .doc((getTokens(controller.keyword.value))[index].tokenCode)
+                                                        .set({"opened": true}, SetOptions(merge: true));
+                                                    Get.toNamed(Routes.TOKENDETAIL, arguments: {"data": (getTokens(controller.keyword.value))[index]});
+                                                  } else {
+                                                    Get.toNamed(
+                                                      Routes.TOKENDETAIL,
+                                                      arguments: {"data": (getTokens(controller.keyword.value))[index]},
+                                                    );
+                                                  }
+                                                },
+                                                leading: Badge(
+                                                  badgeColor: Colors.amber,
+                                                  showBadge: !(getTokens(controller.keyword.value))[index].opened ? true : false,
+                                                  padding: EdgeInsets.all(8),
+                                                  child: CircleAvatar(
+                                                    child: Text(
+                                                      "token",
+                                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                                    ),
+                                                    backgroundColor: Colors.grey.shade200,
+                                                    // backgroundImage: AssetImage(
+                                                    //     "assets/images/user-placeholder.png"),
+                                                  ),
+                                                ),
+                                                title: Text(
+                                                  (getTokens(controller.keyword.value))[index].tokenCode,
+                                                  style: TextStyle(
+                                                      fontSize: 18,
+                                                      fontWeight: !(getTokens(controller.keyword.value))[index].opened ? FontWeight.bold : FontWeight.normal),
+                                                ),
+                                                subtitle: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    // Text("16 Juni 2022 13.45 WITA"),
+                                                    Text("Upline: ${(getTokens(controller.keyword.value))[index].uplineData["name"]}"),
+                                                  ],
+                                                ),
+                                                trailing: ItemMenu(
+                                                  tokenCode: getTokens(controller.keyword.value)[index].tokenCode,
+                                                  tokenUsed: getTokens(controller.keyword.value)[index].tokenUsed,
+                                                ),
+                                              ),
                                             ),
-                                          ),
-                                          title: Text(
-                                            (getTokens(controller.keyword.value))[index].tokenCode,
-                                            style: TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: !(getTokens(controller.keyword.value))[index].opened ? FontWeight.bold : FontWeight.normal),
-                                          ),
-                                          subtitle: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              // Text("16 Juni 2022 13.45 WITA"),
-                                              Text("Upline: ${(getTokens(controller.keyword.value))[index].uplineData["name"]}"),
-                                            ],
-                                          ),
-                                          trailing: ItemMenu(
-                                            tokenCode: getTokens(controller.keyword.value)[index].tokenCode,
-                                            tokenUsed: getTokens(controller.keyword.value)[index].tokenUsed,
                                           ),
                                         ),
-                                      ),
-                                    ),
+                                      )),
+                                sb15,
+                                Container(
+                                  alignment: Alignment.centerLeft,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 15),
+                                    child: PanelTitle(title: "Telah digunakan"),
                                   ),
-                                )),
-                          sb15,
-                          Container(
-                            alignment: Alignment.centerLeft,
-                            child: Padding(
-                              padding: const EdgeInsets.only(left: 15),
-                              child: PanelTitle(title: "Telah digunakan"),
-                            ),
-                          ),
-                          sb10,
-                          Obx(() => getRegisteredTokens(controller.keyword.value).isEmpty
-                              ? Center(child: Text("Kosong"))
-                              : Column(
-                                  children: List.generate(
-                                    getRegisteredTokens(controller.keyword.value).length,
-                                    (index) => Padding(
-                                      padding: const EdgeInsets.only(bottom: 5),
-                                      child: Card(
-                                        elevation: 1,
-                                        child: ListTile(
-                                          contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
-                                          onTap: () {
-                                            Get.toNamed(Routes.MEMBERPROFILE, arguments: {
-                                              "name": getRegisteredTokens(controller.keyword.value)[index].name,
-                                              "id": getRegisteredTokens(controller.keyword.value)[index].id
-                                            });
-                                          },
-                                          leading: Badge(
-                                            badgeColor: Colors.amber,
-                                            showBadge: false,
-                                            padding: EdgeInsets.all(8),
-                                            child: CircleAvatar(
-                                              child: Icon(Icons.person),
-                                              // backgroundImage:
-                                              //     CachedNetworkImageProvider(
-                                              //         "https://i.pravatar.cc/150?img=${index + 10}"),
+                                ),
+                                sb10,
+                                Obx(() => getRegisteredTokens(controller.keyword.value).isEmpty
+                                    ? Center(child: Text("Kosong"))
+                                    : Column(
+                                        children: List.generate(
+                                          getRegisteredTokens(controller.keyword.value).length,
+                                          (index) => Padding(
+                                            padding: const EdgeInsets.only(bottom: 5),
+                                            child: Card(
+                                              elevation: 1,
+                                              child: ListTile(
+                                                contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                                                onTap: () {
+                                                  Get.toNamed(Routes.MEMBERPROFILE, arguments: {
+                                                    "name": getRegisteredTokens(controller.keyword.value)[index].name,
+                                                    "id": getRegisteredTokens(controller.keyword.value)[index].id
+                                                  });
+                                                },
+                                                leading: Badge(
+                                                  badgeColor: Colors.amber,
+                                                  showBadge: false,
+                                                  padding: EdgeInsets.all(8),
+                                                  child: CircleAvatar(
+                                                    child: Icon(Icons.person),
+                                                    // backgroundImage:
+                                                    //     CachedNetworkImageProvider(
+                                                    //         "https://i.pravatar.cc/150?img=${index + 10}"),
+                                                  ),
+                                                ),
+                                                title: Text(
+                                                  getRegisteredTokens(controller.keyword.value)[index].name,
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                  ),
+                                                ),
+                                                subtitle: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    // Text("16 Juni 2022 13.45 WITA"),
+                                                    Text("Upline: ${getRegisteredTokens(controller.keyword.value)[index].uplineData["name"]}"),
+                                                  ],
+                                                ),
+                                                trailing: ItemMenu(
+                                                  tokenCode: getRegisteredTokens(controller.keyword.value)[index].tokenCode,
+                                                  tokenUsed: getRegisteredTokens(controller.keyword.value)[index].tokenUsed,
+                                                ),
+                                              ),
                                             ),
-                                          ),
-                                          title: Text(
-                                            getRegisteredTokens(controller.keyword.value)[index].name,
-                                            style: TextStyle(
-                                              fontSize: 18,
-                                            ),
-                                          ),
-                                          subtitle: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              // Text("16 Juni 2022 13.45 WITA"),
-                                              Text("Upline: ${getRegisteredTokens(controller.keyword.value)[index].uplineData["name"]}"),
-                                            ],
-                                          ),
-                                          trailing: ItemMenu(
-                                            tokenCode: getRegisteredTokens(controller.keyword.value)[index].tokenCode,
-                                            tokenUsed: getRegisteredTokens(controller.keyword.value)[index].tokenUsed,
                                           ),
                                         ),
-                                      ),
-                                    ),
-                                  ),
-                                )),
-                        ],
-                      )),
-                      ),
+                                      )),
+                              ],
+                            )),
+                ),
               ),
             ),
           ],

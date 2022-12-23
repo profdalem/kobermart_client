@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:kobermart_client/app/controllers/auth_controller.dart';
 import 'package:kobermart_client/app/models/Member.dart';
 import 'package:kobermart_client/app/models/Tokens.dart';
 import 'package:kobermart_client/firebase.dart';
@@ -10,7 +11,7 @@ import '../../home/controllers/home_controller.dart';
 import '../../../../extensions.dart';
 
 class TokenlistController extends GetxController {
-  var homeC = Get.find<HomeController>();
+  var authC = Get.find<AuthController>();
   var keyword = "".obs;
   RxList<Tokens> datalist = <Tokens>[].obs;
   RxList<Member> registeredDataList = <Member>[].obs;

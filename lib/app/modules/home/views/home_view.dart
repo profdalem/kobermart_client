@@ -22,13 +22,7 @@ class HomeView extends GetView<HomeController> {
   @override
   Widget build(BuildContext context) {
     final homeC = controller;
-    if (authC.userCredential.value != null) {
-      homeC.name.value = authC.userCredential.value!.displayName!;
-      homeC.id.value = authC.userCredential.value!.uid;
-    }
-    if (Get.arguments != null) {
-      Future.delayed(Duration(milliseconds: 500), (() => controller.getInitialData()));
-    }
+    final authC = Get.find<AuthController>();
 
     return SafeArea(
       top: false,
@@ -42,7 +36,7 @@ class HomeView extends GetView<HomeController> {
           ),
         ),
         body: RefreshIndicator(
-          onRefresh: () => homeC.getInitialData(),
+          onRefresh: () => Future.delayed(Duration(seconds: 5)),
           child: ListView(
             children: [
               Stack(
@@ -50,11 +44,7 @@ class HomeView extends GetView<HomeController> {
                   Obx(
                     () => ClipRRect(
                       borderRadius: BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30)),
-                      child: Container(
-                          height: authC.isAuth.value ? 130 : 100,
-                          width: MediaQuery.of(context).size.width,
-                          color: Colors.blue,
-                          child: SizedBox()),
+                      child: Container(height: authC.isAuth.value ? 130 : 100, width: MediaQuery.of(context).size.width, color: Colors.blue, child: SizedBox()),
                     ),
                   ),
                   Column(
@@ -70,7 +60,7 @@ class HomeView extends GetView<HomeController> {
                                     onTap: () async {
                                       Get.toNamed(Routes.PROFILE);
                                     },
-                                    child: homeC.name.isEmpty
+                                    child: authC.userCredential.value == null
                                         ? SizedBox()
                                         : Padding(
                                             padding: const EdgeInsets.only(left: 3),
@@ -80,11 +70,11 @@ class HomeView extends GetView<HomeController> {
                                                         text: "Halo, ",
                                                         children: [
                                                           TextSpan(
-                                                              text: "${homeC.name.value}", style: TextStyle(fontWeight: FontWeight.bold))
+                                                              text: "${authC.userCredential.value!.displayName}", style: TextStyle(fontWeight: FontWeight.bold))
                                                         ],
                                                         style: TextStyle(fontSize: 20)),
                                                   )
-                                                : Text("Halo, ${homeC.name.value}", style: TextStyle(fontSize: 20)),
+                                                : Text("Halo, ${authC.userCredential.value!.displayName}", style: TextStyle(fontSize: 20)),
                                           ),
                                   )
                                 : SizedBox(
@@ -124,7 +114,7 @@ class HomeView extends GetView<HomeController> {
                         child: Card(
                           elevation: 2,
                           child: Padding(
-                            padding: EdgeInsets.only(top: 15, left: 15, right: 15, bottom: 10),
+                            padding: EdgeInsets.only(top: 15, left: 15, right: 15, bottom: 15),
                             child: Container(
                               // height: Get.width * 0.33,
                               child: Obx(
@@ -248,7 +238,7 @@ class HomeView extends GetView<HomeController> {
                               text1: "Token",
                               text2: "Baru",
                               todo: () {
-                                if (homeC.settings != null) Get.toNamed(Routes.NEWTOKEN);
+                                Get.toNamed(Routes.NEWTOKEN);
                               }),
                         ),
                         SizedBox(
@@ -271,7 +261,7 @@ class HomeView extends GetView<HomeController> {
                                 text1: "Tarik",
                                 text2: "Tunai",
                                 todo: () {
-                                  if (homeC.balance.value == 0) {
+                                  if (authC.balance.value == 0) {
                                     Get.snackbar("Saldo kosong", "Anda tidak memiliki saldo atau data saldo anda sedang dimuat");
                                   } else {
                                     Get.toNamed(Routes.SELECTMETHOD, arguments: {"title": WITHDRAWAL});
@@ -324,6 +314,7 @@ class HomeView extends GetView<HomeController> {
                               text2: "Sampah",
                               todo: () {
                                 Get.toNamed(Routes.TRASHBANK);
+                                // Get.toNamed(Routes.DIGITALPRODUCTS);
                               }),
                         ),
                         SizedBox(
@@ -349,8 +340,8 @@ class HomeView extends GetView<HomeController> {
               // Produk Terkini
               Obx(
                 () => GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3, childAspectRatio: 45 / 100, crossAxisSpacing: 5, mainAxisSpacing: 5),
+                  gridDelegate:
+                      SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3, childAspectRatio: 45 / 100, crossAxisSpacing: 5, mainAxisSpacing: 5),
                   physics: NeverScrollableScrollPhysics(),
                   padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
                   itemCount: getAllActiveProducts().length,
@@ -392,9 +383,9 @@ class InfoCepat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<HomeController>();
+    final controller = Get.find<AuthController>();
     return Obx(
-      () => controller.isLoading.value
+      () => controller.loading.value
           ? Center(
               child: CircularProgressIndicator(),
             )
@@ -422,13 +413,13 @@ class InfoCepat extends StatelessWidget {
                             content: "Rp ${NumberFormat("#,##0", "id_ID").format(controller.cashback.value)}",
                           ),
                         ),
-                        Padding(
-                          padding: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.08),
-                          child: Text(
-                            DateFormat.yMMMM('id_ID').format(DateTime.now()),
-                            style: TextStyle(fontSize: 10),
-                          ),
-                        )
+                        // Padding(
+                        //   padding: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.08),
+                        //   child: Text(
+                        //     DateFormat.yMMMM('id_ID').format(DateTime.now()),
+                        //     style: TextStyle(fontSize: 10),
+                        //   ),
+                        // )
                       ],
                     ),
                     Column(
@@ -474,7 +465,7 @@ class LoginPanel extends StatelessWidget {
           ),
           ElevatedButton(
               onPressed: () {
-                c.isAuth.toggle();
+                
               },
               child: Text("Login"))
         ],

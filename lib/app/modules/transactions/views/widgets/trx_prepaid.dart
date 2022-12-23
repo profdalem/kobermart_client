@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:kobermart_client/app/models/Transactions.dart';
 
 import '../../../../../style.dart';
 import '../../../../routes/app_pages.dart';
@@ -11,17 +11,17 @@ import '../../../widgets/trx_status.dart';
 class ItemTransaksiPrepaid extends StatelessWidget {
   ItemTransaksiPrepaid({Key? key, required this.data}) : super(key: key);
 
-  final data;
+  final Transaction data;
 
   @override
   Widget build(BuildContext context) {
-    var createdAt = Timestamp.fromMillisecondsSinceEpoch(data['createdAt']['_seconds'] * 1000);
-    var nominal = data["nominal"];
+    var createdAt = data.createdAt;
+    var nominal = data.nominal;
     var status = 2;
     var product = "Product";
     var icon = "https://cdn.mobilepulsa.net/img/logo/pulsa/small/listrik.png";
 
-    switch (data["data"]["transactionData"]["rc"]) {
+    switch (data.data["transactionData"]["rc"]) {
       case "00":
         status = 4;
         break;
@@ -29,18 +29,18 @@ class ItemTransaksiPrepaid extends StatelessWidget {
         status = 2;
     }
 
-    switch (data["data"]["transactionData"]["ref_id"].toString().substring(0, 6)) {
+    switch (data.data["transactionData"]["ref_id"].toString().substring(0, 6)) {
       case 'PREPLN':
         product = "Token Listrik";
-        icon = data["data"]["productData"]["icon_url"];
+        icon = data.data["productData"]["icon_url"];
         break;
       case 'PREDAT':
         product = "Paket Internet";
-        icon = data["data"]["productData"]["icon_url"];
+        icon = data.data["productData"]["icon_url"];
         break;
       case 'PREPUL':
         product = "Pulsa";
-        icon = data["data"]["productData"]["icon_url"];
+        icon = data.data["productData"]["icon_url"];
         break;
       default:
         product = "Product";
@@ -115,28 +115,28 @@ class ItemTransaksiPrepaid extends StatelessWidget {
                         Container(
                           width: Get.width * 0.1,
                           child: Text(
-                            "${DateFormat.Hm().format(createdAt.toDate())}",
+                            "${DateFormat.Hm().format(createdAt)}",
                             style: TextStyle(color: Colors.grey, fontSize: 12),
                           ),
                         ),
                         Expanded(
                           child: status == 4 && product == "Token Listrik"
                               ? Text(
-                                  "${data["data"]["customerData"]["name"]}",
+                                  "${data.data["customerData"]["name"]}",
                                   style: TextStyle(color: Colors.black, fontSize: 14),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 )
                               : (product == "Pulsa"
                                   ? Text(
-                                      "${data["data"]["productData"]["product_nominal"]}",
+                                      "${data.data["productData"]["product_nominal"]}",
                                       style: TextStyle(color: Colors.black, fontSize: 14),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                     )
                                   : (product == "Paket Internet"
                                       ? Text(
-                                          "${data["data"]["productData"]["product_nominal"]}",
+                                          "${data.data["productData"]["product_nominal"]}",
                                           style: TextStyle(color: Colors.black, fontSize: 14),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,

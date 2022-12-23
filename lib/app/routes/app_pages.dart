@@ -8,6 +8,8 @@ import '../modules/cart/bindings/cart_binding.dart';
 import '../modules/cart/views/cart_view.dart';
 import '../modules/cashback_history/bindings/cashback_history_binding.dart';
 import '../modules/cashback_history/views/cashback_history_view.dart';
+import '../modules/digitalproducts/bindings/digitalproducts_binding.dart';
+import '../modules/digitalproducts/views/digitalproducts_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/inputnumber/bindings/inputnumber_binding.dart';
@@ -30,6 +32,8 @@ import '../modules/notification/bindings/notification_binding.dart';
 import '../modules/notification/views/notification_view.dart';
 import '../modules/ppob/bindings/ppob_binding.dart';
 import '../modules/ppob/views/ppob_view.dart';
+import '../modules/ppob_pulsadata/bindings/ppob_pulsadata_binding.dart';
+import '../modules/ppob_pulsadata/views/ppob_pulsadata_view.dart';
 import '../modules/product/bindings/product_binding.dart';
 import '../modules/product/views/product_view.dart';
 import '../modules/profile/bindings/profile_binding.dart';
@@ -159,7 +163,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.MEMBERHISTORY,
-      page: () => const MemberhistoryView(),
+      page: () => MemberhistoryView(),
       binding: MemberhistoryBinding(),
     ),
     GetPage(
@@ -271,6 +275,16 @@ class AppPages {
       name: _Paths.SELECTMETHOD,
       page: () => SelectmethodView(),
       binding: SelectmethodBinding(),
+    ),
+    GetPage(
+      name: _Paths.DIGITALPRODUCTS,
+      page: () => const DigitalproductsView(),
+      binding: DigitalproductsBinding(),
+    ),
+    GetPage(
+      name: _Paths.PPOB_PULSADATA,
+      page: () => const PpobPulsadataView(),
+      binding: PpobPulsadataBinding(),
     ),
   ];
 }

@@ -1,16 +1,20 @@
 import 'dart:math';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:kobermart_client/app/controllers/auth_controller.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/style.dart';
 
+import '../../../../constants.dart';
 import '../controllers/memberprofile_controller.dart';
 
 class MemberprofileView extends StatelessWidget {
   final profileC = Get.find<MemberprofileController>();
+  final authC = Get.find<AuthController>();
 
   @override
   Widget build(BuildContext context) {
@@ -52,12 +56,7 @@ class MemberprofileView extends StatelessWidget {
                         height: Get.width * 0.3,
                         width: Get.width * 0.3,
                         child: CircleAvatar(
-                          child: Icon(
-                            Icons.person,
-                            size: Get.width * 0.2,
-                          ),
-                          // backgroundImage: CachedNetworkImageProvider(
-                          //     "https://i.pravatar.cc/150?img=12"),
+                          backgroundImage: CachedNetworkImageProvider(PROFILE_IMG),
                         ),
                       ),
                       sb20,
@@ -109,9 +108,8 @@ class MemberprofileView extends StatelessWidget {
                                   ),
                                 ),
                                 sb15,
-                                Container(
-                                  width: Get.width,
-                                  decoration: Shadow1(),
+                                Card(
+                                  elevation: 1,
                                   child: Padding(
                                     padding: EdgeInsets.all(15),
                                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -143,8 +141,7 @@ class MemberprofileView extends StatelessWidget {
                                       sb15,
                                       PanelTitle(title: "Tanggal lahir"),
                                       Text(
-                                        DateFormat.yMMMMd("id_ID")
-                                            .format(DateTime.fromMillisecondsSinceEpoch(profileC.birthday.value.millisecondsSinceEpoch)),
+                                        DateFormat.yMMMMd("id_ID").format(DateTime.fromMillisecondsSinceEpoch(profileC.birthday.value.millisecondsSinceEpoch)),
                                         style: TextStyle(fontSize: 18),
                                       ),
                                       sb15,
@@ -154,8 +151,7 @@ class MemberprofileView extends StatelessWidget {
                                         style: TextStyle(fontSize: 18),
                                       ),
                                       if (profileC.rek.value.isNotEmpty && profileC.bank.value.isNotEmpty) sb15,
-                                      if (profileC.rek.value.isNotEmpty && profileC.bank.value.isNotEmpty)
-                                        PanelTitle(title: "Nomor Rekening"),
+                                      if (profileC.rek.value.isNotEmpty && profileC.bank.value.isNotEmpty) PanelTitle(title: "Nomor Rekening"),
                                       if (profileC.rek.value.isNotEmpty && profileC.bank.value.isNotEmpty)
                                         Text(
                                           "${profileC.rek.value} (${profileC.bank.value})",
@@ -164,10 +160,8 @@ class MemberprofileView extends StatelessWidget {
                                     ]),
                                   ),
                                 ),
-                                sb15,
-                                Container(
-                                  width: Get.width,
-                                  decoration: Shadow1(),
+                                Card(
+                                  elevation: 1,
                                   child: Padding(
                                     padding: EdgeInsets.all(15),
                                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -175,9 +169,7 @@ class MemberprofileView extends StatelessWidget {
                                       ListTile(
                                         contentPadding: EdgeInsets.all(0),
                                         leading: CircleAvatar(
-                                          child: Icon(Icons.person),
-                                          // backgroundImage: CachedNetworkImageProvider(
-                                          //     "https://i.pravatar.cc/150?img=18"),
+                                          backgroundImage: CachedNetworkImageProvider(PROFILE_IMG),
                                         ),
                                         title: Text(profileC.uplineName.value),
                                         onTap: () {
@@ -187,9 +179,44 @@ class MemberprofileView extends StatelessWidget {
                                     ]),
                                   ),
                                 ),
-                                sb15,
-                                Container(
-                                  decoration: Shadow1(),
+                                Card(
+                                  elevation: 1,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(15),
+                                    child: Row(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Expanded(
+                                          flex: 6,
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              PanelTitle(title: "Kirim dana"),
+                                              Text("Saldo anda: Rp${NumberFormat("#,##0", "id_ID").format(authC.balance.value)}")
+                                            ],
+                                          ),
+                                        ),
+                                        Expanded(
+                                            flex: 4,
+                                            child: ElevatedButton(
+                                                onPressed: () {
+                                                  Get.toNamed(Routes.INPUTNUMBER, arguments: {
+                                                    "title": TRANSFER,
+                                                    "recipient": {
+                                                      "name": profileC.name.value,
+                                                      "id": Get.arguments["id"],
+                                                    }
+                                                  });
+                                                },
+                                                child: Text("Transfer")))
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                Card(
+                                  elevation: 1,
                                   child: Padding(
                                     padding: const EdgeInsets.all(15),
                                     child: Row(
@@ -203,16 +230,21 @@ class MemberprofileView extends StatelessWidget {
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
                                               PanelTitle(title: "Buat token disini"),
-                                              Text("Slot KD1 tersedia: ${(10 - profileC.kd1count.value).toString()}")
+                                              Text("Slot KD1 tersedia: ${(authC.settings["kd1limit"] - profileC.kd1count.value).toString()}")
                                             ],
                                           ),
                                         ),
-                                        Expanded(flex: 4, child: ElevatedButton(onPressed: () {}, child: Text("+ Token")))
+                                        Expanded(
+                                            flex: 4,
+                                            child: ElevatedButton(
+                                                onPressed: () {
+                                                  profileC.generateToken();
+                                                },
+                                                child: Text("Buat Token")))
                                       ],
                                     ),
                                   ),
                                 ),
-                                sb15,
                                 PanelKedalaman(
                                   memberC: profileC,
                                 ),
@@ -277,8 +309,7 @@ class PanelKedalaman extends StatelessWidget {
                                 visualDensity: VisualDensity.compact,
                                 padding: EdgeInsets.all(0),
                                 backgroundColor: Colors.blue,
-                                label:
-                                    Text('${slotSize - item.members.length} kosong', style: TextStyle(fontSize: 12, color: Colors.white)),
+                                label: Text('${slotSize - item.members.length} kosong', style: TextStyle(fontSize: 12, color: Colors.white)),
                               ),
                             ]),
                           );
@@ -289,7 +320,10 @@ class PanelKedalaman extends StatelessWidget {
                           child: ListView.separated(
                               scrollDirection: Axis.horizontal,
                               itemBuilder: (context, index) {
-                                var tokenUsed = item.members[index]["tokenUsed"];
+                                var tokenUsed = false;
+                                if (item.members[index]["type"] == "member") {
+                                  tokenUsed = true;
+                                }
                                 return Container(
                                   width: 100,
                                   child: Card(
@@ -299,44 +333,67 @@ class PanelKedalaman extends StatelessWidget {
                                           if (tokenUsed) {
                                             Get.to(() => MemberprofileView(), arguments: {
                                               "id": item.members[index]["id"],
-                                              "name": item.members[index]["memberData"]["name"],
+                                              "name": item.members[index]["name"],
                                             });
                                           } else {
                                             Get.toNamed(Routes.TOKENDETAIL, arguments: {"data": item.members[index]});
                                           }
                                         },
                                         child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.center,
                                           children: [
-                                            CircleAvatar(
-                                              radius: 30.0,
-                                              backgroundColor: tokenUsed ? Colors.blue : Colors.grey.shade200,
-                                              child: tokenUsed ? Icon(Icons.person) : Text("token"),
-                                            ),
-                                            Text(
-                                              tokenUsed
-                                                  ? item.members[index]["memberData"]["name"]
-                                                  : (FirebaseAuth.instance.currentUser!.uid ==
-                                                          item.members[index]["memberData"]["tokenCreator"]
-                                                      ? item.members[index]["memberData"]["tokenCode"]
-                                                      : "?"),
-                                              overflow: TextOverflow.ellipsis,
-                                              maxLines: 1,
-                                              style: TextStyle(color: Colors.black, fontSize: 12),
-                                            ),
-                                            if (tokenUsed)
-                                              RichText(
-                                                text: TextSpan(
-                                                  style: TextStyle(color: Colors.black, fontSize: 14),
-                                                  children: [
-                                                    WidgetSpan(
-                                                      child: Icon(Icons.person, size: 14),
-                                                    ),
-                                                    TextSpan(
-                                                      text: item.members[index]["kd1count"].toString(),
-                                                    ),
-                                                  ],
+                                            Stack(
+                                              alignment: Alignment.bottomCenter,
+                                              children: [
+                                                Padding(
+                                                  padding: const EdgeInsets.only(bottom: 5),
+                                                  child: CircleAvatar(
+                                                    radius: 30.0,
+                                                    backgroundColor: tokenUsed ? Colors.transparent : Colors.grey.shade200,
+                                                    backgroundImage: tokenUsed ? CachedNetworkImageProvider(PROFILE_IMG) : null,
+                                                    child: tokenUsed ? SizedBox() : Text("token"),
+                                                  ),
                                                 ),
-                                              )
+                                                if (tokenUsed)
+                                                  Align(
+                                                    alignment: Alignment.bottomCenter,
+                                                    child: Container(
+                                                      decoration: BoxDecoration(
+                                                          color: Colors.amber.shade800,
+                                                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                                                          boxShadow: [BoxShadow(blurRadius: 1, color: Colors.grey.shade500)]),
+                                                      child: Padding(
+                                                        padding: EdgeInsets.symmetric(vertical: 2, horizontal: 5),
+                                                        child: RichText(
+                                                          text: TextSpan(
+                                                            style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                                                            children: [
+                                                              WidgetSpan(
+                                                                child: Icon(
+                                                                  Icons.person,
+                                                                  size: 13,
+                                                                  color: Colors.white,
+                                                                ),
+                                                              ),
+                                                              TextSpan(
+                                                                text: (item.members[index]["kd1_member"] + item.members[index]["kd1_token"]).toString(),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  )
+                                              ],
+                                            ),
+                                            sb5,
+                                            Text(
+                                              tokenUsed ? item.members[index]["name"] : item.members[index]["id"],
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 2,
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(color: Colors.black, fontSize: Get.width * 0.25 * 0.12, height: 1),
+                                            ),
                                           ],
                                         ),
                                       )),

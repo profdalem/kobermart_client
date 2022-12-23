@@ -5,16 +5,15 @@ import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:kobermart_client/app/modules/ppob/controllers/ppob_controller.dart';
 import 'app/controllers/auth_controller.dart';
 import 'app/modules/widgets/splashscreen.dart';
 import 'app/routes/app_pages.dart';
 import 'package:flutter/services.dart';
-import '../../../../extensions.dart';
 import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  print(Firebase.apps.length);
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await GetStorage.init();
   FirebaseMessaging messaging = FirebaseMessaging.instance;
@@ -31,16 +30,15 @@ void main() async {
 
   print('User granted permission: ${settings.authorizationStatus}');
 
-  FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) {
-    print(fcmToken);
-  }).onError((err) {
-    print(err);
-  });
+  // FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) {
+  //   print(fcmToken);
+  // }).onError((err) {
+  //   print(err);
+  // });
 
-  await initializeDateFormatting('id_ID', null)
-      .then((value) => SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then((value) {
-            runApp(MyApp());
-          }));
+  await initializeDateFormatting('id_ID', null).then((value) => SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then((value) {
+        runApp(MyApp());
+      }));
 }
 
 class MyApp extends StatelessWidget {
@@ -52,7 +50,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: Future.delayed(Duration(milliseconds: 500)),
+      future: Future.delayed(Duration(milliseconds: 5)),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           return Obx(() => GetMaterialApp(
@@ -64,14 +62,7 @@ class MyApp extends StatelessWidget {
                 getPages: AppPages.routes,
               ));
         }
-
-        // if (snapshot.connectionState == ConnectionState.done) {
-        //   return NoInternetPage();
-        // }
-        return FutureBuilder(
-          future: authC.firstInitialized(),
-          builder: (context, snapshot) => SplashScreen(),
-        );
+        return SplashScreen();
       },
     );
   }

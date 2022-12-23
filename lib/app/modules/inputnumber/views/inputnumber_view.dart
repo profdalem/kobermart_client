@@ -3,6 +3,7 @@ import 'package:flutter_svg/svg.dart';
 
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:kobermart_client/app/controllers/auth_controller.dart';
 import 'package:kobermart_client/app/modules/home/controllers/home_controller.dart';
 import 'package:kobermart_client/constants.dart';
 import 'package:kobermart_client/style.dart';
@@ -11,7 +12,7 @@ import '../controllers/inputnumber_controller.dart';
 
 class InputnumberView extends GetView<InputnumberController> {
   InputnumberView({Key? key}) : super(key: key);
-  final homeC = Get.find<HomeController>();
+  final authC = Get.find<AuthController>();
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +64,7 @@ class InputnumberView extends GetView<InputnumberController> {
                     children: [
                       Text("Saldo anda: "),
                       Text(
-                        "Rp${NumberFormat("#,##0", "id_ID").format(homeC.balance.value)}",
+                        "Rp${NumberFormat("#,##0", "id_ID").format(authC.balance.value)}",
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ],

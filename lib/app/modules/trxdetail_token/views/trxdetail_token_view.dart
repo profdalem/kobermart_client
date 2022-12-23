@@ -127,10 +127,10 @@ class TrxDetailMainPanel extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    PanelTitle(title: "Metode"),
+                    PanelTitle(title: "Status"),
                     TrxStatus(statusCode: status),
                     sb15,
-                    PanelTitle(title: "Jenis"),
+                    PanelTitle(title: "Metode"),
                     Text(method),
                   ],
                 )

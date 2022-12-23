@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:kobermart_client/app/controllers/auth_controller.dart';
 import 'package:kobermart_client/app/modules/home/controllers/home_controller.dart';
+import 'package:kobermart_client/app/modules/widgets/sucess_transfer.dart';
 import 'package:kobermart_client/app/modules/widgets/sucess_withdrawal.dart';
 import 'package:kobermart_client/constants.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -17,7 +19,7 @@ class InputnumberController extends GetxController {
   var recipient = Get.arguments["recipient"];
   var nominal = "0".obs;
   var isLoading = false.obs;
-  final homeC = Get.find<HomeController>();
+  final authC = Get.find<AuthController>();
   @override
   void onInit() {
     super.onInit();
@@ -163,7 +165,7 @@ class InputnumberController extends GetxController {
       } else {
         await BalanceProvider().newTopup(nominal.value, method).then((value) {
           print(value.body);
-          nominal.value = "0";
+          nominal.value = nominal.toString();
           Get.off(() => SuccessPage(), arguments: [nominal.value]);
         });
         devLog("Topup jalan");
@@ -182,13 +184,13 @@ class InputnumberController extends GetxController {
         Get.snackbar("Peringatan", "Minimal withdraw Rp 100.000");
         isLoading.value = false;
       } else {
-        if (int.parse(nominal.value) > homeC.balance.value) {
+        if (int.parse(nominal.value) > authC.balance.value) {
           Get.snackbar("Peringatan", "Saldo anda tidak cukup");
           isLoading.value = false;
         } else {
           await BalanceProvider().newWithdraw(nominal.value, method).then((value) {
             print(value.body);
-            nominal.value = "0";
+            nominal.value = nominal.toString();
             Get.off(() => SuccessWithdrawalPage(), arguments: [nominal.value]);
           });
         }
@@ -208,13 +210,16 @@ class InputnumberController extends GetxController {
         Get.snackbar("Peringatan", "Minimal transfer Rp 10.000");
         isLoading.value = false;
       } else {
-        if(int.parse(nominal.value) > homeC.balance.value){
+        if(int.parse(nominal.value) > authC.balance.value){
           Get.snackbar("Peringatan", "Saldo anda kurang");
           isLoading.value = false;
         } else {
+          await BalanceProvider().newTransfer(recipient["id"], nominal.value).then((value) {
+            print(value.body);
+            nominal.value = nominal.toString();
+            Get.off(() => SuccessTransferPage(), arguments: [nominal.value]);
+          });
         devLog("Transfer jalan");
-        devLog(recipient);
-        devLog(nominal.value);
         }
       }
     }

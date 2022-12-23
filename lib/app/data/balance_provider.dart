@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:kobermart_client/firebase.dart';
 import '../../config.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:convert';
@@ -52,6 +53,30 @@ class BalanceProvider extends GetConnect {
 
     return post(
       "${mainUrl}api/balance/withdraw",
+      body,
+      headers: {
+        "Authorization": "Bearer ${token}",
+      },
+    );
+  }
+
+  // Transfer section
+  Future<Response> newTransfer(String recipient, String nominal) async {
+    var token;
+    var userid = Auth.currentUser!.uid;
+
+    await FirebaseAuth.instance.currentUser
+        ?.getIdToken(true)
+        .then((value) => {token = value});
+
+    final body = json.encode({
+      "sender": userid,
+      "recipient": recipient,
+      "nominal": int.parse(nominal),
+    });
+
+    return post(
+      "${mainUrl}api/balance/transfer",
       body,
       headers: {
         "Authorization": "Bearer ${token}",

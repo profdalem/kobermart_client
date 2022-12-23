@@ -30,6 +30,7 @@ class PpobController extends GetxController with GetSingleTickerProviderStateMix
   ];
 
   final box = GetStorage();
+  final authC = Get.find<AuthController>();
 
   late TabController tabC;
   late TextEditingController customerId;
@@ -640,7 +641,7 @@ class PpobController extends GetxController with GetSingleTickerProviderStateMix
                       : ElevatedButton(
                           onPressed: () async {
                             isProceedLoading.value = true;
-                            if (await HomeController().getBalance() < int.parse(nominalSelected.value)) {
+                            if (authC.balance.value < int.parse(nominalSelected.value)) {
                               isProceedLoading.value = false;
                               Get.defaultDialog(
                                   title: "Saldo tidak cukup", content: Text("Pastikan saldo anda cukup sebelum melakukan transaksi"));

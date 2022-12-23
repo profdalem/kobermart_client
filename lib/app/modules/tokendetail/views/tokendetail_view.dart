@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,6 +10,7 @@ import 'package:kobermart_client/app/modules/home/controllers/home_controller.da
 import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/style.dart';
 
+import '../../../../constants.dart';
 import '../controllers/tokendetail_controller.dart';
 
 class TokendetailView extends GetView<TokendetailController> {
@@ -126,11 +128,9 @@ class TokendetailView extends GetView<TokendetailController> {
                             ListTile(
                               contentPadding: EdgeInsets.all(0),
                               leading: CircleAvatar(
-                                child: Icon(Icons.person),
-                                // backgroundImage: CachedNetworkImageProvider(
-                                //     "https://i.pravatar.cc/150?img=18"),
+                                backgroundImage:CachedNetworkImageProvider(PROFILE_IMG),
                               ),
-                              title: Obx(()=>Text(controller.upline.value)),
+                              title: Obx(()=>Text(controller.uplineName.value)),
                               onTap: () {
                                 print("lihat anggota");
                               },

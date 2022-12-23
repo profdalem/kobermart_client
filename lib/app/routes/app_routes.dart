@@ -41,6 +41,8 @@ abstract class Routes {
   static const CASHBACK_HISTORY = _Paths.CASHBACK_HISTORY;
   static const INPUTNUMBER = _Paths.INPUTNUMBER;
   static const SELECTMETHOD = _Paths.SELECTMETHOD;
+  static const DIGITALPRODUCTS = _Paths.DIGITALPRODUCTS;
+  static const PPOB_PULSADATA = _Paths.PPOB_PULSADATA;
 }
 
 abstract class _Paths {
@@ -83,4 +85,6 @@ abstract class _Paths {
   static const CASHBACK_HISTORY = '/cashback-history';
   static const INPUTNUMBER = '/inputnumber';
   static const SELECTMETHOD = '/selectmethod';
+  static const DIGITALPRODUCTS = '/digitalproducts';
+  static const PPOB_PULSADATA = '/ppob-pulsadata';
 }

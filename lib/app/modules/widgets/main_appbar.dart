@@ -1,8 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:kobermart_client/app/controllers/auth_controller.dart';
 import 'package:kobermart_client/app/controllers/product_controller.dart';
 import 'package:kobermart_client/app/data/iakprepaid_provider.dart';
 import 'package:kobermart_client/app/modules/home/controllers/home_controller.dart';
+import 'package:kobermart_client/firebase.dart';
 
 import '../../routes/app_pages.dart';
 import 'package:get/get.dart';
@@ -14,6 +18,7 @@ class DefaultAppBar extends StatelessWidget {
   final String pageTitle;
   final productC = Get.find<MainProductController>();
   final homeC = Get.find<HomeController>();
+  final authC = Get.find<AuthController>();
 
   @override
   Widget build(BuildContext context) {
@@ -46,9 +51,12 @@ class DefaultAppBar extends StatelessWidget {
             onPressed: () async {
               // productC.getAllProduct();
               // productC.getAllCarts();
-              await homeC.getInitialData();
               // print(homeC.downlines.length);
               // homeC.getDownlines();
+              authC.subscribeMemberInfo.cancel();
+              authC.setSubscribeMembersInfo();
+
+              authC.checker();
             },
             icon: Icon(Icons.refresh)),
         IconButton(
@@ -65,20 +73,20 @@ class DefaultAppBar extends StatelessWidget {
                     badgeColor: Color(0xFFE49542),
                     child: Icon(Icons.notifications),
                   )),
-        IconButton(
-            onPressed: () {
-              Get.toNamed(Routes.CART);
-            },
-            icon: cartCount.isEqual(0)
-                ? Icon(Icons.shopping_cart)
-                : Badge(
-                    badgeContent: Text(
-                      cartCount.toString(),
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    badgeColor: Color(0xFFE49542),
-                    child: Icon(Icons.shopping_cart),
-                  )),
+        // IconButton(
+        //     onPressed: () {
+        //       Get.toNamed(Routes.CART);
+        //     },
+        //     icon: cartCount.isEqual(0)
+        //         ? Icon(Icons.shopping_cart)
+        //         : Badge(
+        //             badgeContent: Text(
+        //               cartCount.toString(),
+        //               style: TextStyle(color: Colors.white),
+        //             ),
+        //             badgeColor: Color(0xFFE49542),
+        //             child: Icon(Icons.shopping_cart),
+        //           )),
         IconButton(
             onPressed: () {
               Get.toNamed(Routes.MENU);

@@ -22,183 +22,185 @@ class LoginView extends GetView {
       authC.passwordC.text = boxStorage.read("password");
     }
     ;
-    return Scaffold(
-        resizeToAvoidBottomInset: false,
-        backgroundColor: Color(0xFF31AAEF),
-        body: Stack(
-          children: [
-            Align(
-              alignment: Alignment.bottomRight,
-              child: Container(
-                child: Image.asset("assets/images/bg-elipse-1.png"),
-              ),
-            ),
-            Align(
-              alignment: Alignment.topLeft,
-              child: Container(
-                child: Image.asset("assets/images/bg-elipse-2.png"),
-              ),
-            ),
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.all(15),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    SvgPicture.asset("assets/logo/kobermart-logo-long.svg", width: Get.width * 0.5),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Text(
-                      "Login",
-                      style: header1,
-                    ),
-                    Container(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Email anggota",
-                            textAlign: TextAlign.left,
-                            style: TextStyle(color: Colors.white, fontSize: 16),
-                          ),
-                          SizedBox(
-                            height: 5,
-                          ),
-                          DefaultTextInput(
-                            controller: authC.emailC,
-                            inputLabel: "Email anggota",
-                            obsecure: false,
-                            password: false,
-                          )
-                        ],
-                      ),
-                    ),
-                    sb10,
-                    Container(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Password",
-                            textAlign: TextAlign.left,
-                            style: TextStyle(color: Colors.white, fontSize: 16),
-                          ),
-                          SizedBox(
-                            height: 5,
-                          ),
-                          Obx(() => DefaultTextInput(
-                                controller: authC.passwordC,
-                                inputLabel: "Password",
-                                obsecure: authC.isObsecure.value,
-                                password: true,
-                              )),
-                        ],
-                      ),
-                    ),
-                    sb10,
-                    Obx(() => Row(
-                          children: [
-                            Checkbox(
-                              value: authC.rememberMe.value,
-                              onChanged: (value) {
-                                authC.rememberMe.value = !authC.rememberMe.value;
-                                print(authC.rememberMe.value);
-                              },
-                              checkColor: Colors.blue,
-                              fillColor: MaterialStatePropertyAll(Colors.white),
-                            ),
-                            SizedBox(
-                              width: 2,
-                            ),
-                            Text(
-                              "Ingat email & password",
-                              style: TextStyle(color: Colors.white),
-                            )
-                          ],
-                        )),
-                    sb20,
-                    Obx(() => authC.loading.value
-                        ? Container(
-                            height: 25,
-                            width: 25,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                            ),
-                          )
-                        : Container(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              clipBehavior: Clip.antiAlias,
-                              onPressed: () async {
-                                if (authC.loading.value == false) {
-                                  authC.loading.value = true;
-                                  if (authC.emailC.text.isNotEmpty && authC.passwordC.text.isNotEmpty) {
-                                    GetUtils.isEmail(authC.emailC.text)
-                                        ? await authC
-                                            .login(authC.emailC.text, authC.passwordC.text)
-                                            .then((value) => authC.loading.value = false)
-                                        : Get.defaultDialog(title: "Error", content: Text("Email tidak valid"));
-                                    authC.loading.value = false;
-                                  } else {
-                                    authC.loading.value = false;
-                                    Get.defaultDialog(title: "Error", content: Text("Email dan password harus diisi"));
-                                  }
-                                }
-                              },
-                              child: Container(
-                                height: 30,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      "Masuk",
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              style: TextButton.styleFrom(padding: EdgeInsets.all(15), backgroundColor: Colors.blue),
-                            ),
-                          )),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Get.toNamed(Routes.TOKENINPUT);
-                      },
-                      child: Text(
-                        "Lupa password",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    // GestureDetector(
-                    //   onTap: () {
-                    //     Get.toNamed(Routes.TOKENINPUT, preventDuplicates: true);
-                    //   },
-                    //   child: Text(
-                    //     "Registrasi dengan Token",
-                    //     style: TextStyle(color: Colors.white),
-                    //   ),
-                    // ),
-                    if (devMode)
-                      IconButton(
-                          onPressed: () {
-                            authC.emailC.text = "kobermart@gmail.com";
-                            authC.passwordC.text = "123456";
-                          },
-                          icon: Icon(Icons.refresh))
-                  ],
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+          resizeToAvoidBottomInset: false,
+          backgroundColor: Color(0xFF31AAEF),
+          body: Stack(
+            children: [
+              Align(
+                alignment: Alignment.bottomRight,
+                child: Container(
+                  child: Image.asset("assets/images/bg-elipse-1.png"),
                 ),
               ),
-            ),
-          ],
-        ));
+              Align(
+                alignment: Alignment.topLeft,
+                child: Container(
+                  child: Image.asset("assets/images/bg-elipse-2.png"),
+                ),
+              ),
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(15),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset("assets/logo/kobermart-logo-long.svg", width: Get.width * 0.5),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Text(
+                        "Login",
+                        style: header1,
+                      ),
+                      Container(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Email anggota",
+                              textAlign: TextAlign.left,
+                              style: TextStyle(color: Colors.white, fontSize: 16),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            DefaultTextInput(
+                              controller: authC.emailC,
+                              inputLabel: "Email anggota",
+                              obsecure: false,
+                              password: false,
+                            )
+                          ],
+                        ),
+                      ),
+                      sb10,
+                      Container(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Password",
+                              textAlign: TextAlign.left,
+                              style: TextStyle(color: Colors.white, fontSize: 16),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Obx(() => DefaultTextInput(
+                                  controller: authC.passwordC,
+                                  inputLabel: "Password",
+                                  obsecure: authC.isObsecure.value,
+                                  password: true,
+                                )),
+                          ],
+                        ),
+                      ),
+                      sb10,
+                      Obx(() => Row(
+                            children: [
+                              Checkbox(
+                                value: authC.rememberMe.value,
+                                onChanged: (value) {
+                                  authC.rememberMe.value = !authC.rememberMe.value;
+                                  print(authC.rememberMe.value);
+                                },
+                                checkColor: Colors.blue,
+                                fillColor: MaterialStatePropertyAll(Colors.white),
+                              ),
+                              SizedBox(
+                                width: 2,
+                              ),
+                              Text(
+                                "Ingat email & password",
+                                style: TextStyle(color: Colors.white),
+                              )
+                            ],
+                          )),
+                      sb20,
+                      Obx(() => authC.loading.value
+                          ? Container(
+                              height: 25,
+                              width: 25,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                              ),
+                            )
+                          : Container(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                clipBehavior: Clip.antiAlias,
+                                onPressed: () async {
+                                  if (authC.loading.value == false) {
+                                    authC.loading.value = true;
+                                    if (authC.emailC.text.isNotEmpty && authC.passwordC.text.isNotEmpty) {
+                                      GetUtils.isEmail(authC.emailC.text)
+                                          ? await authC.login(authC.emailC.text, authC.passwordC.text).then((value) => authC.loading.value = false)
+                                          : Get.defaultDialog(title: "Error", content: Text("Email tidak valid"));
+                                      authC.loading.value = false;
+                                    } else {
+                                      authC.loading.value = false;
+                                      Get.defaultDialog(title: "Error", content: Text("Email dan password harus diisi"));
+                                    }
+                                  }
+                                },
+                                child: Container(
+                                  height: 30,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "Masuk",
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                style: TextButton.styleFrom(padding: EdgeInsets.all(15), backgroundColor: Colors.blue),
+                              ),
+                            )),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Get.toNamed(Routes.TOKENINPUT);
+                        },
+                        child: Text(
+                          "Lupa password",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      // GestureDetector(
+                      //   onTap: () {
+                      //     Get.toNamed(Routes.TOKENINPUT, preventDuplicates: true);
+                      //   },
+                      //   child: Text(
+                      //     "Registrasi dengan Token",
+                      //     style: TextStyle(color: Colors.white),
+                      //   ),
+                      // ),
+                      
+                        IconButton(
+                            onPressed: () {
+                              authC.emailC.text = "kobermart@gmail.com";
+                              authC.passwordC.text = "123456";
+                              authC.checker();
+                            },
+                            icon: Icon(Icons.refresh))
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          )),
+    );
   }
 }
 

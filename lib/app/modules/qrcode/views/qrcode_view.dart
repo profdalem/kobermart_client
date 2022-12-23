@@ -15,7 +15,7 @@ class QrcodeView extends GetView<QrcodeController> {
       top: false,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('QR Code Anda'),
+          title: const Text('QR Code'),
           centerTitle: true,
         ),
         body: Center(
@@ -24,21 +24,48 @@ class QrcodeView extends GetView<QrcodeController> {
               SizedBox(
                 height: 100,
               ),
-              Obx(() => QrImage(
-                    data: controller.qrcode.value,
-                    version: QrVersions.auto,
-                    size: Get.width * 0.7,
+              Obx(() => Center(
+                child: Stack(alignment: AlignmentDirectional.center,
+                  children: [
+                  if(controller.qrcode.value.isNotEmpty) QrImage(
+                      data: controller.qrcode.value,
+                      version: QrVersions.auto,
+                      size: Get.width * 0.7, foregroundColor: controller.remaining.value > 0? Colors.black :Colors.grey.shade400,
+                    ),
+                  if(controller.remaining.value <= 0) Center(child: GestureDetector(
+                    onTap: () => controller.generateCodes(),
+                    child: Container(
+                      decoration: BoxDecoration(color: Colors.red.shade300, borderRadius: BorderRadius.circular(10)),
+                      width: 150,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("Muat ulang"), SizedBox(width: 5,),
+                            Icon(Icons.refresh),
+                          ],
+                        ),
+                      )),
                   )),
-              sb15,
+                ],),
+              )),
+              
+              Obx(()=> controller.remaining.value > 0? Column(
+                children: [
+                  sb15,
               Text(
-                'QR Code Validation',
-                style: TextStyle(fontSize: 20),
+                "Sisa waktu: ",
+                style: TextStyle(fontSize: 16),
               ),
-              TextButton(
-                  onPressed: () {
-                    controller.generateCodes();
-                  },
-                  child: Icon(Icons.refresh))
+                  Text(
+                     controller.remaining.value.toString()+" detik",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ): SizedBox()),
+              sb15,
+              
             ],
           ),
         ),

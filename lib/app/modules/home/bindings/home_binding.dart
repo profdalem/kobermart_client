@@ -8,6 +8,6 @@ class HomeBinding extends Bindings {
     // Get.lazyPut<HomeController>(
     //   () => HomeController(),
     // );
-    Get.put(HomeController(), permanent: true);
+    Get.put(HomeController());
   }
 }

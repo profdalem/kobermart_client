@@ -6,6 +6,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:get_cli/common/utils/json_serialize/json_ast/error.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:kobermart_client/config.dart';
@@ -20,14 +21,95 @@ class AuthController extends GetxController {
   var rememberMe = false.obs;
   late TextEditingController emailC;
   late TextEditingController passwordC;
-
-  Rx<User?> userCredential = FirebaseAuth.instance.currentUser.obs;
-
-  var userBalance = 0.obs;
-
+  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
   Rx<ConnectivityResult> connectionStatus = ConnectivityResult.none.obs;
   final Connectivity _connectivity = Connectivity();
-  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
+  var subscribeMemberInfo;
+  var subscribeSetting;
+
+  // Current user data
+  Rx<User?> userCredential = FirebaseAuth.instance.currentUser.obs;
+  var refId = "".obs;
+  var balance = 0.obs;
+  var cashback = 0.obs;
+  var anggota = 0.obs;
+  var kd = 0.obs;
+  var level = 0.obs;
+  var kd1_member = 0.obs;
+  var kd1_token = 0.obs;
+  var uplineName = "".obs;
+  var fcmToken = "";
+  var imgurl = "".obs;
+  var settings;
+  RxList downlines = [].obs;
+
+  @override
+  void onInit() {
+    // TODO: implement onInit
+    firstInitialized();
+    super.onInit();
+  }
+
+  void checker() {
+    Get.defaultDialog(
+        content: Column(
+      children: [
+        if (Auth.currentUser != null) Text(Auth.currentUser!.email.toString()),
+        Text(isAuth.toString()),
+      ],
+    ));
+  }
+
+  Future<void> firstInitialized() async {
+    print("auth first initialized");
+    emailC = TextEditingController();
+    passwordC = TextEditingController();
+
+    if (Auth.currentUser != null) {
+      userCredential.value = Auth.currentUser;
+
+      try {
+        setSubscribeMembersInfo();
+        setSubscribeSetting();
+        await Members.doc(Auth.currentUser!.uid).get().then((value) {
+          level.value = value.data()!["level"];
+          imgurl.value = value.data()!["imgurl"];
+        });
+      } on FirebaseException catch (e) {
+        print(e.message);
+      }
+    } else {
+      isAuth.value = false;
+    }
+
+    if (box.read("rememberMe") == null) {
+      box.write("rememberMe", true);
+    } else {
+      rememberMe.value = box.read("rememberMe");
+    }
+
+    initConnectivity();
+    _connectivitySubscription = _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+    await Future.delayed(
+        Duration(seconds: 5),
+        (() => _connectivitySubscription.onData((data) async {
+              connectionStatus.value = data;
+              InternetAddress.lookup("google.com").then((value) {
+                print('connected');
+                if (Get.isDialogOpen!) {
+                  Get.back();
+                }
+              }).catchError((onError) {
+                print('not connected');
+                if (!Get.isDialogOpen!) {
+                  Get.defaultDialog(title: "No Internet", content: Text("Koneksi internet terputus"), barrierDismissible: false);
+                }
+              });
+            })));
+
+    if (preFilled) emailC.text = "kobermart@gmail.com";
+    if (preFilled) passwordC.text = "123456";
+  }
 
   Future<void> initConnectivity() async {
     late ConnectivityResult result;
@@ -46,61 +128,11 @@ class AuthController extends GetxController {
     connectionStatus.value = result;
   }
 
-  Future<void> firstInitialized() async {
-    print(boxStorage.read("rememberMe"));
-    if (boxStorage.read("rememberMe") == null) {
-      boxStorage.write("rememberMe", true);
-    } else {
-      rememberMe.value = boxStorage.read("rememberMe");
-    }
-    initConnectivity();
-    _connectivitySubscription = _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
-    _connectivitySubscription.onData((data) async {
-      connectionStatus.value = data;
-      print(data);
-      InternetAddress.lookup("google.com").then((value) {
-        print('connected');
-        if (Get.isDialogOpen!) {
-          Get.back();
-        }
-      }).catchError((onError) {
-        print('not connected');
-        Get.defaultDialog(title: "No Internet", content: Text("Koneksi internet terputus"), barrierDismissible: false);
-      });
-    });
-
-    Auth.authStateChanges().listen((event) {
-      print("Authstatechange");
-      if (event == null) {
-        Get.toNamed(Routes.LOGIN);
-      }
-    });
-
-    emailC = TextEditingController();
-    passwordC = TextEditingController();
-    // checkToken();
-    if (preFilled) emailC.text = "kobermart@gmail.com";
-    if (preFilled) passwordC.text = "123456";
-    await tokenExist().then((value) {
-      if (value) {
-        isAuth.value = true;
-      }
-    });
-  }
-
   Future<void> logout() async {
     Auth.signOut().then((value) {
       isAuth.value = false;
       Get.offAllNamed(Routes.LOGIN);
     });
-  }
-
-  Future<bool> tokenExist() async {
-    if (box.read("token") != null) {
-      return true;
-    } else {
-      return false;
-    }
   }
 
   Future<void> login(String email, String password) async {
@@ -114,14 +146,15 @@ class AuthController extends GetxController {
           try {
             await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password).then((UserCredential value) async {
               isAuth.value = true;
+
               if (rememberMe.value) {
-                await boxStorage.write("email", email);
-                await boxStorage.write("password", password);
+                await box.write("email", email);
+                await box.write("password", password);
               } else {
-                await boxStorage.remove("email");
-                await boxStorage.remove("password");
+                await box.remove("email");
+                await box.remove("password");
               }
-              await boxStorage.write("rememberMe", rememberMe.value);
+              await box.write("rememberMe", rememberMe.value);
               userCredential.value = value.user!;
               emailC.text = "";
               passwordC.text = "";
@@ -131,8 +164,14 @@ class AuthController extends GetxController {
                   // box.write("token", value);
                 });
 
-              Future.delayed(Duration(seconds: 1)).then((value) {
+              Future.delayed(Duration(seconds: 1)).then((value) async {
                 loading.value = false;
+                setSubscribeMembersInfo();
+                setSubscribeSetting();
+                await Members.doc(Auth.currentUser!.uid).get().then((value) {
+          level.value = value.data()!["level"];
+          imgurl.value = value.data()!["imgurl"];
+        });
                 Get.offAllNamed(Routes.HOME, arguments: {"refresh": true});
               });
               Get.defaultDialog(
@@ -171,5 +210,81 @@ class AuthController extends GetxController {
     }).catchError((onError) {
       Get.snackbar("Error", "Error on login");
     });
+  }
+
+  void setSubscribeSetting() async {
+    if (subscribeSetting != null) {
+      subscribeSetting.cancel();
+    }
+    subscribeSetting = await AppSettings.doc("latest").snapshots().listen((event) {
+      devLog("setting changed");
+      settings = event.data();
+    }, onError: (error) {
+      print(error);
+    });
+  }
+
+  void setSubscribeMembersInfo() async {
+    if (subscribeMemberInfo != null) {
+      subscribeMemberInfo.cancel();
+    }
+    subscribeMemberInfo = await MembersInfo.doc(Auth.currentUser!.uid).snapshots().listen(
+      (event) async {
+        print("changed");
+        anggota.value = 0;
+        var data = event.data()!;
+        print(data["balance"]);
+        refId.value = event.id;
+        uplineName.value = data["uplineName"];
+        kd1_member.value = data["kd1_member"];
+        kd1_token.value = data["kd1_token"];
+        cashback.value = data["cashback"];
+        balance.value = data["balance"];
+        downlines.value = data["downlines"];
+
+        if (downlines.isNotEmpty) {
+          kd.value = downlines[0]["level"] - level.value;
+          downlines.forEach((element) {
+            if (kd.value < (element["level"] - level.value)) {
+              kd.value = element["level"] - level.value;
+            }
+
+            if (element["type"] == "member") {
+              anggota.value++;
+            }
+          });
+        }
+      },
+      onError: (error) {
+        print(error);
+      },
+    );
+  }
+
+  List downlineList(String keyword) {
+    List list = [];
+    for (var i = 0; i < kd.value; i++) {
+      list.add([]);
+    }
+    downlines.forEach((element) {
+      if (element["name"].toLowerCase().contains(keyword.trim().toLowerCase()) || element["uplineName"].toLowerCase().contains(keyword.trim().toLowerCase())) {
+        list[element["level"] - (level.value + 1)].add(element);
+      }
+    });
+
+    return list;
+  }
+
+  List sortedMemberList(String keyword) {
+    List list = [];
+    downlines.forEach((element) {
+      if (element["type"] == "member" &&
+          (element["name"].toLowerCase().contains(keyword.trim().toLowerCase()) ||
+              element["uplineName"].toLowerCase().contains(keyword.trim().toLowerCase()))) {
+        list.add(element);
+      }
+    });
+
+    return list;
   }
 }

@@ -1,9 +1,11 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:kobermart_client/app/controllers/auth_controller.dart';
 import 'package:kobermart_client/app/modules/home/controllers/home_controller.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
+import 'package:kobermart_client/constants.dart';
 import 'package:kobermart_client/style.dart';
 
 import '../controllers/menu_controller.dart';
@@ -15,6 +17,11 @@ class MenuView extends GetView<MenuController> {
   Widget build(BuildContext context) {
     final authC = Get.find<AuthController>();
     final homeC = Get.find<HomeController>();
+
+    String name = "";
+    if (authC.userCredential.value != null) {
+      name = authC.userCredential.value!.displayName!;
+    }
 
     return SafeArea(
       top: false,
@@ -39,12 +46,10 @@ class MenuView extends GetView<MenuController> {
                   Get.offAndToNamed(Routes.PROFILE);
                 },
                 leading: CircleAvatar(
-                  child: Icon(Icons.person),
-                  // backgroundImage: CachedNetworkImageProvider(
-                  //     "https://i.pravatar.cc/150?img=1"),
+                  backgroundImage: authC.imgurl.isNotEmpty? CachedNetworkImageProvider(authC.imgurl.value): CachedNetworkImageProvider(PROFILE_IMG),
                 ),
-                title: PanelTitle(title: homeC.name.value),
-                subtitle: Text("Referral ID: ${homeC.refId.value}"),
+                title: PanelTitle(title: name),
+                subtitle: Text("Referral ID: ${authC.refId.value}"),
                 trailing: IconButton(
                   icon: Icon(Icons.logout_rounded),
                   onPressed: () async {
@@ -58,7 +63,7 @@ class MenuView extends GetView<MenuController> {
                 leading: Icon(Icons.wallet),
                 title: Text("Saldo Belanja"),
                 subtitle: Text(
-                  "Rp ${NumberFormat("#,##0", "id_ID").format(homeC.balance.value)}",
+                  "Rp ${NumberFormat("#,##0", "id_ID").format(authC.balance.value)}",
                   style: TextStyle(color: Colors.blue.shade600, fontWeight: FontWeight.bold, fontSize: 16),
                 ),
               ),
@@ -67,7 +72,7 @@ class MenuView extends GetView<MenuController> {
                 leading: Icon(Icons.percent),
                 title: Text("Cashback"),
                 subtitle: Text(
-                  "Rp ${NumberFormat("#,##0", "id_ID").format(homeC.cashback.value)}",
+                  "Rp ${NumberFormat("#,##0", "id_ID").format(authC.cashback.value)}",
                   style: TextStyle(color: Colors.blue.shade600, fontWeight: FontWeight.bold, fontSize: 16),
                 ),
               ),

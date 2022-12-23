@@ -13,7 +13,7 @@ class SplashScreen extends StatelessWidget {
           child: Container(
             width: Get.width * 0.5,
             height: Get.width * 0.5,
-            child: SvgPicture.asset("assets/logo/kobermart-logo-long.svg"),
+            child: SvgPicture.asset("assets/logo/kobermart-logo-long.png"),
           ),
         ),
       ),
