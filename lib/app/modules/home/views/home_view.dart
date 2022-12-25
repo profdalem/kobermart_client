@@ -326,7 +326,8 @@ class HomeView extends GetView<HomeController> {
                               text1: "Listrik",
                               text2: "& Pulsa",
                               todo: () {
-                                Get.toNamed(Routes.PPOB);
+                                // Get.toNamed(Routes.PPOB);
+                                Get.toNamed(Routes.DIGITALPRODUCTS);
                               }),
                         ),
                       ],

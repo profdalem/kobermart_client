@@ -15,3 +15,4 @@ final MembersInfo = db.collection("membersInfo");
 final GlobalTrx = db.collection("globaltrx");
 final AppSettings = db.collection("settings");
 final Prepaid = db.collection("prepaid_pricelist");
+final PrepaidPricelist = db.collection("iak_prepaid");

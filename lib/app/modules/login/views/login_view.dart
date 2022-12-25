@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 import 'package:get/get.dart';
+import 'package:kobermart_client/app/modules/login/controllers/login_controller.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/config.dart';
 import 'package:kobermart_client/firebase.dart';
@@ -13,6 +14,7 @@ class LoginView extends GetView {
   LoginView({Key? key}) : super(key: key);
 
   final authC = Get.find<AuthController>();
+  final c = Get.put(LoginController());
 
   @override
   Widget build(BuildContext context) {
@@ -186,14 +188,14 @@ class LoginView extends GetView {
                       //     style: TextStyle(color: Colors.white),
                       //   ),
                       // ),
-                      
-                        IconButton(
-                            onPressed: () {
-                              authC.emailC.text = "kobermart@gmail.com";
-                              authC.passwordC.text = "123456";
-                              authC.checker();
-                            },
-                            icon: Icon(Icons.refresh))
+
+                      IconButton(
+                          onPressed: () {
+                            authC.emailC.text = "kobermart@gmail.com";
+                            authC.passwordC.text = "123456";
+                            authC.checker();
+                          },
+                          icon: Icon(Icons.refresh))
                     ],
                   ),
                 ),

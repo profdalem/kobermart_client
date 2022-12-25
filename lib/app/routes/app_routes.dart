@@ -43,6 +43,8 @@ abstract class Routes {
   static const SELECTMETHOD = _Paths.SELECTMETHOD;
   static const DIGITALPRODUCTS = _Paths.DIGITALPRODUCTS;
   static const PPOB_PULSADATA = _Paths.PPOB_PULSADATA;
+  static const PPOB_PLN_PREPAID = _Paths.PPOB_PLN_PREPAID;
+  static const PPOB_PLN_POSTPAID = _Paths.PPOB_PLN_POSTPAID;
 }
 
 abstract class _Paths {
@@ -87,4 +89,6 @@ abstract class _Paths {
   static const SELECTMETHOD = '/selectmethod';
   static const DIGITALPRODUCTS = '/digitalproducts';
   static const PPOB_PULSADATA = '/ppob-pulsadata';
+  static const PPOB_PLN_PREPAID = '/ppob-pln-prepaid';
+  static const PPOB_PLN_POSTPAID = '/ppob-pln-postpaid';
 }

@@ -31,7 +31,7 @@ class DigitalproductsController extends GetxController {
         color: Colors.amber.shade700,
       ),
       "icon_bg": Colors.yellow.shade200,
-      "action": () => Get.toNamed(Routes.INVESTMENT),
+      "action": () => Get.toNamed(Routes.PPOB_PLN_PREPAID),
     },
     {
       "name": "Tagihan Listrik",
@@ -40,7 +40,7 @@ class DigitalproductsController extends GetxController {
         color: Colors.amber.shade700,
       ),
       "icon_bg": Colors.yellow.shade200,
-      "action": () => Get.toNamed(Routes.INVESTMENT),
+      "action": () => Get.toNamed(Routes.PPOB_PLN_POSTPAID),
     },
   ];
 

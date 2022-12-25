@@ -61,7 +61,7 @@ class RegistrationController extends GetxController {
   var selectedDesa = "".obs;
 
   @override
-  void onInit() {
+  Future<void> onInit() async {
     name = TextEditingController();
     day = TextEditingController();
     month = TextEditingController();
@@ -89,9 +89,7 @@ class RegistrationController extends GetxController {
       password.text = "123456";
       passwordConf.text = "123456";
     }
-
-    getProvinceData();
-
+    await getProvinceData();
     month.text = "01";
     super.onInit();
   }
@@ -124,7 +122,7 @@ class RegistrationController extends GetxController {
   }
 
   Future<void> getProvinceData() async {
-    await GetConnect().get("${url}provinces.json").then((value) {
+    await GetConnect(timeout: Duration(seconds: 30)).get("${url}provinces.json").then((value) {
       provList.value = value.body;
       prov.text = provList[0]["name"];
     });
@@ -137,14 +135,10 @@ class RegistrationController extends GetxController {
     errorCheck();
 
     if (imageFileList.isNotEmpty) {
-      filename.value =
-          "${token.toString()}-${Timestamp.now().seconds}${p.extension(imageFileList.last!.path)}";
+      filename.value = "${token.toString()}-${Timestamp.now().seconds}${p.extension(imageFileList.last!.path)}";
 
       try {
-        profileRef
-            .child(filename.value)
-            .putFile(File(imageFileList.last!.path))
-            .then((result) => print(result));
+        profileRef.child(filename.value).putFile(File(imageFileList.last!.path)).then((result) => print(result));
       } on FirebaseException catch (e) {
         print(e.message);
       }
@@ -174,17 +168,13 @@ class RegistrationController extends GetxController {
       });
 
       // if (devMode) print(body);
-
-      var result = await MemberProvider().setMember(body);
+      return await MemberProvider().setMember(body).then((value) {
       isLoading.value = false;
-      return result;
+        return value;
+      });
     } else {
       isLoading.value = false;
-      Response res = Response(body: {
-        "success": false,
-        "message": "Result of the function",
-        "error_msg": errorText
-      });
+      Response res = Response(body: {"success": false, "message": "Result of the function", "error_msg": errorText});
       return res;
     }
   }
@@ -248,8 +238,7 @@ class RegistrationController extends GetxController {
       yearError.value = true;
       errorText.add("Kolom tahun lahir tidak boleh kosong");
     } else {
-      if (int.parse(year.text) < 1900 ||
-          int.parse(year.text) > DateTime.now().year) {
+      if (int.parse(year.text) < 1900 || int.parse(year.text) > DateTime.now().year) {
         yearError.value = true;
         errorText.add("Tahun lahir anda salah");
       }

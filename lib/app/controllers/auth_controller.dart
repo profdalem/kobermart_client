@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer' as developer;
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -24,11 +25,10 @@ class AuthController extends GetxController {
   late StreamSubscription<ConnectivityResult> _connectivitySubscription;
   Rx<ConnectivityResult> connectionStatus = ConnectivityResult.none.obs;
   final Connectivity _connectivity = Connectivity();
-  var subscribeMemberInfo;
-  var subscribeSetting;
 
   // Current user data
   Rx<User?> userCredential = FirebaseAuth.instance.currentUser.obs;
+  var name = "".obs;
   var refId = "".obs;
   var balance = 0.obs;
   var cashback = 0.obs;
@@ -43,11 +43,39 @@ class AuthController extends GetxController {
   var settings;
   RxList downlines = [].obs;
 
+  var subscribeMemberInfo = MembersInfo.doc().snapshots().listen((event) {});
+  var subscribeSetting = AppSettings.doc("latest").snapshots().listen((event) {});
+
   @override
   void onInit() {
-    // TODO: implement onInit
+    subscribeSetting.onData((event) {
+      devLog("setting changed");
+      settings = event.data();
+    });
+    subscribeSetting.onError((error) {
+      print(error);
+    });
+    subscribeMemberInfo.pause();
+    refId.listen(
+      (event) {
+        if (event.isEmpty) {
+          subscribeMemberInfo.cancel();
+        } else {
+          setSubscribeMembersInfo();
+        }
+      },
+    );
     firstInitialized();
     super.onInit();
+  }
+
+  @override
+  void onClose() {
+    // TODO: implement onClose
+    subscribeSetting.cancel();
+    subscribeMemberInfo.cancel();
+    refId.close();
+    super.onClose();
   }
 
   void checker() {
@@ -56,6 +84,7 @@ class AuthController extends GetxController {
       children: [
         if (Auth.currentUser != null) Text(Auth.currentUser!.email.toString()),
         Text(isAuth.toString()),
+        Text(refId.toString()),
       ],
     ));
   }
@@ -67,13 +96,11 @@ class AuthController extends GetxController {
 
     if (Auth.currentUser != null) {
       userCredential.value = Auth.currentUser;
-
       try {
-        setSubscribeMembersInfo();
-        setSubscribeSetting();
         await Members.doc(Auth.currentUser!.uid).get().then((value) {
           level.value = value.data()!["level"];
           imgurl.value = value.data()!["imgurl"];
+          refId.value = value.id;
         });
       } on FirebaseException catch (e) {
         print(e.message);
@@ -131,6 +158,7 @@ class AuthController extends GetxController {
   Future<void> logout() async {
     Auth.signOut().then((value) {
       isAuth.value = false;
+      refId.value = "";
       Get.offAllNamed(Routes.LOGIN);
     });
   }
@@ -146,7 +174,7 @@ class AuthController extends GetxController {
           try {
             await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password).then((UserCredential value) async {
               isAuth.value = true;
-
+              refId.value = value.user!.uid;
               if (rememberMe.value) {
                 await box.write("email", email);
                 await box.write("password", password);
@@ -167,11 +195,11 @@ class AuthController extends GetxController {
               Future.delayed(Duration(seconds: 1)).then((value) async {
                 loading.value = false;
                 setSubscribeMembersInfo();
-                setSubscribeSetting();
                 await Members.doc(Auth.currentUser!.uid).get().then((value) {
-          level.value = value.data()!["level"];
-          imgurl.value = value.data()!["imgurl"];
-        });
+                  level.value = value.data()!["level"];
+                  imgurl.value = value.data()!["imgurl"];
+                  refId.value = value.id;
+                });
                 Get.offAllNamed(Routes.HOME, arguments: {"refresh": true});
               });
               Get.defaultDialog(
@@ -181,8 +209,6 @@ class AuthController extends GetxController {
                   Text("Login berhasil"),
                 ],
               ));
-            }).catchError((error) {
-              print(error.toString());
             });
           } on FirebaseAuthException catch (e) {
             var message = "";
@@ -199,6 +225,7 @@ class AuthController extends GetxController {
             }
 
             Get.snackbar("Error", message.toString());
+            print(e);
             loading.value = false;
           }
         } else {
@@ -212,23 +239,9 @@ class AuthController extends GetxController {
     });
   }
 
-  void setSubscribeSetting() async {
-    if (subscribeSetting != null) {
-      subscribeSetting.cancel();
-    }
-    subscribeSetting = await AppSettings.doc("latest").snapshots().listen((event) {
-      devLog("setting changed");
-      settings = event.data();
-    }, onError: (error) {
-      print(error);
-    });
-  }
-
   void setSubscribeMembersInfo() async {
-    if (subscribeMemberInfo != null) {
-      subscribeMemberInfo.cancel();
-    }
-    subscribeMemberInfo = await MembersInfo.doc(Auth.currentUser!.uid).snapshots().listen(
+    subscribeMemberInfo.cancel();
+    subscribeMemberInfo = MembersInfo.doc(refId.value).snapshots().listen(
       (event) async {
         print("changed");
         anggota.value = 0;
@@ -253,6 +266,8 @@ class AuthController extends GetxController {
               anggota.value++;
             }
           });
+        } else {
+          kd.value = 0;
         }
       },
       onError: (error) {

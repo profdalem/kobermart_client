@@ -9,6 +9,7 @@ import 'package:kobermart_client/app/modules/home/controllers/home_controller.da
 import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/config.dart';
 import 'package:kobermart_client/style.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../controllers/registration_controller.dart';
 
@@ -16,19 +17,31 @@ import 'dart:io';
 
 class RegistrationView extends GetView<RegistrationController> {
   RegistrationView({Key? key}) : super(key: key);
-  final homeC = Get.find<HomeController>();
 
   ImagePicker imagePicker = ImagePicker();
 
-  void selectImage() async {
-    final XFile? selectedImages = await imagePicker.pickImage(
-        source: ImageSource.gallery,
-        maxHeight: 500,
-        maxWidth: 500,
-        imageQuality: 50);
+  void selectImageFromCamera() async {
+    await Permission.camera.request().then((value) async {
+      if (value == PermissionStatus.granted) {
+        final XFile? selectedImages = await imagePicker.pickImage(source: ImageSource.camera, maxHeight: 500, maxWidth: 500, imageQuality: 50);
+        controller.imageFileList.clear();
+        controller.imageFileList.add(selectedImages);
+      } else {
+        Get.snackbar("Gagal", "Tidak diijinkan mengakses kamera");
+      }
+    });
+  }
 
-    controller.imageFileList.clear();
-    controller.imageFileList.add(selectedImages);
+  void selectImageFromGallery() async {
+    await Permission.mediaLibrary.request().then((value) async {
+      if (value == PermissionStatus.granted) {
+        final XFile? selectedImages = await imagePicker.pickImage(source: ImageSource.gallery, maxHeight: 500, maxWidth: 500, imageQuality: 50);
+        controller.imageFileList.clear();
+        controller.imageFileList.add(selectedImages);
+      } else {
+        Get.snackbar("Gagal", "Tidak diijinkan mengakses kamera");
+      }
+    });
   }
 
   @override
@@ -64,24 +77,30 @@ class RegistrationView extends GetView<RegistrationController> {
                           ),
                         )
                       : CircleAvatar(
-                          backgroundImage: FileImage(
-                              File(controller.imageFileList.last!.path)),
-
-                          // CachedNetworkImageProvider("https://i.pravatar.cc/150"),
+                          backgroundImage: FileImage(File(controller.imageFileList.last!.path)),
                         ),
                 ),
               ),
-              TextButton(
-                onPressed: () {
-                  selectImage();
-                },
-                child: Text("Pilih gambar"),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      selectImageFromGallery();
+                    },
+                    child: Text("Pilih gambar"),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      selectImageFromCamera();
+                    },
+                    child: Text("Ambil foto"),
+                  ),
+                ],
               ),
               PanelIdentitasDiri(),
               sb15,
-              Obx(() => controller.provList.isEmpty
-                  ? PanelAlamat()
-                  : PanelAlamatAPI()),
+              Obx(() => controller.provList.isEmpty ? PanelAlamat() : PanelAlamatAPI()),
               sb15,
               PanelKontak(),
               sb15,
@@ -101,20 +120,14 @@ class RegistrationView extends GetView<RegistrationController> {
               ),
               sb20,
               Obx(
-                () => Container(
+                () => controller.isLoading.value? CircularProgressIndicator() : Container(
                   width: Get.width - 30,
                   child: ElevatedButton(
-                    child: controller.isLoading.value
-                        ? Container(
-                            height: 15,
-                            width: 15,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                            ))
-                        : Text("Kirim"),
+                    child: Text("Kirim"),
                     onPressed: () async {
                       await controller.setMember(tokenCode).then((value) async {
                         if (devMode) print(value.body);
+                        if (devMode) Get.snackbar("Result", value.body.toString());
                         if (value.body["success"] == false) {
                           Get.defaultDialog(
                               title: "Registrasi Gagal",
@@ -122,22 +135,17 @@ class RegistrationView extends GetView<RegistrationController> {
                                 height: 100,
                                 child: SingleChildScrollView(
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: List.generate(
-                                        value.body["error_msg"].length,
-                                        (index) => Text(
-                                            "${index + 1}. ${value.body["error_msg"][index]}")),
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: List.generate(value.body["error_msg"].length, (index) => Text("${index + 1}. ${value.body["error_msg"][index]}")),
                                   ),
                                 ),
                               ));
                         } else {
                           controller.isLoading.value = true;
-                          
-                            Get.snackbar("Registrasi berhasil!",
-                                "Anggota baru berhasil didaftarkan");
-                            Get.offAllNamed(Routes.HOME);
-                          
+
+                          Get.snackbar("Registrasi berhasil!", "Anggota baru berhasil didaftarkan");
+                          Get.offAllNamed(Routes.HOME);
+
                           controller.isLoading.value = false;
                         }
                       });
@@ -145,15 +153,16 @@ class RegistrationView extends GetView<RegistrationController> {
                   ),
                 ),
               ),
-              Container(
+              Obx(()=> controller.isLoading.value? SizedBox(height: 40,) : Container(
                 width: Get.width - 30,
+                height: 40,
                 child: TextButton(
                   child: Text("Batalkan"),
                   onPressed: () {
                     Get.back();
                   },
                 ),
-              ),
+              )),
               sb20
             ],
           ),
@@ -196,10 +205,7 @@ class PanelIdentitasDiri extends StatelessWidget {
                   contentPadding: EdgeInsets.all(10),
                   isDense: true,
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: controller.nameError.value
-                            ? Colors.red
-                            : Colors.grey),
+                    borderSide: BorderSide(color: controller.nameError.value ? Colors.red : Colors.grey),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.blue),
@@ -229,10 +235,7 @@ class PanelIdentitasDiri extends StatelessWidget {
                             contentPadding: EdgeInsets.all(10),
                             isDense: true,
                             enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: controller.dayError.value
-                                      ? Colors.red
-                                      : Colors.grey),
+                              borderSide: BorderSide(color: controller.dayError.value ? Colors.red : Colors.grey),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderSide: BorderSide(color: Colors.blue),
@@ -351,10 +354,7 @@ class PanelIdentitasDiri extends StatelessWidget {
                             contentPadding: EdgeInsets.all(10),
                             isDense: true,
                             enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: controller.yearError.value
-                                      ? Colors.red
-                                      : Colors.grey),
+                              borderSide: BorderSide(color: controller.yearError.value ? Colors.red : Colors.grey),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderSide: BorderSide(color: Colors.blue),
@@ -445,19 +445,13 @@ class PanelAlamat extends StatelessWidget {
               sb5,
               TextField(
                 controller: controller.jalan,
-                autofillHints: [
-                  AutofillHints.streetAddressLine1,
-                  AutofillHints.fullStreetAddress
-                ],
+                autofillHints: [AutofillHints.streetAddressLine1, AutofillHints.fullStreetAddress],
                 decoration: InputDecoration(
                   hintText: "Nama jalan/banjar",
                   contentPadding: EdgeInsets.all(10),
                   isDense: true,
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: controller.jalanError.value
-                            ? Colors.red
-                            : Colors.grey),
+                    borderSide: BorderSide(color: controller.jalanError.value ? Colors.red : Colors.grey),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.blue),
@@ -478,10 +472,7 @@ class PanelAlamat extends StatelessWidget {
                   contentPadding: EdgeInsets.all(10),
                   isDense: true,
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: controller.desaError.value
-                            ? Colors.red
-                            : Colors.grey),
+                    borderSide: BorderSide(color: controller.desaError.value ? Colors.red : Colors.grey),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.blue),
@@ -507,10 +498,7 @@ class PanelAlamat extends StatelessWidget {
                             contentPadding: EdgeInsets.all(10),
                             isDense: true,
                             enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: controller.kecError.value
-                                      ? Colors.red
-                                      : Colors.grey),
+                              borderSide: BorderSide(color: controller.kecError.value ? Colors.red : Colors.grey),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderSide: BorderSide(color: Colors.blue),
@@ -540,10 +528,7 @@ class PanelAlamat extends StatelessWidget {
                             contentPadding: EdgeInsets.all(10),
                             isDense: true,
                             enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: controller.kabError.value
-                                      ? Colors.red
-                                      : Colors.grey),
+                              borderSide: BorderSide(color: controller.kabError.value ? Colors.red : Colors.grey),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderSide: BorderSide(color: Colors.blue),
@@ -575,10 +560,7 @@ class PanelAlamat extends StatelessWidget {
                             contentPadding: EdgeInsets.all(10),
                             isDense: true,
                             enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: controller.provError.value
-                                      ? Colors.red
-                                      : Colors.grey),
+                              borderSide: BorderSide(color: controller.provError.value ? Colors.red : Colors.grey),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderSide: BorderSide(color: Colors.blue),
@@ -666,10 +648,7 @@ class PanelKontak extends StatelessWidget {
                   contentPadding: EdgeInsets.all(10),
                   isDense: true,
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: controller.whatsappError.value
-                            ? Colors.red
-                            : Colors.grey),
+                    borderSide: BorderSide(color: controller.whatsappError.value ? Colors.red : Colors.grey),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.blue),
@@ -693,10 +672,7 @@ class PanelKontak extends StatelessWidget {
                   contentPadding: EdgeInsets.all(10),
                   isDense: true,
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: controller.emailError.value
-                            ? Colors.red
-                            : Colors.grey),
+                    borderSide: BorderSide(color: controller.emailError.value ? Colors.red : Colors.grey),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.blue),
@@ -815,10 +791,7 @@ class PanelKeamanan extends StatelessWidget {
                   contentPadding: EdgeInsets.all(10),
                   isDense: true,
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: controller.passwordError.value
-                            ? Colors.red
-                            : Colors.grey),
+                    borderSide: BorderSide(color: controller.passwordError.value ? Colors.red : Colors.grey),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.blue),
@@ -839,10 +812,7 @@ class PanelKeamanan extends StatelessWidget {
                   contentPadding: EdgeInsets.all(10),
                   isDense: true,
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: controller.passwordConfError.value
-                            ? Colors.red
-                            : Colors.grey),
+                    borderSide: BorderSide(color: controller.passwordConfError.value ? Colors.red : Colors.grey),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.blue),
@@ -921,12 +891,8 @@ class PanelAlamatAPI extends StatelessWidget {
               Container(
                 height: 40,
                 child: DropdownSearch<String>(
-                  popupProps: PopupProps.modalBottomSheet(
-                      fit: FlexFit.loose,
-                      showSelectedItems: true,
-                      title: Center(child: Text("Pilih Daerah/Provinsi"))),
-                  items: List.generate(controller.provList.value.length,
-                      (index) => controller.provList.value[index]["name"]),
+                  popupProps: PopupProps.modalBottomSheet(fit: FlexFit.loose, showSelectedItems: true, title: Center(child: Text("Pilih Daerah/Provinsi"))),
+                  items: List.generate(controller.provList.value.length, (index) => controller.provList.value[index]["name"]),
                   onChanged: (value) async {
                     // clear another list
                     controller.kabList.clear();
@@ -945,9 +911,7 @@ class PanelAlamatAPI extends StatelessWidget {
                       }
                     });
                     if (devMode) print(controller.selectedProv.value);
-                    await GetConnect()
-                        .get("${controller.url}regencies/${id}.json")
-                        .then((value) {
+                    await GetConnect().get("${controller.url}regencies/${id}.json").then((value) {
                       controller.kabList.value = value.body;
                       controller.kab.text = controller.kabList[0]["name"];
                     });
@@ -966,12 +930,8 @@ class PanelAlamatAPI extends StatelessWidget {
                 Container(
                   height: 40,
                   child: DropdownSearch<String>(
-                    popupProps: PopupProps.modalBottomSheet(
-                        fit: FlexFit.loose,
-                        showSelectedItems: true,
-                        title: Center(child: Text("Pilih Kabupaten"))),
-                    items: List.generate(controller.kabList.value.length,
-                        (index) => controller.kabList.value[index]["name"]),
+                    popupProps: PopupProps.modalBottomSheet(fit: FlexFit.loose, showSelectedItems: true, title: Center(child: Text("Pilih Kabupaten"))),
+                    items: List.generate(controller.kabList.value.length, (index) => controller.kabList.value[index]["name"]),
                     onChanged: (value) async {
                       // clear another list
                       controller.kecList.clear();
@@ -988,9 +948,7 @@ class PanelAlamatAPI extends StatelessWidget {
                         }
                       });
                       if (devMode) print(controller.selectedKab.value);
-                      await GetConnect()
-                          .get("${controller.url}districts/${id}.json")
-                          .then((value) {
+                      await GetConnect().get("${controller.url}districts/${id}.json").then((value) {
                         controller.kecList.value = value.body;
                         controller.kec.text = controller.kecList[0]["name"];
                       });
@@ -1009,12 +967,8 @@ class PanelAlamatAPI extends StatelessWidget {
                 Container(
                   height: 40,
                   child: DropdownSearch<String>(
-                    popupProps: PopupProps.modalBottomSheet(
-                        fit: FlexFit.loose,
-                        showSelectedItems: true,
-                        title: Center(child: Text("Pilih Kecamatan"))),
-                    items: List.generate(controller.kecList.value.length,
-                        (index) => controller.kecList.value[index]["name"]),
+                    popupProps: PopupProps.modalBottomSheet(fit: FlexFit.loose, showSelectedItems: true, title: Center(child: Text("Pilih Kecamatan"))),
+                    items: List.generate(controller.kecList.value.length, (index) => controller.kecList.value[index]["name"]),
                     onChanged: (value) async {
                       // clear another list
                       controller.desaList.clear();
@@ -1029,9 +983,7 @@ class PanelAlamatAPI extends StatelessWidget {
                         }
                       });
                       if (devMode) print(controller.selectedKec.value);
-                      await GetConnect()
-                          .get("${controller.url}villages/${id}.json")
-                          .then((value) {
+                      await GetConnect().get("${controller.url}villages/${id}.json").then((value) {
                         controller.desaList.value = value.body;
                         controller.desa.text = controller.desaList[0]["name"];
                       });
@@ -1050,12 +1002,8 @@ class PanelAlamatAPI extends StatelessWidget {
                 Container(
                   height: 40,
                   child: DropdownSearch<String>(
-                    popupProps: PopupProps.modalBottomSheet(
-                        fit: FlexFit.loose,
-                        showSelectedItems: true,
-                        title: Center(child: Text("Pilih Desa"))),
-                    items: List.generate(controller.desaList.value.length,
-                        (index) => controller.desaList.value[index]["name"]),
+                    popupProps: PopupProps.modalBottomSheet(fit: FlexFit.loose, showSelectedItems: true, title: Center(child: Text("Pilih Desa"))),
+                    items: List.generate(controller.desaList.value.length, (index) => controller.desaList.value[index]["name"]),
                     onChanged: (value) async {
                       controller.desa.text = value!;
                       controller.desaList.forEach((e) {
@@ -1076,19 +1024,13 @@ class PanelAlamatAPI extends StatelessWidget {
               sb5,
               TextField(
                 controller: controller.jalan,
-                autofillHints: [
-                  AutofillHints.streetAddressLine1,
-                  AutofillHints.fullStreetAddress
-                ],
+                autofillHints: [AutofillHints.streetAddressLine1, AutofillHints.fullStreetAddress],
                 decoration: InputDecoration(
                   hintText: "Nama jalan/banjar",
                   contentPadding: EdgeInsets.all(10),
                   isDense: true,
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: controller.jalanError.value
-                            ? Colors.red
-                            : Colors.grey),
+                    borderSide: BorderSide(color: controller.jalanError.value ? Colors.red : Colors.grey),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.blue),

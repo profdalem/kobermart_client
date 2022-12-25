@@ -1,9 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
+import 'package:kobermart_client/app/models/Transactions.dart';
 import '../../../../style.dart';
 import '../../../routes/app_pages.dart';
 import '../../widgets/trx_status.dart';
@@ -14,10 +15,10 @@ class TrxdetailPrepaidView extends GetView {
   final c = Get.put(TrxdetailPrepaidController());
   @override
   Widget build(BuildContext context) {
-    final data = Get.arguments["data"];
-    var time = Timestamp.fromMillisecondsSinceEpoch(data["createdAt"]["_seconds"] * 1000);
+    Transaction data = Get.arguments["data"];
+    var time = data.createdAt;
 
-    String icon = data["data"]["productData"]["icon_url"];
+    String icon = data.data["productData"]["icon_url"];
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -58,17 +59,18 @@ class TrxdetailPrepaidView extends GetView {
             Container(
               alignment: Alignment.center,
               child: Text(
-                "Dibuat ${DateFormat.yMMMd("id_ID").format(time.toDate())} ${DateFormat.Hm().format(time.toDate())} WITA",
+                "Dibuat ${DateFormat.yMMMd("id_ID").format(data.createdAt)} ${DateFormat.Hm().format(data.createdAt)} WITA",
                 style: TextStyle(color: Colors.grey),
               ),
             ),
             sb15,
             TrxDetailMainPanel(data: data),
             sb15,
-            TrxDetailSerialNumber(
-              data: data["data"]["transactionData"],
-              customerData: data["data"]["customerData"],
-            ),
+            if (data.data["customerData"] != null)
+              TrxDetailSerialNumber(
+                data: data.data["transactionData"],
+                customerData: data.data["customerData"],
+              ),
             Container(
               width: Get.width,
               child: Padding(
@@ -93,7 +95,7 @@ class TrxDetailMainPanel extends StatelessWidget {
     Key? key,
     required this.data,
   }) : super(key: key);
-  final dynamic data;
+  final Transaction data;
 
   @override
   Widget build(BuildContext context) {
@@ -104,10 +106,10 @@ class TrxDetailMainPanel extends StatelessWidget {
     int status = 2;
 
     if (data != null) {
-      nominal = int.parse(data["nominal"].toString());
-      notrx = data["data"]["transactionData"]["ref_id"];
+      nominal = data.nominal;
+      notrx = data.data["transactionData"]["ref_id"];
 
-      switch (data["data"]["transactionData"]["rc"]) {
+      switch (data.data["transactionData"]["rc"]) {
         case "00":
           status = 4;
           break;
@@ -173,6 +175,8 @@ class TrxDetailMainPanel extends StatelessWidget {
                     sb10,
                     PanelTitle(title: "Status"),
                     TrxStatus(statusCode: status),
+                    if(type == "Pulsa" || type == "Paket Internet") PanelTitle(title: "Nomor"),
+                    Text(data.data["transactionData"]["customer_id"]),
                   ],
                 )
               ],

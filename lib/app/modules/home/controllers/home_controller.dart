@@ -26,13 +26,11 @@ class HomeController extends GetxController {
         authC.isAuth.value = false;
         if (authC.subscribeMemberInfo != null) {
           authC.subscribeMemberInfo.cancel();
-          authC.subscribeSetting.cancel();
         }
         Get.toNamed(Routes.LOGIN);
       } else {
         devLog("Current user:" + event.uid);
         authC.setSubscribeMembersInfo();
-        authC.setSubscribeSetting();
         await Members.doc(Auth.currentUser!.uid).get().then((value) {
           authC.level.value = value.data()!["level"];
           authC.imgurl.value = value.data()!["imgurl"];

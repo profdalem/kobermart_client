@@ -509,9 +509,8 @@ class PpobController extends GetxController with GetSingleTickerProviderStateMix
         paketDataCodeSelected.isNotEmpty) {
       // setTopUp
       // print("beli paket data");
-      var refId = generateRandomString(6, "PREDAT");
       await IakprepaidProvider()
-          .setTopUpPaketData(phoneNumber.text, refId, paketDataCodeSelected.value, paketDataNominalSelected.value, productData)
+          .setTopUp(phoneNumber.text, "PREDAT", paketDataCodeSelected.value, paketDataNominalSelected.value, "data")
           .then((value) {
         print(value.body);
       }).catchError((err) {
@@ -531,8 +530,7 @@ class PpobController extends GetxController with GetSingleTickerProviderStateMix
     if (paketDataPhoneNumberError.isFalse && phoneNumber.text.isNotEmpty && phoneNumber.text.length >= 10 && pulsaCodeSelected.isNotEmpty) {
       // setTopUp
       // print("beli paket data");
-      var refId = generateRandomString(6, "PREPUL");
-      await IakprepaidProvider().setTopUpPulsa(phoneNumber.text, refId, pulsaCodeSelected.value, pulsaNominalSelected.value).then((value) {
+      await IakprepaidProvider().setTopUp(phoneNumber.text, "PREPUL", pulsaCodeSelected.value, pulsaNominalSelected.value, "pulsa").then((value) {
         print(value.body);
       }).catchError((err) {
         print(err);
@@ -556,7 +554,7 @@ class PpobController extends GetxController with GetSingleTickerProviderStateMix
       } else {
         var refId = generateRandomString(6, "POSPLN");
         isLoading.value = true;
-        await IakpostpaidProvider().setInquiryPlnA(customerId.text, refId).then(
+        await IakpostpaidProvider().setInquiryPlnA(customerId.text).then(
           (value) {
             isLoading.value = false;
             if (value.body["code"] == 400) {
@@ -583,7 +581,7 @@ class PpobController extends GetxController with GetSingleTickerProviderStateMix
           Get.snackbar("Peringatan", "Pilih nominal token terlebih dahulu");
         } else {
           isLoading.value = true;
-          await IakprepaidProvider().setInquiryPln(customerId.text).then((value) {
+          await IakprepaidProvider().setPrepaidInquiryPln(customerId.text).then((value) {
             var response = value.body;
             if (response["status"] == "failed") {
               Get.defaultDialog(

@@ -12,12 +12,15 @@ class MemberProvider extends GetConnect {
 
   Future<Response> setMember(var body) async {
     var token;
+    httpClient.timeout = Duration(seconds: 30);
+    try {
+      await FirebaseAuth.instance.currentUser?.getIdToken(true).then((value) => {token = value});
+    } on FirebaseException catch (e) {
+      print(e.message);
+      Get.snackbar("Error", e.message!);
+    }
 
-    await FirebaseAuth.instance.currentUser
-        ?.getIdToken(true)
-        .then((value) => {token = value});
-
-  return post(
+    return post(
       "${mainUrl}api/member/member",
       body,
       headers: {
@@ -30,9 +33,7 @@ class MemberProvider extends GetConnect {
     var token;
     httpClient.timeout = Duration(seconds: 30);
 
-    await FirebaseAuth.instance.currentUser
-        ?.getIdToken(true)
-        .then((value) => {token = value});
+    await FirebaseAuth.instance.currentUser?.getIdToken(true).then((value) => {token = value});
 
     final body = json.encode({
       "ref": ref,

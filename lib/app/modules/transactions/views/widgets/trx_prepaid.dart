@@ -97,7 +97,7 @@ class ItemTransaksiPrepaid extends StatelessWidget {
                         ),
                         Text(
                           "- Rp ${NumberFormat("#,##0", "id_ID").format(int.parse(nominal.toString()))}",
-                          style: TextStyle(color: Colors.red.shade400, fontWeight: FontWeight.bold, fontSize: 14),
+                          style: TextStyle(color: data.status == "ACTIVE"?Colors.red.shade400:Colors.grey.shade600, fontWeight: FontWeight.bold, fontSize: 14),
                         ),
                         // TrxStatus(
                         //   statusCode: status,

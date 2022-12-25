@@ -32,6 +32,10 @@ import '../modules/notification/bindings/notification_binding.dart';
 import '../modules/notification/views/notification_view.dart';
 import '../modules/ppob/bindings/ppob_binding.dart';
 import '../modules/ppob/views/ppob_view.dart';
+import '../modules/ppob_pln_postpaid/bindings/ppob_pln_postpaid_binding.dart';
+import '../modules/ppob_pln_postpaid/views/ppob_pln_postpaid_view.dart';
+import '../modules/ppob_pln_prepaid/bindings/ppob_pln_prepaid_binding.dart';
+import '../modules/ppob_pln_prepaid/views/ppob_pln_prepaid_view.dart';
 import '../modules/ppob_pulsadata/bindings/ppob_pulsadata_binding.dart';
 import '../modules/ppob_pulsadata/views/ppob_pulsadata_view.dart';
 import '../modules/product/bindings/product_binding.dart';
@@ -84,7 +88,7 @@ part 'app_routes.dart';
 class AppPages {
   AppPages._();
 
-  static const INITIAL = Routes.HOME;
+  static const INITIAL = Routes.PPOB_PLN_POSTPAID;
 
   static final routes = [
     GetPage(
@@ -285,6 +289,16 @@ class AppPages {
       name: _Paths.PPOB_PULSADATA,
       page: () => const PpobPulsadataView(),
       binding: PpobPulsadataBinding(),
+    ),
+    GetPage(
+      name: _Paths.PPOB_PLN_PREPAID,
+      page: () => const PpobPlnPrepaidView(),
+      binding: PpobPlnPrepaidBinding(),
+    ),
+    GetPage(
+      name: _Paths.PPOB_PLN_POSTPAID,
+      page: () => const PpobPlnPostpaidView(),
+      binding: PpobPlnPostpaidBinding(),
     ),
   ];
 }
