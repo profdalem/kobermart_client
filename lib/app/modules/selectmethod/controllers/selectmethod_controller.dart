@@ -1,7 +1,6 @@
 import 'package:get/get.dart';
 
 class SelectmethodController extends GetxController {
-  //TODO: Implement SelectmethodController
 
   final count = 0.obs;
   @override

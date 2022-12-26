@@ -3,7 +3,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-import 'package:get_cli/common/utils/json_serialize/json_ast/utils/grapheme_splitter.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:kobermart_client/app/controllers/auth_controller.dart';
 import 'package:kobermart_client/firebase.dart';
@@ -15,7 +14,6 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:kobermart_client/app/data/iakpostpaid_provider.dart';
 import 'package:kobermart_client/app/data/iakprepaid_provider.dart';
-import 'package:kobermart_client/app/modules/home/controllers/home_controller.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/config.dart';
 import 'package:kobermart_client/style.dart';
@@ -552,7 +550,6 @@ class PpobController extends GetxController with GetSingleTickerProviderStateMix
       if (customerId.text.length < 12) {
         Get.snackbar("Peringatan", "ID Pelanggan/No Meter kurang dari 12 digit");
       } else {
-        var refId = generateRandomString(6, "POSPLN");
         isLoading.value = true;
         await IakpostpaidProvider().setInquiryPlnA(customerId.text).then(
           (value) {

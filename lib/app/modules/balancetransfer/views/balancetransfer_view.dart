@@ -2,11 +2,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kobermart_client/app/controllers/auth_controller.dart';
-import 'package:kobermart_client/app/modules/home/controllers/home_controller.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/constants.dart';
 import 'package:kobermart_client/style.dart';
-import 'package:username_gen/username_gen.dart';
 import '../controllers/balancetransfer_controller.dart';
 
 class BalancetransferView extends GetView<BalancetransferController> {
@@ -15,10 +13,6 @@ class BalancetransferView extends GetView<BalancetransferController> {
 
   @override
   Widget build(BuildContext context) {
-    var todo = () {
-      Get.toNamed(Routes.TRANSFERNOMINAL);
-    };
-
     return SafeArea(
       top: false,
       child: Scaffold(

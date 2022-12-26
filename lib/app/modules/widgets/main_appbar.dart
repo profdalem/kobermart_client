@@ -1,12 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:kobermart_client/app/controllers/auth_controller.dart';
 import 'package:kobermart_client/app/controllers/product_controller.dart';
-import 'package:kobermart_client/app/data/iakprepaid_provider.dart';
 import 'package:kobermart_client/app/modules/home/controllers/home_controller.dart';
-import 'package:kobermart_client/firebase.dart';
 
 import '../../routes/app_pages.dart';
 import 'package:get/get.dart';
@@ -23,7 +19,6 @@ class DefaultAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     int notifCount = 0;
-    int cartCount = 0;
     return AppBar(
       elevation: 0,
       automaticallyImplyLeading: false,

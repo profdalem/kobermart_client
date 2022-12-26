@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:kobermart_client/app/models/Transactions.dart';
-
-import '../../../../../style.dart';
 import '../../../../routes/app_pages.dart';
-import '../../../widgets/trx_status.dart';
 
 class ItemTransaksiPrepaid extends StatelessWidget {
   ItemTransaksiPrepaid({Key? key, required this.data}) : super(key: key);

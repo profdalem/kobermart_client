@@ -5,7 +5,6 @@ import 'package:intl/intl.dart';
 import 'package:kobermart_client/app/models/Transactions.dart';
 
 import '../../../../routes/app_pages.dart';
-import '../../../widgets/trx_status.dart';
 
 class ItemTransaksiCashback extends StatelessWidget {
   final Transaction data;
@@ -16,11 +15,6 @@ class ItemTransaksiCashback extends StatelessWidget {
     var jenis = "";
     var sumber = "";
     Color? iconColor = Colors.blue;
-    int code = 4;
-
-    if (data.status == "FAILED") {
-      code = 5;
-    }
 
     switch (data.type) {
       case "referral":

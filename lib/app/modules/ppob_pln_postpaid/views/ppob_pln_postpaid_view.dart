@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:kobermart_client/app/modules/ppob_pln_postpaid/controllers/ppob_pln_postpaid_controller.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
 
 import '../../../../style.dart';
-import '../controllers/ppob_pln_postpaid_controller.dart';
 
 class PpobPlnPostpaidView extends GetView<PpobPlnPostpaidController> {
   const PpobPlnPostpaidView({Key? key}) : super(key: key);

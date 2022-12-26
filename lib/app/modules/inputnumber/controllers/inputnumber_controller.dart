@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:kobermart_client/app/controllers/auth_controller.dart';
-import 'package:kobermart_client/app/modules/home/controllers/home_controller.dart';
 import 'package:kobermart_client/app/modules/widgets/sucess_transfer.dart';
 import 'package:kobermart_client/app/modules/widgets/sucess_withdrawal.dart';
 import 'package:kobermart_client/constants.dart';

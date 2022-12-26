@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:kobermart_client/app/models/Transactions.dart';
 import '../../../../style.dart';
@@ -16,7 +15,6 @@ class TrxdetailPrepaidView extends GetView {
   @override
   Widget build(BuildContext context) {
     Transaction data = Get.arguments["data"];
-    var time = data.createdAt;
 
     String icon = data.data["productData"]["icon_url"];
     return Scaffold(
@@ -105,7 +103,6 @@ class TrxDetailMainPanel extends StatelessWidget {
     int nominal = 0;
     int status = 2;
 
-    if (data != null) {
       nominal = data.nominal;
       notrx = data.data["transactionData"]["ref_id"];
 
@@ -130,7 +127,6 @@ class TrxDetailMainPanel extends StatelessWidget {
         default:
           type = "Tipe Produk";
       }
-    }
 
     return Container(
       decoration: Shadow1(),

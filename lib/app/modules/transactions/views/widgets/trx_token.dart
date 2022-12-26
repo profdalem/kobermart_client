@@ -5,7 +5,6 @@ import 'package:intl/intl.dart';
 
 import '../../../../models/Transactions.dart';
 import '../../../../routes/app_pages.dart';
-import '../../../widgets/trx_status.dart';
 
 class ItemTransaksiToken extends StatelessWidget {
   final Transaction data;

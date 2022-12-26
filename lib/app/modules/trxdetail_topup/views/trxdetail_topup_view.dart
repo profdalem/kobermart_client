@@ -254,7 +254,6 @@ class TrxDetailPaymentInfoShop extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int type = 0; // 0 transfer, 1 cash
     var typeTitle;
     var content;
     var btnText = "Buka QR Code";

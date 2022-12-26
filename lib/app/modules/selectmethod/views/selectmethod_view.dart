@@ -6,8 +6,6 @@ import 'package:kobermart_client/app/controllers/auth_controller.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/constants.dart';
 import 'package:kobermart_client/style.dart';
-
-import '../../home/controllers/home_controller.dart';
 import '../controllers/selectmethod_controller.dart';
 
 class SelectmethodView extends GetView<SelectmethodController> {

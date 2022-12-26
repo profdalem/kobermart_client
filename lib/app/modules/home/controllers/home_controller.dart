@@ -5,10 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kobermart_client/app/controllers/auth_controller.dart';
 
-import '../../../../config.dart';
-import '../../../../firebase.dart';
-import '../../../routes/app_pages.dart';
-
 class HomeController extends GetxController {
   late TextEditingController emailC;
   late TextEditingController passwordC;
@@ -20,23 +16,6 @@ class HomeController extends GetxController {
   void onInit() async {
     emailC = TextEditingController();
     passwordC = TextEditingController();
-    await Auth.authStateChanges().listen((event) async {
-      if (event == null) {
-        devLog("User Logged out");
-        authC.isAuth.value = false;
-        if (authC.subscribeMemberInfo != null) {
-          authC.subscribeMemberInfo.cancel();
-        }
-        Get.toNamed(Routes.LOGIN);
-      } else {
-        devLog("Current user:" + event.uid);
-        authC.setSubscribeMembersInfo();
-        await Members.doc(Auth.currentUser!.uid).get().then((value) {
-          authC.level.value = value.data()!["level"];
-          authC.imgurl.value = value.data()!["imgurl"];
-        });
-      }
-    }, onError: (error) => Auth.signOut());
     super.onInit();
   }
 

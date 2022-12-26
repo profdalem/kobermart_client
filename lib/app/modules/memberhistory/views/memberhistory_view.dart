@@ -1,4 +1,3 @@
-import 'package:badges/badges.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +9,6 @@ import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/constants.dart';
 import 'package:kobermart_client/style.dart';
 import 'package:sticky_grouped_list/sticky_grouped_list.dart';
-import 'package:username_gen/username_gen.dart';
 
 import '../controllers/memberhistory_controller.dart';
 

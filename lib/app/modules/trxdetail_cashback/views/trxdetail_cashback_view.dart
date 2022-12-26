@@ -17,7 +17,6 @@ class TrxdetailCashbackView extends GetView<TrxdetailCashbackController> {
     final Transaction data = Get.arguments["data"];
     DateTime createdAt = data.createdAt;
     Color? iconColor = Get.arguments["iconColor"];
-    String jenis = Get.arguments["jenis"];
 
     return SafeArea(
       top: false,

@@ -6,8 +6,6 @@ import 'package:kobermart_client/app/controllers/auth_controller.dart';
 import 'package:kobermart_client/app/models/Member.dart';
 import 'package:kobermart_client/app/models/Tokens.dart';
 import 'package:kobermart_client/firebase.dart';
-
-import '../../home/controllers/home_controller.dart';
 import '../../../../extensions.dart';
 
 class TokenlistController extends GetxController {

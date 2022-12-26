@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:kobermart_client/app/controllers/auth_controller.dart';
-import 'package:kobermart_client/app/modules/home/controllers/home_controller.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/constants.dart';
 import 'package:kobermart_client/style.dart';
@@ -16,7 +15,6 @@ class MenuView extends GetView<MenuController> {
   @override
   Widget build(BuildContext context) {
     final authC = Get.find<AuthController>();
-    final homeC = Get.find<HomeController>();
 
     String name = "";
     if (authC.userCredential.value != null) {

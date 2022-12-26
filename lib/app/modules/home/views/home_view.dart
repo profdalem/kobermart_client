@@ -7,7 +7,6 @@ import 'package:kobermart_client/app/controllers/auth_controller.dart';
 import 'package:kobermart_client/app/controllers/product_controller.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/constants.dart';
-import 'package:kobermart_client/firebase.dart';
 import 'package:kobermart_client/style.dart';
 import '../../widgets/main_appbar.dart';
 import '../controllers/home_controller.dart';
@@ -21,7 +20,6 @@ class HomeView extends GetView<HomeController> {
   final authC = Get.find<AuthController>();
   @override
   Widget build(BuildContext context) {
-    final homeC = controller;
     final authC = Get.find<AuthController>();
 
     return SafeArea(

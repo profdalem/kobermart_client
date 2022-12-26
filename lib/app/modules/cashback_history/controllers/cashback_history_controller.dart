@@ -1,7 +1,6 @@
 import 'package:get/get.dart';
 
 class CashbackHistoryController extends GetxController {
-  //TODO: Implement CashbackHistoryController
 
   final count = 0.obs;
   @override

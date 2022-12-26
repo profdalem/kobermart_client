@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 import '../../../../style.dart';
 import '../controllers/ppob_pulsadata_controller.dart';
@@ -139,16 +137,6 @@ class PpobPulsadataView extends GetView<PpobPulsadataController> {
         ],
       ),
     );
-  }
-
-  Future<PermissionStatus> _getPermission() async {
-    final PermissionStatus permission = await Permission.contacts.status;
-    if (permission != PermissionStatus.granted && permission != PermissionStatus.denied) {
-      final Map<Permission, PermissionStatus> permissionStatus = await [Permission.contacts].request();
-      return permissionStatus[Permission.contacts] ?? PermissionStatus.limited;
-    } else {
-      return permission;
-    }
   }
 }
 

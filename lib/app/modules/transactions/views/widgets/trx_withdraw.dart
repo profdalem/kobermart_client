@@ -5,7 +5,6 @@ import 'package:intl/intl.dart';
 import 'package:kobermart_client/app/models/Transactions.dart';
 
 import '../../../../routes/app_pages.dart';
-import '../../../widgets/trx_status.dart';
 
 class ItemTransaksiWithdrawal extends StatelessWidget {
   final Transaction data;

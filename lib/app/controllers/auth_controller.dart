@@ -1,13 +1,10 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 import 'dart:io';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:get_cli/common/utils/json_serialize/json_ast/error.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:kobermart_client/config.dart';
@@ -71,7 +68,6 @@ class AuthController extends GetxController {
 
   @override
   void onClose() {
-    // TODO: implement onClose
     subscribeSetting.cancel();
     subscribeMemberInfo.cancel();
     refId.close();

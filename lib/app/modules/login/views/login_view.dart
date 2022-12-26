@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:kobermart_client/app/modules/login/controllers/login_controller.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/config.dart';
-import 'package:kobermart_client/firebase.dart';
 import 'package:kobermart_client/style.dart';
 
 import '../../../controllers/auth_controller.dart';

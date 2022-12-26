@@ -1,10 +1,10 @@
+// ignore_for_file: unused_local_variable
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-
-import '../../../../../style.dart';
 import '../../../../routes/app_pages.dart';
 import '../../../widgets/trx_status.dart';
 
