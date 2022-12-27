@@ -15,14 +15,15 @@ class TokendetailController extends GetxController {
   @override
   Future<void> onInit() async {
     if (Get.arguments["data"] != null) {
+      
       data = Get.arguments["data"];
-      tokenCode.value = data.tokenCode;
+      tokenCode.value = data.tokenReg;
       creator.value = (await data.getCreatorData())["name"];
       upline.value = data.uplineData["name"];
       createdAt.value = data.tokenCreatedAt;
     } else {
       await Members.doc(Get.arguments["tokenCode"]).get().then((doc) {
-        tokenCode.value = doc.id;
+        tokenCode.value = doc.data()!["tokenReg"];
         creator.value = doc.data()!["tokenCreator"];
         upline.value = doc.data()!["upline"];
         createdAt.value = (doc.data()!["tokenCreatedAt"] as Timestamp).toDate();
@@ -30,7 +31,6 @@ class TokendetailController extends GetxController {
     }
     uplineName.value = await Members.doc(upline.value).get().then((value) => value.data()!["name"]);
     super.onInit();
-    print(upline.value);
   }
 
   @override

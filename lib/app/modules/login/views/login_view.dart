@@ -178,15 +178,15 @@ class LoginView extends GetView {
                       SizedBox(
                         height: 20,
                       ),
-                      // GestureDetector(
-                      //   onTap: () {
-                      //     Get.toNamed(Routes.TOKENINPUT, preventDuplicates: true);
-                      //   },
-                      //   child: Text(
-                      //     "Registrasi dengan Token",
-                      //     style: TextStyle(color: Colors.white),
-                      //   ),
-                      // ),
+                      GestureDetector(
+                        onTap: () {
+                          Get.toNamed(Routes.TOKENINPUT, preventDuplicates: true);
+                        },
+                        child: Text(
+                          "Registrasi dengan Token",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
 
                       IconButton(
                           onPressed: () {

@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:kobermart_client/app/controllers/auth_controller.dart';
 import 'package:kobermart_client/app/modules/home/controllers/home_controller.dart';
 import 'package:kobermart_client/app/modules/widgets/success_token.dart';
+import 'package:kobermart_client/firebase.dart';
 import 'package:kobermart_client/style.dart';
 import '../../../../constants.dart';
 import '../controllers/newtoken_controller.dart';
@@ -20,9 +21,9 @@ class NewtokenView extends GetView {
   Widget build(BuildContext context) {
     String name = "";
     String id = "";
-    if (authC.userCredential.value != null) {
-      name = authC.userCredential.value!.displayName!;
-      id = authC.userCredential.value!.uid;
+    if (Auth.currentUser != null) {
+      name = Auth.currentUser!.displayName!;
+      id = Auth.currentUser!.uid;
     }
     return SafeArea(
       top: false,
@@ -92,6 +93,7 @@ class NewtokenView extends GetView {
                                       // Generate Token dibawah Saya
                                       newTokenC.isLoading.value = true;
                                       newTokenC.newToken(id, id).then((value) {
+                                        print(value);
                                         if (value["success"]) {
                                           Get.back();
                                           Get.to(() => SuccessTokenPage(), arguments: {"token": value["token"]});
@@ -100,13 +102,16 @@ class NewtokenView extends GetView {
                                           Get.defaultDialog(title: "Gagal", content: Text(value["message"]));
                                         }
                                         newTokenC.isLoading.value = false;
+                                      }).catchError((error) {
+                                        print(error);
+                                        newTokenC.isLoading.value = false;
                                       });
                                     },
                                     child: Text("Yakin")));
                           }
                         },
                         leading: CircleAvatar(
-                          backgroundImage:CachedNetworkImageProvider(PROFILE_IMG),
+                          backgroundImage: CachedNetworkImageProvider(PROFILE_IMG),
                         ),
                         title: PanelTitle(title: name),
                         subtitle: Text(authC.uplineName.value),
@@ -127,14 +132,15 @@ class NewtokenView extends GetView {
                         });
                         return Column(
                           children: [
-                            if(showtitle) Container(
-                              alignment: Alignment.centerLeft,
-                              child: Padding(
-                                padding: const EdgeInsets.only(left: 15),
-                                child: PanelTitle(title: "KD ${index + 1}"),
+                            if (showtitle)
+                              Container(
+                                alignment: Alignment.centerLeft,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 15),
+                                  child: PanelTitle(title: "KD ${index + 1}"),
+                                ),
                               ),
-                            ),
-                            if(showtitle) sb5,
+                            if (showtitle) sb5,
                             Column(
                               children: List.generate(
                                   authC.downlineList(newTokenC.keyword.value)[index].length,
@@ -161,7 +167,8 @@ class NewtokenView extends GetView {
                                                             ? Center(
                                                                 child: CircularProgressIndicator(),
                                                               )
-                                                            : Text("Jadikan ${authC.downlineList(newTokenC.keyword.value)[index][kdindex]['name']} sebagai upline token?"),
+                                                            : Text(
+                                                                "Jadikan ${authC.downlineList(newTokenC.keyword.value)[index][kdindex]['name']} sebagai upline token?"),
                                                       )),
                                                       cancel: Padding(
                                                         padding: const EdgeInsets.only(right: 50),
@@ -175,7 +182,8 @@ class NewtokenView extends GetView {
                                                           onPressed: () async {
                                                             newTokenC.isLoading.value = true;
                                                             await newTokenC
-                                                                .newToken(authC.downlineList(newTokenC.keyword.value)[index][kdindex]['id'], authC.userCredential.value!.uid)
+                                                                .newToken(authC.downlineList(newTokenC.keyword.value)[index][kdindex]['id'],
+                                                                    authC.userCredential.value!.uid)
                                                                 .then((value) async {
                                                               if (value["success"]) {
                                                                 Get.back();
@@ -192,7 +200,7 @@ class NewtokenView extends GetView {
                                                 }
                                               },
                                               leading: CircleAvatar(
-                                                backgroundImage:CachedNetworkImageProvider(PROFILE_IMG),
+                                                backgroundImage: CachedNetworkImageProvider(PROFILE_IMG),
                                               ),
                                               title: PanelTitle(
                                                   title: authC.downlineList(newTokenC.keyword.value)[index][kdindex]['name'] != null
@@ -233,7 +241,6 @@ class CariButton extends StatelessWidget {
   }) : super(key: key);
 
   final newTokenC = Get.find<NewtokenController>();
-  
 
   @override
   Widget build(BuildContext context) {

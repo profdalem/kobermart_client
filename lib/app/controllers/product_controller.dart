@@ -24,7 +24,7 @@ class MainProductController extends GetxController {
     super.onClose();
   }
 
-  void getAllProduct() async {
+  Future<void> getAllProduct() async {
     isLoading.value = true;
     try {
       await ProductsProvider().getProducts().then((value) {

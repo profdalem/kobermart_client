@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kobermart_client/firebase.dart';
 
 class TokeninputController extends GetxController {
   late TextEditingController tokenC;
@@ -22,4 +23,22 @@ class TokeninputController extends GetxController {
   }
 
   void increment() => count.value++;
+
+  Future<dynamic> validateToken() async {
+    bool success = false;
+    String id = "";
+    String message = "Token tidak valid";
+    await Members.where("tokenReg", isEqualTo: tokenC.text).where("tokenUsed", isEqualTo: false).limit(1).get().then((value) {
+      print(value.size);
+      if (value.size > 0) {
+        success = true;
+        id = value.docs[0].id;
+        message = "Token valid";
+      }
+    }).catchError(((err) {
+      print(err);
+    }));
+
+    return {"success": success, "id": id, "message": message};
+  }
 }

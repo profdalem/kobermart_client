@@ -7,7 +7,6 @@ import 'dart:convert';
 class BalanceProvider extends GetConnect {
   @override
   void onInit() {
-    httpClient.baseUrl = mainUrl;
   }
 
   // Top up section

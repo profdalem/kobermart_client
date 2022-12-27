@@ -44,14 +44,14 @@ class DefaultAppBar extends StatelessWidget {
       actions: [
         IconButton(
             onPressed: () async {
-              // productC.getAllProduct();
+              productC.getAllProduct();
               // productC.getAllCarts();
               // print(homeC.downlines.length);
               // homeC.getDownlines();
               authC.subscribeMemberInfo.cancel();
               authC.setSubscribeMembersInfo();
 
-              authC.checker();
+              // authC.checker();
             },
             icon: Icon(Icons.refresh)),
         IconButton(

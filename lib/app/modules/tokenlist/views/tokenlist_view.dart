@@ -22,7 +22,7 @@ class TokenlistView extends GetView<TokenlistController> {
           .where((e) =>
               e.tokenUsed == false &&
               (e.upline.toString().toLowerCase().contains(controller.keyword.value.toLowerCase()) ||
-                  e.tokenCode.toString().toLowerCase().contains(controller.keyword.value.toLowerCase())))
+                  e.tokenReg.toString().toLowerCase().contains(controller.keyword.value.toLowerCase())))
           .toList();
     }
 
@@ -118,7 +118,7 @@ class TokenlistView extends GetView<TokenlistController> {
                                                   ),
                                                 ),
                                                 title: Text(
-                                                  (getTokens(controller.keyword.value))[index].tokenCode,
+                                                  (getTokens(controller.keyword.value))[index].tokenReg,
                                                   style: TextStyle(
                                                       fontSize: 18,
                                                       fontWeight: !(getTokens(controller.keyword.value))[index].opened ? FontWeight.bold : FontWeight.normal),
@@ -131,7 +131,7 @@ class TokenlistView extends GetView<TokenlistController> {
                                                   ],
                                                 ),
                                                 trailing: ItemMenu(
-                                                  tokenCode: getTokens(controller.keyword.value)[index].tokenCode,
+                                                  tokenCode: getTokens(controller.keyword.value)[index].tokenReg,
                                                   tokenUsed: getTokens(controller.keyword.value)[index].tokenUsed,
                                                 ),
                                               ),

@@ -21,7 +21,7 @@ class PpobPlnPostpaidView extends GetView<PpobPlnPostpaidController> {
           centerTitle: true,
           elevation: 1,
           leading: TextButton(
-            onPressed: () => Get.toNamed(Routes.HOME),
+            onPressed: () => Get.toNamed(Routes.DIGITALPRODUCTS),
             child: Icon(
               Icons.arrow_back,
               color: Colors.grey.shade800,

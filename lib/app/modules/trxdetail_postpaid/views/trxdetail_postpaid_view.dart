@@ -320,7 +320,7 @@ class TrxdetailPostpaidView extends GetView<TrxdetailPostpaidController> {
                         child: ElevatedButton(
                           onPressed: () async {
                             print("bayar");
-                            await IakpostpaidProvider().setPayment(data["tr_id"], data["ref_id"], data["hp"]).then((value) {
+                            await IakpostpaidProvider().setPayment(data["tr_id"], data["ref_id"]).then((value) {
                               print(value.body);
                               if (value.body["code"] == 400) {
                                 Get.defaultDialog(title: "Gagal", content: Text(value.body["data"]["message"]));

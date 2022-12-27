@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
+import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/style.dart';
 
 import '../controllers/digitalproducts_controller.dart';
@@ -13,6 +14,7 @@ class DigitalproductsView extends GetView<DigitalproductsController> {
       appBar: AppBar(
         title: const Text('Produk'),
         centerTitle: true,
+        leading: IconButton(icon: Icon(Icons.arrow_back_rounded), onPressed: ()=> Get.offNamed(Routes.HOME),),
       ),
       body: Column(
         children: [

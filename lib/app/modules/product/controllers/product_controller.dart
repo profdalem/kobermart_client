@@ -1,9 +1,16 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class ProductController extends GetxController {
-  final count = 0.obs;
+  final count = 10.obs;
+  var page = 1.obs;
+
+  final ScrollController slide = ScrollController();
   @override
   void onInit() {
+    slide.addListener(() {
+      page.value = (slide.offset / Get.width).floor() + 1;
+    });
     super.onInit();
   }
 
@@ -14,6 +21,8 @@ class ProductController extends GetxController {
 
   @override
   void onClose() {
+    slide.dispose();
+    slide.removeListener(() {});
     super.onClose();
   }
 

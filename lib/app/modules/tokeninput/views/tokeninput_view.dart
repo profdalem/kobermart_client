@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 
 import 'package:get/get.dart';
+import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/style.dart';
 
 import '../controllers/tokeninput_controller.dart';
@@ -34,8 +35,7 @@ class TokeninputView extends GetView<TokeninputController> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    SvgPicture.asset("assets/logo/kobermart-logo-long.svg",
-                        width: Get.width * 0.5),
+                    SvgPicture.asset("assets/logo/kobermart-logo-long.svg", width: Get.width * 0.5),
                     SizedBox(
                       height: 100,
                     ),
@@ -66,7 +66,16 @@ class TokeninputView extends GetView<TokeninputController> {
                       width: double.infinity,
                       height: 40,
                       child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            controller.validateToken().then((value) {
+                              print(value["success"]);
+                              if (value["success"]) {
+                                Get.toNamed(Routes.REGISTRATION, arguments: {"tokenCode": value["id"]});
+                              } else {
+                                Get.defaultDialog(title: "Gagal", content: Text(value["message"]));
+                              }
+                            });
+                          },
                           child: PanelTitle(
                             title: "Validasi",
                           )),
@@ -118,11 +127,8 @@ class DefaultTextInput extends StatelessWidget {
           autocorrect: false,
           obscureText: obsecure,
           keyboardType: TextInputType.number,
-          inputFormatters: <TextInputFormatter>[
-            FilteringTextInputFormatter.digitsOnly
-          ],
-          decoration:
-              InputDecoration(hintText: inputLabel, border: InputBorder.none),
+          inputFormatters: <TextInputFormatter>[FilteringTextInputFormatter.digitsOnly],
+          decoration: InputDecoration(hintText: inputLabel, border: InputBorder.none),
           textAlign: TextAlign.center,
         ),
       ),

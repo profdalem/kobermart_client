@@ -6,7 +6,6 @@ import 'package:kobermart_client/config.dart';
 class IakprepaidProvider extends GetConnect {
   @override
   void onInit() {
-    httpClient.baseUrl = mainUrl;
   }
 
   Future<Response> setTopUp(var customerId, var trxCode, var productCode, var nominal, var type) async {

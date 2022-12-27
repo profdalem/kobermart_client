@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:kobermart_client/app/controllers/auth_controller.dart';
 import 'package:kobermart_client/app/data/member_provider.dart';
+import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/config.dart';
 import 'package:path/path.dart' as p;
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -12,6 +14,7 @@ import 'package:kobermart_client/firebase.dart';
 class RegistrationController extends GetxController {
   String url = "https://www.emsifa.com/api-wilayah-indonesia/api/";
   RxList<XFile?> imageFileList = <XFile?>[].obs;
+  final authC = Get.find<AuthController>();
 
   late TextEditingController name;
   late TextEditingController email;
@@ -80,14 +83,22 @@ class RegistrationController extends GetxController {
     password = TextEditingController();
     passwordConf = TextEditingController();
     if (preFilled) {
-      name.text = "Random name";
+      name.text = "Agung";
       day.text = "11";
       year.text = "1990";
-      email.text = "hohoho@gmail.com";
+      email.text = "kobermart@gmail.com";
       whatsapp.text = "081999222999";
       jalan.text = "Jalan raya pesalakan";
       password.text = "123456";
       passwordConf.text = "123456";
+      selectedDesa.value = "new";
+      selectedKec.value = "new";
+      selectedKab.value = "new";
+      selectedProv.value = "new";
+      kab.text = "new";
+      kec.text = "new";
+      desa.text = "new";
+      gender.value = "L";
     }
     await getProvinceData();
     month.text = "01";
@@ -128,7 +139,7 @@ class RegistrationController extends GetxController {
     });
   }
 
-  Future<Response> setMember(String token) async {
+  void setMember(String token) async {
     isLoading.value = true;
     var body;
 
@@ -168,14 +179,40 @@ class RegistrationController extends GetxController {
       });
 
       // if (devMode) print(body);
-      return await MemberProvider().setMember(body).then((value) {
-      isLoading.value = false;
-        return value;
+      await MemberProvider().registerMember(body).then((value) {
+        isLoading.value = false;
+        if (devMode) print(value.body);
+        if (devMode) Get.snackbar("Result", value.body.toString());
+        if (value.body["success"] == false) {
+          print(value.body);
+        } else {
+          isLoading.value = true;
+
+          Get.snackbar("Registrasi berhasil!", "Anggota baru berhasil didaftarkan");
+          if (Auth.currentUser != null) {
+            Get.offAllNamed(Routes.HOME);
+          } else {
+            authC.emailC.text = email.text;
+            authC.passwordC.text = password.text;
+            Get.toNamed(Routes.LOGIN);
+          }
+
+          isLoading.value = false;
+        }
       });
     } else {
       isLoading.value = false;
-      Response res = Response(body: {"success": false, "message": "Result of the function", "error_msg": errorText});
-      return res;
+      Get.defaultDialog(
+          title: "Registrasi Gagal",
+          content: Container(
+            height: 100,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: List.generate(errorText.length, (index) => Text("${index + 1}. ${errorText[index]}")),
+              ),
+            ),
+          ));
     }
   }
 

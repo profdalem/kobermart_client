@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -27,9 +28,7 @@ class ProductView extends GetView<ProductController> {
           backgroundColor: Colors.white,
           centerTitle: true,
           elevation: 1,
-          actions: [
-            IconButton(onPressed: () {}, icon: Icon(Icons.shopping_cart))
-          ],
+          actions: [IconButton(onPressed: () {}, icon: Icon(Icons.shopping_cart))],
         ),
         body: SingleChildScrollView(
           child: Column(children: [
@@ -39,34 +38,46 @@ class ProductView extends GetView<ProductController> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    height: Get.width,
                     width: Get.width,
-                    decoration: BoxDecoration(
-                        shape: BoxShape.rectangle,
-                        image: DecorationImage(
-                            image: CachedNetworkImageProvider(
-                              productData()["imgurl"].toString(),
-                            ),
-                            fit: BoxFit.cover)),
+                    height: Get.width,
+                    child: Stack(
+                      alignment: Alignment.bottomLeft,
+                      children: [ListView.separated(
+                          controller: controller.slide,
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (context, index) => Container(
+                                height: Get.width,
+                                width: Get.width,
+                                decoration: BoxDecoration(
+                                    shape: BoxShape.rectangle,
+                                    image: DecorationImage(
+                                        image: CachedNetworkImageProvider(
+                                          productData()["imgurl"].toString(),
+                                        ),
+                                        fit: BoxFit.cover)),
+                              ),
+                          separatorBuilder: (context, index) => SizedBox(),
+                          itemCount: 5),
+                          Obx(()=> Container(
+                            padding: EdgeInsets.all(2),
+                            decoration: BoxDecoration(color: Colors.white.withOpacity(0.5), borderRadius: BorderRadius.only(topRight: Radius.circular(10))),
+                            child: Text("${controller.page.value}/${5.toString()}", style: TextStyle(fontSize: 12),))),],
+                    ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(15),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        
                         Text(
                           productData()["name"].toString(),
                           style: TextStyle(fontSize: 20),
                         ),
                         sb10,
                         Text(
-                          NumberFormat.currency(
-                                  locale: "id_ID",
-                                  symbol: "Rp ",
-                                  decimalDigits: 0)
-                              .format(productData()["sell_price"]),
-                          style: TextStyle(
-                              fontSize: 22, fontWeight: FontWeight.bold),
+                          NumberFormat.currency(locale: "id_ID", symbol: "Rp ", decimalDigits: 0).format(productData()["sell_price"]),
+                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                         ),
                         sb10,
                         Row(
@@ -74,8 +85,7 @@ class ProductView extends GetView<ProductController> {
                           children: [
                             Row(
                               children: [
-                                Text(
-                                    "Stok: ${productData()["stockQty"].toString()}"),
+                                Text("Stok: ${productData()["stockQty"].toString()}"),
                                 SizedBox(
                                   width: 10,
                                 ),
@@ -83,7 +93,10 @@ class ProductView extends GetView<ProductController> {
                               ],
                             ),
                             GestureDetector(
-                              onTap: () {},
+                              onTap: () async {
+                                print("barcode");
+                                // await controller.slide.animateTo(360 * 2, duration: Duration(seconds: 1), curve: Curves.elasticInOut).then((value) => print("done")).catchError((err)=>print(err));
+                              },
                               child: Text(
                                 "Lihat Barcode",
                                 style: TextStyle(color: Colors.blue),
@@ -108,36 +121,15 @@ class ProductView extends GetView<ProductController> {
                   children: [
                     PanelTitle(title: "Bagian"),
                     sb10,
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: [
-                          bg_anggota(
-                            number: double.parse(
-                                productData()["bagian"][0].toString()),
-                          ),
-                          bg_kd(
-                              kd: "1",
-                              nominal: double.parse(
-                                  productData()["bagian"][1].toString())),
-                          bg_kd(
-                              kd: "2",
-                              nominal: double.parse(
-                                  productData()["bagian"][2].toString())),
-                          bg_kd(
-                              kd: "3",
-                              nominal: double.parse(
-                                  productData()["bagian"][3].toString())),
-                          bg_kd(
-                              kd: "4",
-                              nominal: double.parse(
-                                  productData()["bagian"][4].toString())),
-                          bg_kd(
-                              kd: "5",
-                              nominal: double.parse(
-                                  productData()["bagian"][5].toString())),
-                        ],
-                      ),
+                    Row(
+                      children: [
+                        Expanded(child: bg_anggota(number: double.parse(productData()["bagian"][0].toString()),),),
+                        Expanded(child: bg_kd(kd: "1", nominal: double.parse(productData()["bagian"][1].toString())),),
+                        Expanded(child: bg_kd(kd: "2", nominal: double.parse(productData()["bagian"][2].toString())),),
+                        Expanded(child: bg_kd(kd: "3", nominal: double.parse(productData()["bagian"][3].toString())),),
+                        Expanded(child: bg_kd(kd: "4", nominal: double.parse(productData()["bagian"][4].toString())),),
+                        Expanded(child: bg_kd(kd: "5", nominal: double.parse(productData()["bagian"][5].toString())),),
+                      ],
                     ),
                   ],
                 ),
@@ -151,10 +143,7 @@ class ProductView extends GetView<ProductController> {
                 padding: EdgeInsets.all(15),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    PanelTitle(title: "Deskripsi"),
-                    Text(productData()["desc"].toString())
-                  ],
+                  children: [PanelTitle(title: "Deskripsi"), Text(productData()["desc"].toString())],
                 ),
               ),
             ),
@@ -169,9 +158,7 @@ class ProductView extends GetView<ProductController> {
   }
 
   productData() {
-    return productC.products
-        .where((p0) => p0["id"] == Get.arguments["id"])
-        .toList()[0];
+    return productC.products.where((p0) => p0["id"] == Get.arguments["id"]).toList()[0];
   }
 }
 
@@ -186,23 +173,18 @@ class bg_anggota extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(5)),
-          color: Colors.grey.shade200,
-          border: Border.all(color: Colors.grey.shade400)),
+      decoration:
+          BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(5)), color: Colors.grey.shade200, border: Border.all(color: Colors.grey.shade400)),
       child: Padding(
-        padding: const EdgeInsets.all(3),
+        padding: const EdgeInsets.only(top: 3, bottom: 3),
         child: Column(children: [
           Text(
-            "Anggota",
+            "Saya",
             style: TextStyle(fontSize: 12, color: Colors.orange.shade800),
           ),
           Text(
             "2%",
-            style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-                color: Colors.orange.shade800),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.orange.shade800),
           ),
         ]),
       ),
@@ -225,11 +207,9 @@ class bg_kd extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(left: 10),
       child: Container(
-        width: Get.width * 0.12,
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(5)),
-            color: Colors.grey.shade200,
-            border: Border.all(color: Colors.grey.shade400)),
+        // width: Get.width * 0.12,
+        decoration:
+            BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(5)), color: Colors.grey.shade200, border: Border.all(color: Colors.grey.shade400)),
         child: Padding(
           padding: const EdgeInsets.all(3),
           child: Column(children: [
@@ -264,59 +244,59 @@ class ProductBottomBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: ShadowBottom(),
-      height: 120,
+      height: 80,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           sb10,
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                PanelTitle(title: "Jumlah"),
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        controller.decrement();
-                      },
-                      onLongPress: () {
-                        controller.tenDecrement();
-                      },
-                      child: Icon(
-                        Icons.remove_circle,
-                        color: Colors.orange.shade300,
-                      ),
-                    ),
-                    Container(
-                        decoration: BoxDecoration(
-                            border:
-                                Border(bottom: BorderSide(color: Colors.grey))),
-                        alignment: Alignment.center,
-                        width: Get.width * 0.2,
-                        child: Obx(() => Text(
-                              controller.count.value.toString(),
-                              style: TextStyle(fontSize: 18),
-                            ))),
-                    GestureDetector(
-                      onTap: () {
-                        controller.increment();
-                      },
-                      onLongPress: () {
-                        controller.tenIncrement();
-                      },
-                      child: Icon(
-                        Icons.add_circle,
-                        color: Colors.green.shade700,
-                      ),
-                    ),
-                  ],
-                )
-              ],
-            ),
-          ),
-          sb15,
+          // Padding(
+          //   padding: const EdgeInsets.symmetric(horizontal: 15),
+          //   child: Row(
+          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //     children: [
+          //       PanelTitle(title: "Jumlah"),
+          //       Row(
+          //         children: [
+          //           GestureDetector(
+          //             onTap: () {
+          //               controller.decrement();
+          //             },
+          //             onLongPress: () {
+          //               controller.tenDecrement();
+          //             },
+          //             child: Icon(
+          //               Icons.remove_circle,
+          //               color: Colors.orange.shade300,
+          //             ),
+          //           ),
+          //           Container(
+          //               decoration: BoxDecoration(
+          //                   border:
+          //                       Border(bottom: BorderSide(color: Colors.grey))),
+          //               alignment: Alignment.center,
+          //               width: Get.width * 0.2,
+          //               child: Obx(() => Text(
+          //                     controller.count.value.toString(),
+          //                     style: TextStyle(fontSize: 18),
+          //                   ))),
+          //           GestureDetector(
+          //             onTap: () {
+          //               controller.increment();
+          //             },
+          //             onLongPress: () {
+          //               controller.tenIncrement();
+          //             },
+          //             child: Icon(
+          //               Icons.add_circle,
+          //               color: Colors.green.shade700,
+          //             ),
+          //           ),
+          //         ],
+          //       )
+          //     ],
+          //   ),
+          // ),
+          // sb15,
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -330,24 +310,22 @@ class ProductBottomBar extends StatelessWidget {
                       Get.toNamed(Routes.BUYNOW);
                     },
                     child: Text("Langsung Beli"),
-                    style: ButtonStyle(
-                        backgroundColor:
-                            MaterialStateProperty.all(Colors.amber.shade700))),
+                    style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.amber.shade700))),
               ),
-              SizedBox(
-                width: 30,
-              ),
-              Expanded(
-                flex: 5,
-                child: ElevatedButton(
-                    onPressed: () {
-                      Get.offAndToNamed(Routes.CART);
-                    },
-                    child: Text("+ Keranjang"),
-                    style: ButtonStyle(
-                        backgroundColor:
-                            MaterialStateProperty.all(Colors.blue))),
-              ),
+              // SizedBox(
+              //   width: 30,
+              // ),
+              // Expanded(
+              //   flex: 5,
+              //   child: ElevatedButton(
+              //       onPressed: () {
+              //         Get.offAndToNamed(Routes.CART);
+              //       },
+              //       child: Text("+ Keranjang"),
+              //       style: ButtonStyle(
+              //           backgroundColor:
+              //               MaterialStateProperty.all(Colors.blue))),
+              // ),
               SizedBox(
                 width: 15,
               ),

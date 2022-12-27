@@ -5,7 +5,6 @@ import 'package:kobermart_client/config.dart';
 class SettingProvider extends GetConnect {
   @override
   void onInit() {
-    httpClient.baseUrl = mainUrl;
   }
 
   Future<Response> getLatestSetting() async {

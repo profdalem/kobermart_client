@@ -6,7 +6,6 @@ import 'package:kobermart_client/config.dart';
 class IakpostpaidProvider extends GetConnect {
   @override
   void onInit() {
-    httpClient.baseUrl = mainUrl;
   }
 
   Future<Response> setInquiryPlnA(var hp) async {
@@ -41,7 +40,7 @@ class IakpostpaidProvider extends GetConnect {
     );
   }
 
-  Future<Response> setPayment(var trId, var refId, var hp) async {
+  Future<Response> setPayment(var trId, int nominal) async {
     var token;
 
     await FirebaseAuth.instance.currentUser
@@ -50,11 +49,7 @@ class IakpostpaidProvider extends GetConnect {
 
     return post(
       "${mainUrl}api/ppob/postpaid/payment/",
-      {
-        "trId": trId,
-        "refId": refId,
-        "hp": hp,
-      },
+      {trId, nominal},
       headers: {
         "Authorization": "Bearer ${token}",
       },

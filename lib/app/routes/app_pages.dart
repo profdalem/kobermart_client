@@ -88,7 +88,7 @@ part 'app_routes.dart';
 class AppPages {
   AppPages._();
 
-  static const INITIAL = Routes.PPOB_PLN_POSTPAID;
+  static const INITIAL = Routes.HOME;
 
   static final routes = [
     GetPage(

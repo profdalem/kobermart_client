@@ -131,8 +131,8 @@ class PpobPulsadataController extends GetxController {
       }
     });
     listPaketData.listen((event) async {});
-    contactNumber.value = "085313924122";
-    phoneNumber.text = "085313924122";
+    if(devMode) contactNumber.value = "085313924122";
+    if(devMode) phoneNumber.text = "085313924122";
     super.onInit();
   }
 

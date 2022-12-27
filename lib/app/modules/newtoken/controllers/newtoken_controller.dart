@@ -26,6 +26,8 @@ class NewtokenController extends GetxController {
   }
 
   Future<dynamic> newToken(String upline, String ref) async {
+    print(upline);
+    print(ref);
     return await MemberProvider().newToken(upline, ref).then((value) => value.body);
   }
 }

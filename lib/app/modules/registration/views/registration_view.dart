@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:kobermart_client/app/controllers/auth_controller.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/config.dart';
+import 'package:kobermart_client/firebase.dart';
 import 'package:kobermart_client/style.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -18,6 +20,7 @@ class RegistrationView extends GetView<RegistrationController> {
   RegistrationView({Key? key}) : super(key: key);
 
   ImagePicker imagePicker = ImagePicker();
+  final authC = Get.find<AuthController>();
 
   void selectImageFromCamera() async {
     await Permission.camera.request().then((value) async {
@@ -119,49 +122,31 @@ class RegistrationView extends GetView<RegistrationController> {
               ),
               sb20,
               Obx(
-                () => controller.isLoading.value? CircularProgressIndicator() : Container(
-                  width: Get.width - 30,
-                  child: ElevatedButton(
-                    child: Text("Kirim"),
-                    onPressed: () async {
-                      await controller.setMember(tokenCode).then((value) async {
-                        if (devMode) print(value.body);
-                        if (devMode) Get.snackbar("Result", value.body.toString());
-                        if (value.body["success"] == false) {
-                          Get.defaultDialog(
-                              title: "Registrasi Gagal",
-                              content: Container(
-                                height: 100,
-                                child: SingleChildScrollView(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: List.generate(value.body["error_msg"].length, (index) => Text("${index + 1}. ${value.body["error_msg"][index]}")),
-                                  ),
-                                ),
-                              ));
-                        } else {
-                          controller.isLoading.value = true;
-
-                          Get.snackbar("Registrasi berhasil!", "Anggota baru berhasil didaftarkan");
-                          Get.offAllNamed(Routes.HOME);
-
-                          controller.isLoading.value = false;
-                        }
-                      });
-                    },
-                  ),
-                ),
+                () => controller.isLoading.value
+                    ? CircularProgressIndicator()
+                    : Container(
+                        width: Get.width - 30,
+                        child: ElevatedButton(
+                            child: Text("Kirim"),
+                            onPressed: () async {
+                              controller.setMember(tokenCode);
+                            }),
+                      ),
               ),
-              Obx(()=> controller.isLoading.value? SizedBox(height: 40,) : Container(
-                width: Get.width - 30,
-                height: 40,
-                child: TextButton(
-                  child: Text("Batalkan"),
-                  onPressed: () {
-                    Get.back();
-                  },
-                ),
-              )),
+              Obx(() => controller.isLoading.value
+                  ? SizedBox(
+                      height: 40,
+                    )
+                  : Container(
+                      width: Get.width - 30,
+                      height: 40,
+                      child: TextButton(
+                        child: Text("Batalkan"),
+                        onPressed: () {
+                          Get.back();
+                        },
+                      ),
+                    )),
               sb20
             ],
           ),

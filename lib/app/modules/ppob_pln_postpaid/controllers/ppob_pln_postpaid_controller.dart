@@ -5,6 +5,8 @@ import 'package:kobermart_client/app/controllers/auth_controller.dart';
 import 'package:kobermart_client/app/data/iakpostpaid_provider.dart';
 import 'package:kobermart_client/app/helpers/general_helper.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
+import 'package:kobermart_client/config.dart';
+import 'package:kobermart_client/constants.dart';
 import 'package:kobermart_client/firebase.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
@@ -64,15 +66,15 @@ class PpobPlnPostpaidController extends GetxController {
       }
     }
     historyList.value = temp2;
-    historyList.add({"customerId": "530000000001", "name": "Success - 1 bill"});
-    historyList.add({"customerId": "530000000002", "name": "Success - 8 bills"});
-    historyList.add({"customerId": "530000000003", "name": "Inquiry - Time Out"});
-    historyList.add({"customerId": "530000000004", "name": "Inquiry - Invoice Has Been Paid"});
-    historyList.add({"customerId": "530000000005", "name": "Inquiry - Incorrect Destination Number"});
-    historyList.add({"customerId": "530000000006", "name": "Payment - Payment Failed"});
-    historyList.add({"customerId": "530000000007", "name": "Payment - Pending / transaction in process"});
-    historyList.add({"customerId": "530000000008", "name": "Payment - MISC Error / Biller System Error"});
-    print(historyList);
+    if(devMode) historyList.add({"customerId": "530000000001", "name": "Success - 1 bill"});
+    if(devMode) historyList.add({"customerId": "530000000002", "name": "Success - 8 bills"});
+    if(devMode) historyList.add({"customerId": "530000000003", "name": "Inquiry - Time Out"});
+    if(devMode) historyList.add({"customerId": "530000000004", "name": "Inquiry - Invoice Has Been Paid"});
+    if(devMode) historyList.add({"customerId": "530000000005", "name": "Inquiry - Incorrect Destination Number"});
+    if(devMode) historyList.add({"customerId": "530000000006", "name": "Payment - Payment Failed"});
+    if(devMode) historyList.add({"customerId": "530000000007", "name": "Payment - Pending / transaction in process"});
+    if(devMode) historyList.add({"customerId": "530000000008", "name": "Payment - MISC Error / Biller System Error"});
+    if(devMode) print(historyList);
   }
 
   void openBottomSheetModal(BuildContext context, dynamic content1, dynamic content2, dynamic action, bool isDismissible) {
@@ -346,16 +348,17 @@ class PpobPlnPostpaidController extends GetxController {
                 sb15,
               ],
             ), () {
-          setPostpaidTopupPln("", "", "");
+          setPostpaidPayment(value.body["data"]["tr_id"], value.body["data"]["price"]);
         }, false);
       }
     });
   }
 
-  void setPostpaidTopupPln(String trId, String refId, String hp) async {
+  void setPostpaidPayment(String trId, int nominal) async {
     isLoading.value = true;
     if (fieldError.isEmpty && customerId.isNotEmpty) {
-      await IakpostpaidProvider().setPayment(trId, refId, hp).then((value) {
+      if (nominal <= authC.balance.value) {
+      await IakpostpaidProvider().setPayment(trId, nominal).then((value) {
         print(value.body["success"]);
         if (value.body["success"]) {
           Get.offNamed(Routes.TRANSACTIONS, arguments: {"refresh": true});
@@ -367,26 +370,25 @@ class PpobPlnPostpaidController extends GetxController {
       }).catchError((err) {
         print(err);
       });
-      // Get.offNamed(Routes.TRANSACTIONS, arguments: {"refresh": true});
-      // if (0 <= authC.balance.value) {
-      // } else {
-      //   Get.back();
-      //   Get.defaultDialog(
-      //       title: "Peringatan",
-      //       content: Column(
-      //         children: [
-      //           Text("Saldo anda kurang."),
-      //           Text("Lakukan top Up saldo sekarang?"),
-      //           Row(
-      //             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      //             children: [
-      //               TextButton(onPressed: () => Get.back(), child: Text("Nanti")),
-      //               ElevatedButton(onPressed: () => Get.offNamed(Routes.SELECTMETHOD, arguments: {"title": TOPUP}), child: Text("Top Up"))
-      //             ],
-      //           )
-      //         ],
-      //       ));
-      // }
+      Get.offNamed(Routes.TRANSACTIONS, arguments: {"refresh": true});
+      } else {
+        Get.back();
+        Get.defaultDialog(
+            title: "Peringatan",
+            content: Column(
+              children: [
+                Text("Saldo anda kurang."),
+                Text("Lakukan top Up saldo sekarang?"),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    TextButton(onPressed: () => Get.back(), child: Text("Nanti")),
+                    ElevatedButton(onPressed: () => Get.offNamed(Routes.SELECTMETHOD, arguments: {"title": TOPUP}), child: Text("Top Up"))
+                  ],
+                )
+              ],
+            ));
+      }
     } else {
       Get.back();
       Get.defaultDialog(title: "Peringatan", content: Text("Nomor meter tidak boleh kosong"));

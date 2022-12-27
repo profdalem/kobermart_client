@@ -5,7 +5,6 @@ import '../../config.dart';
 class TransactionProvider extends GetConnect {
   @override
   void onInit() {
-    httpClient.baseUrl = mainUrlv2;
   }
 
   Future<Response> getUserTransactions(int days) async {
@@ -15,7 +14,7 @@ class TransactionProvider extends GetConnect {
     await FirebaseAuth.instance.currentUser?.getIdToken(true).then((value) => {token = value});
 
     return get(
-      "${mainUrlv2}api/transaction/${await FirebaseAuth.instance.currentUser!.uid}/${days.toString()}",
+      "${mainUrl}api/transaction/${await FirebaseAuth.instance.currentUser!.uid}/${days.toString()}",
       headers: {
         "Authorization": "Bearer $token",
       },

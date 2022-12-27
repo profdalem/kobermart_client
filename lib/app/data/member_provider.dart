@@ -5,12 +5,7 @@ import 'package:get/get.dart';
 import 'package:kobermart_client/config.dart';
 
 class MemberProvider extends GetConnect {
-  @override
-  void onInit() {
-    httpClient.baseUrl = mainUrl;
-  }
-
-  Future<Response> setMember(var body) async {
+  Future<Response> setMember(dynamic body) async {
     var token;
     httpClient.timeout = Duration(seconds: 30);
     try {
@@ -19,7 +14,26 @@ class MemberProvider extends GetConnect {
       print(e.message);
       Get.snackbar("Error", e.message!);
     }
+    print("running");
+    return post(
+      "${mainUrl}api/member/member",
+      body,
+      headers: {
+        "Authorization": "Bearer ${token}",
+      },
+    );
+  }
 
+  Future<Response> registerMember(dynamic body) async {
+    var token;
+    httpClient.timeout = Duration(seconds: 30);
+    try {
+      await FirebaseAuth.instance.currentUser?.getIdToken(true).then((value) => {token = value});
+    } on FirebaseException catch (e) {
+      print(e.message);
+      Get.snackbar("Error", e.message!);
+    }
+    print("running");
     return post(
       "${mainUrl}api/member/member",
       body,
@@ -39,7 +53,6 @@ class MemberProvider extends GetConnect {
       "ref": ref,
       "upline": upline,
     });
-
     return post(
       "${mainUrl}api/member/token",
       body,

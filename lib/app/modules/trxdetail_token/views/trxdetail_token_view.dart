@@ -90,7 +90,7 @@ class TrxDetailMainPanel extends StatelessWidget {
     String method = "Potong Saldo";
     int status = 4;
     int nominal = data.nominal;
-    String tokenCode = data.data["transactionData"]["tokenCode"];
+    String tokenCode = data.data["transactionData"]["tokenReg"];
 
     return Container(
       decoration: Shadow1(),
@@ -146,7 +146,7 @@ class TrxDetailMainPanel extends StatelessWidget {
                 ),
                 GestureDetector(
                   onTap: () {
-                    Get.toNamed(Routes.TOKENDETAIL);
+                    // Get.toNamed(Routes.TOKENDETAIL);
                   },
                   child: Text(
                     "Lihat",

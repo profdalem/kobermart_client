@@ -34,7 +34,7 @@ class HomeView extends GetView<HomeController> {
           ),
         ),
         body: RefreshIndicator(
-          onRefresh: () => Future.delayed(Duration(seconds: 5)),
+          onRefresh: () => productC.getAllProduct(),
           child: ListView(
             children: [
               Stack(
@@ -331,16 +331,19 @@ class HomeView extends GetView<HomeController> {
                       ],
                     ),
                     sb15,
-                    sb15,
-                    PanelTitle(title: "Produk Terlaris"),
                   ],
                 ),
+              ),
+              sb15,
+              Padding(
+                padding: const EdgeInsets.only(left: 15),
+                child: PanelTitle(title: "Produk Terlaris"),
               ),
               // Produk Terkini
               Obx(
                 () => GridView.builder(
                   gridDelegate:
-                      SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3, childAspectRatio: 45 / 100, crossAxisSpacing: 5, mainAxisSpacing: 5),
+                      SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: Get.width > 360? 3: 2, childAspectRatio: 55 / 100, crossAxisSpacing: 10, mainAxisSpacing: 15),
                   physics: NeverScrollableScrollPhysics(),
                   padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
                   itemCount: getAllActiveProducts().length,
@@ -462,11 +465,7 @@ class LoginPanel extends StatelessWidget {
           SizedBox(
             height: 15,
           ),
-          ElevatedButton(
-              onPressed: () {
-                
-              },
-              child: Text("Login"))
+          ElevatedButton(onPressed: () {}, child: Text("Login"))
         ],
       ),
     );
