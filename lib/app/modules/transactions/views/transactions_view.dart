@@ -41,35 +41,36 @@ class TransactionsView extends GetView<TransactionsController> {
             pageTitle: "Transaksi",
           ),
         ),
-        body: Column(
-          children: [
-            sb10,
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: Obx(
-                  () => controller.filterBy.isNotEmpty
-                      ? Row(
-                          children: List.generate(
-                            controller.filters.length,
-                            (index) => Padding(
-                              padding: EdgeInsets.only(right: 10),
-                              child: FilterJenis(
-                                code: controller.filters[index]["code"]!,
-                                title: controller.filters[index]["name"]!,
+        body: RefreshIndicator(
+          onRefresh: () => controller.getUserTransactions(),
+          child: Column(
+            children: [
+              sb10,
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: Obx(
+                    () => controller.filterBy.isNotEmpty
+                        ? Row(
+                            children: List.generate(
+                              controller.filters.length,
+                              (index) => Padding(
+                                padding: EdgeInsets.only(right: 10),
+                                child: FilterJenis(
+                                  code: controller.filters[index]["code"]!,
+                                  title: controller.filters[index]["name"]!,
+                                ),
                               ),
                             ),
-                          ),
-                        )
-                      : SizedBox(),
+                          )
+                        : SizedBox(),
+                  ),
                 ),
               ),
-            ),
-            
-            sb10,
-            Expanded(
-              child: RefreshIndicator(
+              
+              sb10,
+              Expanded(
                 child: Obx(
                   () => controller.globaltrx.isEmpty
                       ? controller.isLoading.value
@@ -87,7 +88,7 @@ class TransactionsView extends GetView<TransactionsController> {
                           },
                           itemBuilder: (BuildContext context, Transaction element) {
                             Widget item;
-
+        
                             switch (element.type) {
                               case 'topup':
                                 item = ItemTransaksiTopup(data: element);
@@ -129,7 +130,7 @@ class TransactionsView extends GetView<TransactionsController> {
                               default:
                                 item = ItemTransaksiBelanja();
                             }
-
+        
                             return item;
                           },
                           groupSeparatorBuilder: (Transaction element) {
@@ -149,48 +150,9 @@ class TransactionsView extends GetView<TransactionsController> {
                           order: StickyGroupedListOrder.DESC,
                         ),
                 ),
-                // child: ListView(
-                //   children: [
-                //     Padding(
-                //       padding: EdgeInsets.only(bottom: 15),
-                //       child: Column(
-                //         crossAxisAlignment: CrossAxisAlignment.start,
-                //         children: [
-                //           Padding(
-                //             padding: const EdgeInsets.only(left: 15),
-                //             child: PanelTitle(title: "Hari ini"),
-                //           ),
-                //           sb15,
-                //           ItemTransaksiBelanja(),
-                //           ItemTransaksiWithdrawal(),
-                //           // ItemTransaksiTopup(),
-                //           ItemTransaksiTransfer(),
-                //         ],
-                //       ),
-                //     ),
-                //     Padding(
-                //       padding: EdgeInsets.only(bottom: 15),
-                //       child: Column(
-                //         crossAxisAlignment: CrossAxisAlignment.start,
-                //         children: [
-                //           Padding(
-                //             padding: const EdgeInsets.only(left: 15),
-                //             child: PanelTitle(title: "Kemarin"),
-                //           ),
-                //           sb15,
-                //           ItemTransaksiCashback(),
-                //           ItemTransaksiToken(),
-                //         ],
-                //       ),
-                //     )
-                //   ],
-                // ),
-                onRefresh: () {
-                  return controller.getUserTransactions();
-                },
-              ),
-            )
-          ],
+              )
+            ],
+          ),
         ),
         bottomNavigationBar: BottomNav(
           context: context,

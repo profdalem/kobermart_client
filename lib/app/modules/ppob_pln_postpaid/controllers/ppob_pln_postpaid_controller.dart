@@ -66,15 +66,15 @@ class PpobPlnPostpaidController extends GetxController {
       }
     }
     historyList.value = temp2;
-    if(devMode) historyList.add({"customerId": "530000000001", "name": "Success - 1 bill"});
-    if(devMode) historyList.add({"customerId": "530000000002", "name": "Success - 8 bills"});
-    if(devMode) historyList.add({"customerId": "530000000003", "name": "Inquiry - Time Out"});
-    if(devMode) historyList.add({"customerId": "530000000004", "name": "Inquiry - Invoice Has Been Paid"});
-    if(devMode) historyList.add({"customerId": "530000000005", "name": "Inquiry - Incorrect Destination Number"});
-    if(devMode) historyList.add({"customerId": "530000000006", "name": "Payment - Payment Failed"});
-    if(devMode) historyList.add({"customerId": "530000000007", "name": "Payment - Pending / transaction in process"});
-    if(devMode) historyList.add({"customerId": "530000000008", "name": "Payment - MISC Error / Biller System Error"});
-    if(devMode) print(historyList);
+    if (devMode) historyList.add({"customerId": "530000000001", "name": "Success - 1 bill"});
+    if (devMode) historyList.add({"customerId": "530000000002", "name": "Success - 8 bills"});
+    if (devMode) historyList.add({"customerId": "530000000003", "name": "Inquiry - Time Out"});
+    if (devMode) historyList.add({"customerId": "530000000004", "name": "Inquiry - Invoice Has Been Paid"});
+    if (devMode) historyList.add({"customerId": "530000000005", "name": "Inquiry - Incorrect Destination Number"});
+    if (devMode) historyList.add({"customerId": "530000000006", "name": "Payment - Payment Failed"});
+    if (devMode) historyList.add({"customerId": "530000000007", "name": "Payment - Pending / transaction in process"});
+    if (devMode) historyList.add({"customerId": "530000000008", "name": "Payment - MISC Error / Biller System Error"});
+    if (devMode) print(historyList);
   }
 
   void openBottomSheetModal(BuildContext context, dynamic content1, dynamic content2, dynamic action, bool isDismissible) {
@@ -149,6 +149,21 @@ class PpobPlnPostpaidController extends GetxController {
         Get.back();
       }
       if (value.body["code"] == 400) {
+        print(value.body);
+        var message = "";
+        switch (value.body["data"]["rc"]) {
+          case "01":
+            message = "Tagihan sudah lunas.";
+            break;
+          case "103":
+            message = "Server merespon terlalu lama. Coba lagi.";
+            break;
+          case "14":
+            message = "Nomor pelanggan tidak ditemukan.";
+            break;
+          default:
+            message = "Nomor meter yang anda masukkan salah.";
+        }
         openBottomSheetModal(
             context,
             null,
@@ -161,7 +176,7 @@ class PpobPlnPostpaidController extends GetxController {
                 ),
                 sb10,
                 Text(
-                  "Nomor meter yang anda masukkan salah.",
+                  message,
                   style: TextStyle(
                     fontSize: 14,
                   ),
@@ -348,7 +363,7 @@ class PpobPlnPostpaidController extends GetxController {
                 sb15,
               ],
             ), () {
-          setPostpaidPayment(value.body["data"]["tr_id"], value.body["data"]["price"]);
+          setPostpaidPayment(value.body["data"]["tr_id"].toString(), int.parse(value.body["data"]["price"].toString()));
         }, false);
       }
     });
@@ -358,19 +373,30 @@ class PpobPlnPostpaidController extends GetxController {
     isLoading.value = true;
     if (fieldError.isEmpty && customerId.isNotEmpty) {
       if (nominal <= authC.balance.value) {
-      await IakpostpaidProvider().setPayment(trId, nominal).then((value) {
-        print(value.body["success"]);
-        if (value.body["success"]) {
-          Get.offNamed(Routes.TRANSACTIONS, arguments: {"refresh": true});
+        await IakpostpaidProvider().setPayment(trId, nominal).then((value) {
           print(value.body);
-        } else {
-          Get.back();
-          Get.defaultDialog(title: "Terjadi kesalahan", content: Text("Mohon coba lagi nanti"));
-        }
-      }).catchError((err) {
-        print(err);
-      });
-      Get.offNamed(Routes.TRANSACTIONS, arguments: {"refresh": true});
+          if (value.body["code"] == 200) {
+            Get.offNamed(Routes.TRANSACTIONS, arguments: {"refresh": true});
+          } else {
+            Get.back();
+            var message = "";
+            switch (value.body["data"]["rc"]) {
+              case "05":
+                message = "Terjadi kesalahan sistem";
+                break;
+              // case "05":
+              //   message = "Terjadi kesalahan dari sisi server";
+              //   break;
+              default:
+                message = "Terjadi kesalahan";
+            }
+
+            Get.defaultDialog(title: "Gagal", content: Text(message));
+          }
+        }).catchError((err) {
+          print(err);
+        });
+        // Get.offNamed(Routes.TRANSACTIONS, arguments: {"refresh": true});
       } else {
         Get.back();
         Get.defaultDialog(

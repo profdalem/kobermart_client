@@ -10,10 +10,11 @@ class HomeController extends GetxController {
   late TextEditingController passwordC;
 
   final authC = Get.find<AuthController>();
-   var isLoading = false.obs;
+  var isLoading = false.obs;
 
   @override
   void onInit() async {
+    authC.setSubscribeMembersInfo();
     emailC = TextEditingController();
     passwordC = TextEditingController();
     super.onInit();

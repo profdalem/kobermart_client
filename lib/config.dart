@@ -2,11 +2,9 @@ import 'package:get_storage/get_storage.dart';
 
 // final mainUrl = "https://us-central1-kobermart2022.cloudfunctions.net/server/";
 // final mainUrl = "http://34.136.231.191/";
-final mainUrl = "http://192.168.1.18:4000/";
-// final mainUrl = "http://10.0.2.2:5001/kobermart2022/us-central1/server/";
+final mainUrl = "http://192.168.8.116:4000/";
 
-final iakSignPricelist = "5b5e24672a33f29449dd5064cc2f45bc";
-
+final iakSignPricelist = "5b5e24672a33f29449dd5064cc2f45bc";  
 final devMode = true;
 final preFilled = true;
 

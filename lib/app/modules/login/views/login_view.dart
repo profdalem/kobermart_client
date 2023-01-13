@@ -188,7 +188,7 @@ class LoginView extends GetView {
                         ),
                       ),
 
-                      IconButton(
+                      if(devMode) IconButton(
                           onPressed: () {
                             authC.emailC.text = "kobermart@gmail.com";
                             authC.passwordC.text = "123456";

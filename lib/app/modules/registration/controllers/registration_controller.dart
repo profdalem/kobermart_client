@@ -51,6 +51,7 @@ class RegistrationController extends GetxController {
   var gender = "".obs;
   var filename = "".obs;
   var isLoading = false.obs;
+  var obsecurePwd = true.obs;
   List<String> errorText = [];
 
   var provList = [].obs;
@@ -62,6 +63,17 @@ class RegistrationController extends GetxController {
   var selectedKab = "".obs;
   var selectedKec = "".obs;
   var selectedDesa = "".obs;
+
+  FocusNode ftgl = new FocusNode();
+  FocusNode fthn = new FocusNode();
+  FocusNode fjalan = new FocusNode();
+  FocusNode fwa = new FocusNode();
+  FocusNode femail = new FocusNode();
+  FocusNode fbank = new FocusNode();
+  FocusNode frek = new FocusNode();
+  FocusNode fpwd = new FocusNode();
+  FocusNode fpwdc = new FocusNode();
+  GlobalKey kbln = GlobalKey();
 
   @override
   Future<void> onInit() async {
@@ -82,6 +94,8 @@ class RegistrationController extends GetxController {
     kodepos = TextEditingController();
     password = TextEditingController();
     passwordConf = TextEditingController();
+    gender.value = "male";
+    month.text = "01";
     if (preFilled) {
       name.text = "Agung";
       day.text = "11";
@@ -98,10 +112,8 @@ class RegistrationController extends GetxController {
       kab.text = "new";
       kec.text = "new";
       desa.text = "new";
-      gender.value = "L";
     }
     await getProvinceData();
-    month.text = "01";
     super.onInit();
   }
 
@@ -185,10 +197,21 @@ class RegistrationController extends GetxController {
         if (devMode) Get.snackbar("Result", value.body.toString());
         if (value.body["success"] == false) {
           print(value.body);
+          Get.defaultDialog(
+              title: "Registrasi Gagal",
+              content: Container(
+                height: 100,
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: List.generate(value.body["error_msg"].length, (index) => Text("${index + 1}. ${value.body["error_msg"][index]}")),
+                  ),
+                ),
+              ));
         } else {
           isLoading.value = true;
-
           Get.snackbar("Registrasi berhasil!", "Anggota baru berhasil didaftarkan");
+
           if (Auth.currentUser != null) {
             Get.offAllNamed(Routes.HOME);
           } else {

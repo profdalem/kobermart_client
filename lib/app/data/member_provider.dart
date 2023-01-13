@@ -33,7 +33,7 @@ class MemberProvider extends GetConnect {
       print(e.message);
       Get.snackbar("Error", e.message!);
     }
-    print("running");
+    print("${mainUrl}api/member/member");
     return post(
       "${mainUrl}api/member/member",
       body,

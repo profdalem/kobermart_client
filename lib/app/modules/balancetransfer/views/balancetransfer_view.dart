@@ -40,9 +40,9 @@ class BalancetransferView extends GetView<BalancetransferController> {
               child: ListView(
                 children: [
                     Obx(()=> Column(
-                      children: List.generate(authC.downlineList(controller.keyword.value).length, (index) {
+                      children: List.generate(authC.downlineList(controller.keyword.value, true).length, (index) {
                         var showtitle = false;
-                        authC.downlineList(controller.keyword.value)[index].forEach((el) {
+                        authC.downlineList(controller.keyword.value, true)[index].forEach((el) {
                           if (el["type"] == "member") {
                             showtitle = true;
                           }
@@ -59,8 +59,8 @@ class BalancetransferView extends GetView<BalancetransferController> {
                             if(showtitle) sb5,
                             Column(
                               children: List.generate(
-                                  authC.downlineList(controller.keyword.value)[index].length,
-                                  (kdindex) => authC.downlineList(controller.keyword.value)[index][kdindex]["type"] == "member"
+                                  authC.downlineList(controller.keyword.value, true)[index].length,
+                                  (kdindex) => authC.downlineList(controller.keyword.value, true)[index][kdindex]["type"] == "member"
                                       ? Padding(
                                           padding: const EdgeInsets.only(bottom: 0),
                                           child: Card(
@@ -69,8 +69,8 @@ class BalancetransferView extends GetView<BalancetransferController> {
                                               onTap: () {
                                                 
                                                     Get.toNamed(Routes.INPUTNUMBER, arguments: {"title": TRANSFER, "recipient": {
-                                                      "name": authC.downlineList(controller.keyword.value)[index][kdindex]['name'],
-                                                      "id": authC.downlineList(controller.keyword.value)[index][kdindex]['id'],
+                                                      "name": authC.downlineList(controller.keyword.value, true)[index][kdindex]['name'],
+                                                      "id": authC.downlineList(controller.keyword.value, true)[index][kdindex]['id'],
                                                     }});
                                                   
                                               },
@@ -78,14 +78,14 @@ class BalancetransferView extends GetView<BalancetransferController> {
                                                 backgroundImage:CachedNetworkImageProvider(PROFILE_IMG),
                                               ),
                                               title: PanelTitle(
-                                                  title: authC.downlineList(controller.keyword.value)[index][kdindex]['name'] != null
-                                                      ? authC.downlineList(controller.keyword.value)[index][kdindex]['name']
-                                                      : authC.downlineList(controller.keyword.value)[index][kdindex]['id']),
-                                              subtitle: Text("Upline: ${authC.downlineList(controller.keyword.value)[index][kdindex]['uplineName']}"),
+                                                  title: authC.downlineList(controller.keyword.value, true)[index][kdindex]['name'] != null
+                                                      ? authC.downlineList(controller.keyword.value, true)[index][kdindex]['name']
+                                                      : authC.downlineList(controller.keyword.value, true)[index][kdindex]['id']),
+                                              subtitle: Text("Upline: ${authC.downlineList(controller.keyword.value, true)[index][kdindex]['uplineName']}"),
                                               trailing: Chip(
                                                 label: Text((authC.settings["kd1limit"] -
-                                                        (authC.downlineList(controller.keyword.value)[index][kdindex]['kd1_token'] +
-                                                            authC.downlineList(controller.keyword.value)[index][kdindex]['kd1_member']))
+                                                        (authC.downlineList(controller.keyword.value, true)[index][kdindex]['kd1_token'] +
+                                                            authC.downlineList(controller.keyword.value, true)[index][kdindex]['kd1_member']))
                                                     .toString()),
                                                 backgroundColor: Colors.orange.shade200,
                                               ),

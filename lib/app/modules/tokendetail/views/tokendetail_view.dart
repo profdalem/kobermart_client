@@ -6,6 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
+import 'package:kobermart_client/firebase.dart';
 import 'package:kobermart_client/style.dart';
 
 import '../../../../constants.dart';
@@ -50,8 +51,8 @@ class TokendetailView extends GetView<TokendetailController> {
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          PanelTitle(title: "Token"),
-                          Row(
+                          if(controller.creator == Auth.currentUser!.uid || controller.upline == Auth.currentUser!.uid )PanelTitle(title: "Token"),
+                          if(controller.creator == Auth.currentUser!.uid || controller.upline == Auth.currentUser!.uid ) Row(
                             children: [
                               Row(
                                 children: [
@@ -78,7 +79,7 @@ class TokendetailView extends GetView<TokendetailController> {
                               ),
                             ],
                           ),
-                          sb15,
+                          if(controller.creator == Auth.currentUser!.uid || controller.upline == Auth.currentUser!.uid ) sb15,
                           PanelTitle(title: "Dibuat oleh"),
                           GestureDetector(
                               onTap: () {
@@ -99,8 +100,8 @@ class TokendetailView extends GetView<TokendetailController> {
                                 "${DateFormat.yMMMd("id_ID").format(controller.createdAt.value)} ${DateFormat.Hm().format(controller.createdAt.value)} WITA",
                                 style: TextStyle(fontSize: 18),
                               )),
-                          sb15,
-                            Container(
+                          if(controller.creator == Auth.currentUser!.uid || controller.upline == Auth.currentUser!.uid ) sb15,
+                            if(controller.creator == Auth.currentUser!.uid || controller.upline == Auth.currentUser!.uid ) Container(
                               width: double.infinity,
                               child: ElevatedButton(
                                   onPressed: () {

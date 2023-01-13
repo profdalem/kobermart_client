@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:kobermart_client/app/controllers/auth_controller.dart';
+import 'package:kobermart_client/app/helpers/general_helper.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/style.dart';
 
@@ -55,13 +56,13 @@ class MemberprofileView extends StatelessWidget {
                         height: Get.width * 0.3,
                         width: Get.width * 0.3,
                         child: CircleAvatar(
-                          backgroundImage: CachedNetworkImageProvider(PROFILE_IMG),
+                          backgroundImage: CachedNetworkImageProvider(profileC.imgurl.value),
                         ),
                       ),
                       sb20,
                       // Name
                       PanelTitle(
-                        title: profileC.name.value,
+                        title: capitalizeIt(profileC.name.value),
                       ),
                       // Bundle information
                       profileC.isLoading.value
@@ -112,7 +113,7 @@ class MemberprofileView extends StatelessWidget {
                                   child: Padding(
                                     padding: EdgeInsets.all(15),
                                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                      PanelTitle(title: "Referal ID"),
+                                      PanelTitle(title: "ReferRal ID"),
                                       Text(
                                         profileC.refid.value,
                                         style: TextStyle(fontSize: 18),
@@ -168,7 +169,7 @@ class MemberprofileView extends StatelessWidget {
                                       ListTile(
                                         contentPadding: EdgeInsets.all(0),
                                         leading: CircleAvatar(
-                                          backgroundImage: CachedNetworkImageProvider(PROFILE_IMG),
+                                          backgroundImage: CachedNetworkImageProvider(profileC.uplineIgmurl.value),
                                         ),
                                         title: Text(profileC.uplineName.value),
                                         onTap: () {
@@ -301,15 +302,15 @@ class PanelKedalaman extends StatelessWidget {
                                 backgroundColor: Color(0xFFFF9800),
                                 label: Text('${item.members.length} terisi', style: TextStyle(fontSize: 12, color: Colors.white)),
                               ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Chip(
-                                visualDensity: VisualDensity.compact,
-                                padding: EdgeInsets.all(0),
-                                backgroundColor: Colors.blue,
-                                label: Text('${slotSize - item.members.length} kosong', style: TextStyle(fontSize: 12, color: Colors.white)),
-                              ),
+                              // SizedBox(
+                              //   width: 10,
+                              // ),
+                              // Chip(
+                              //   visualDensity: VisualDensity.compact,
+                              //   padding: EdgeInsets.all(0),
+                              //   backgroundColor: Colors.blue,
+                              //   label: Text('${slotSize - item.members.length} kosong', style: TextStyle(fontSize: 12, color: Colors.white)),
+                              // ),
                             ]),
                           );
                         },
@@ -349,7 +350,7 @@ class PanelKedalaman extends StatelessWidget {
                                                   child: CircleAvatar(
                                                     radius: 30.0,
                                                     backgroundColor: tokenUsed ? Colors.transparent : Colors.grey.shade200,
-                                                    backgroundImage: tokenUsed ? CachedNetworkImageProvider(PROFILE_IMG) : null,
+                                                    backgroundImage: tokenUsed ? CachedNetworkImageProvider(item.members[index]["imgurl"]) : null,
                                                     child: tokenUsed ? SizedBox() : Text("token"),
                                                   ),
                                                 ),
@@ -387,7 +388,7 @@ class PanelKedalaman extends StatelessWidget {
                                             ),
                                             sb5,
                                             Text(
-                                              tokenUsed ? item.members[index]["name"] : item.members[index]["id"],
+                                              tokenUsed ? capitalizeIt(item.members[index]["name"]) : item.members[index]["id"],
                                               overflow: TextOverflow.ellipsis,
                                               maxLines: 2,
                                               textAlign: TextAlign.center,

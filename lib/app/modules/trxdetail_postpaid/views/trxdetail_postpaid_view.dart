@@ -1,5 +1,4 @@
 // ignore_for_file: invalid_return_type_for_catch_error
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -8,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:kobermart_client/app/data/iakpostpaid_provider.dart';
 
 import '../../../../style.dart';
+import '../../../models/Transactions.dart';
 import '../../../routes/app_pages.dart';
 import '../../widgets/trx_status.dart';
 import '../controllers/trxdetail_postpaid_controller.dart';
@@ -18,21 +18,18 @@ class TrxdetailPostpaidView extends GetView<TrxdetailPostpaidController> {
   }) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    var data = Get.arguments["data"]["data"]["transactionData"];
-    var detail = data["desc"]["tagihan"]["detail"];
-    print(data["ref_id"].toString().toLowerCase().substring(3, 6));
+    Transaction data = Get.arguments["data"];
+    var detail = data.data["transactionData"]["desc"]["tagihan"]["detail"];
+    print(data.data["transactionData"]["ref_id"].toString().toLowerCase().substring(3, 6));
 
     String logo = "assets/icons/logo_pln.svg";
     String product = "";
 
-    int nominal = data["price"];
+    int nominal = data.data["transactionData"]["price"];
     int status = 1;
-    var createdAt = Timestamp.now();
-    if (Get.arguments["createdAt"] != null) {
-      createdAt = Get.arguments["createdAt"];
-    }
+    var createdAt = data.createdAt;
 
-    switch (data["ref_id"].toString().toLowerCase().substring(3, 6)) {
+    switch (data.data["transactionData"]["ref_id"].toString().toLowerCase().substring(3, 6)) {
       case "pln":
         logo = "assets/icons/logo_pln.svg";
         product = "Tagihan Listrik";
@@ -42,7 +39,7 @@ class TrxdetailPostpaidView extends GetView<TrxdetailPostpaidController> {
         product = "Produk";
     }
 
-    switch (data["message"]) {
+    switch (data.data["transactionData"]["message"]) {
       case "PAYMENT SUCCESS":
         status = 4;
 
@@ -95,7 +92,7 @@ class TrxdetailPostpaidView extends GetView<TrxdetailPostpaidController> {
             Container(
               alignment: Alignment.center,
               child: Text(
-                "Dibuat ${DateFormat.yMMMd("id_ID").format(createdAt.toDate())} ${DateFormat.Hm().format(createdAt.toDate())} WITA",
+                "Dibuat ${DateFormat.yMMMd("id_ID").format(createdAt)} ${DateFormat.Hm().format(createdAt)} WITA",
                 style: TextStyle(color: Colors.grey),
               ),
             ),
@@ -122,7 +119,7 @@ class TrxdetailPostpaidView extends GetView<TrxdetailPostpaidController> {
                                 print("notrx");
                               },
                               child: Text(
-                                data["ref_id"],
+                                data.data["transactionData"]["ref_id"],
                                 style: TextStyle(color: Colors.blue),
                               ),
                             ),
@@ -172,13 +169,13 @@ class TrxdetailPostpaidView extends GetView<TrxdetailPostpaidController> {
                               "Nama Rekening:",
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
-                            Text(data["tr_name"]),
+                            Text(data.data["transactionData"]["tr_name"]),
                             sb10,
                             Text(
                               "Tarif/Daya:",
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
-                            Text("${data["desc"]["tarif"]}/${data["desc"]["daya"]} VA"),
+                            Text("${data.data["transactionData"]["desc"]["tarif"]}/${data.data["transactionData"]["desc"]["daya"]} VA"),
                           ],
                         ),
                         Column(
@@ -188,13 +185,13 @@ class TrxdetailPostpaidView extends GetView<TrxdetailPostpaidController> {
                               "Nomor Meter:",
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
-                            Text(data["hp"]),
+                            Text(data.data["transactionData"]["hp"]),
                             sb10,
                             Text(
                               "Keterangan:",
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
-                            data["desc"]["lembar_tagihan"] == "1"
+                            data.data["transactionData"]["desc"]["lembar_tagihan"] == "1"
                                 ? Text("Belum terlambat")
                                 : Text(
                                     "Terlambat",
@@ -206,7 +203,7 @@ class TrxdetailPostpaidView extends GetView<TrxdetailPostpaidController> {
                     ),
                     sb10,
                     PanelTitle(
-                      title: "Komponen (${data["desc"]["lembar_tagihan"]})",
+                      title: "Komponen (${data.data["transactionData"]["desc"]["lembar_tagihan"]})",
                     ),
                     sb10,
                     Container(
@@ -215,7 +212,7 @@ class TrxdetailPostpaidView extends GetView<TrxdetailPostpaidController> {
                       child: ListView(
                         scrollDirection: Axis.horizontal,
                         children: List.generate(
-                          data["desc"]["tagihan"]["detail"].length,
+                          data.data["transactionData"]["desc"]["tagihan"]["detail"].length,
                           (index) => Container(
                             width: 190,
                             height: double.infinity,
@@ -320,7 +317,7 @@ class TrxdetailPostpaidView extends GetView<TrxdetailPostpaidController> {
                         child: ElevatedButton(
                           onPressed: () async {
                             print("bayar");
-                            await IakpostpaidProvider().setPayment(data["tr_id"], data["ref_id"]).then((value) {
+                            await IakpostpaidProvider().setPayment(data.data["transactionData"]["tr_id"], data.data["transactionData"]["ref_id"]).then((value) {
                               print(value.body);
                               if (value.body["code"] == 400) {
                                 Get.defaultDialog(title: "Gagal", content: Text(value.body["data"]["message"]));

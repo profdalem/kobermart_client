@@ -90,7 +90,7 @@ class TrxDetailMainPanel extends StatelessWidget {
     String method = "Potong Saldo";
     int status = 4;
     int nominal = data.nominal;
-    String tokenCode = data.data["transactionData"]["tokenReg"];
+    String tokenCode = data.data["transactionData"]["tokenCode"];
 
     return Container(
       decoration: Shadow1(),

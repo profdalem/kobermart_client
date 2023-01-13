@@ -39,7 +39,7 @@ class PpobPlnPostpaidView extends GetView<PpobPlnPostpaidController> {
                 ),
                 backgroundColor: Colors.yellow.shade200,
               ),
-              title: Text("Token Listrik"),
+              title: Text("Tagihan Listrik"),
             ),
           ),
           Card(
@@ -55,7 +55,6 @@ class PpobPlnPostpaidView extends GetView<PpobPlnPostpaidController> {
                 Obx(() => TextField(
                       controller: controller.customerIdC,
                       autofocus: true,
-                      autofillHints: [AutofillHints.telephoneNumber],
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
                           focusColor: Colors.blueGrey.shade50,

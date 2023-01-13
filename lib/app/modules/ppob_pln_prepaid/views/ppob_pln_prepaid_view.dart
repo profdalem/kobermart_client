@@ -56,7 +56,6 @@ class PpobPlnPrepaidView extends GetView<PpobPlnPrepaidController> {
                 Obx(() => TextField(
                       controller: controller.customerIdC,
                       autofocus: true,
-                      autofillHints: [AutofillHints.telephoneNumber],
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
                           focusColor: Colors.blueGrey.shade50,

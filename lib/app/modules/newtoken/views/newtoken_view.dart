@@ -4,7 +4,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kobermart_client/app/controllers/auth_controller.dart';
-import 'package:kobermart_client/app/modules/home/controllers/home_controller.dart';
 import 'package:kobermart_client/app/modules/widgets/success_token.dart';
 import 'package:kobermart_client/firebase.dart';
 import 'package:kobermart_client/style.dart';
@@ -13,7 +12,6 @@ import '../controllers/newtoken_controller.dart';
 
 class NewtokenView extends GetView {
   NewtokenView({Key? key}) : super(key: key);
-  final homeC = Get.find<HomeController>();
   final authC = Get.find<AuthController>();
   final newTokenC = Get.put(NewtokenController());
 
@@ -123,9 +121,9 @@ class NewtokenView extends GetView {
                     ),
                     sb15,
                     Column(
-                      children: List.generate(authC.downlineList(newTokenC.keyword.value).length, (index) {
+                      children: List.generate(authC.downlineList(newTokenC.keyword.value, true).length, (index) {
                         var showtitle = false;
-                        authC.downlineList(newTokenC.keyword.value)[index].forEach((el) {
+                        authC.downlineList(newTokenC.keyword.value, true)[index].forEach((el) {
                           if (el["type"] == "member") {
                             showtitle = true;
                           }
@@ -143,16 +141,18 @@ class NewtokenView extends GetView {
                             if (showtitle) sb5,
                             Column(
                               children: List.generate(
-                                  authC.downlineList(newTokenC.keyword.value)[index].length,
-                                  (kdindex) => authC.downlineList(newTokenC.keyword.value)[index][kdindex]["type"] == "member"
-                                      ? Padding(
+                                  authC.downlineList(newTokenC.keyword.value, true)[index].length,
+                                  (kdindex) => authC.downlineList(newTokenC.keyword.value, true)[index][kdindex]["type"] == "member"
+                                      ? (authC.settings["kd1limit"] -
+                                                        (authC.downlineList(newTokenC.keyword.value, true)[index][kdindex]['kd1_token'] +
+                                                            authC.downlineList(newTokenC.keyword.value, true)[index][kdindex]['kd1_member']) >0 ? Padding(
                                           padding: const EdgeInsets.only(bottom: 0),
                                           child: Card(
                                             elevation: 1,
                                             child: ListTile(
                                               onTap: () {
                                                 // pastikan slot kd1 tidak penuh
-                                                if (authC.settings["kd1limit"] == authC.downlineList(newTokenC.keyword.value)[index][kdindex]['kd1count']) {
+                                                if (authC.settings["kd1limit"] == authC.downlineList(newTokenC.keyword.value, true)[index][kdindex]['kd1count']) {
                                                   Get.defaultDialog(
                                                     title: "Slot Penuh",
                                                     content: Text("Slot di KD1 anda telah terisi semua"),
@@ -168,7 +168,7 @@ class NewtokenView extends GetView {
                                                                 child: CircularProgressIndicator(),
                                                               )
                                                             : Text(
-                                                                "Jadikan ${authC.downlineList(newTokenC.keyword.value)[index][kdindex]['name']} sebagai upline token?"),
+                                                                "Jadikan ${authC.downlineList(newTokenC.keyword.value, true)[index][kdindex]['name']} sebagai upline token?"),
                                                       )),
                                                       cancel: Padding(
                                                         padding: const EdgeInsets.only(right: 50),
@@ -182,7 +182,7 @@ class NewtokenView extends GetView {
                                                           onPressed: () async {
                                                             newTokenC.isLoading.value = true;
                                                             await newTokenC
-                                                                .newToken(authC.downlineList(newTokenC.keyword.value)[index][kdindex]['id'],
+                                                                .newToken(authC.downlineList(newTokenC.keyword.value, true)[index][kdindex]['id'],
                                                                     authC.userCredential.value!.uid)
                                                                 .then((value) async {
                                                               if (value["success"]) {
@@ -203,20 +203,20 @@ class NewtokenView extends GetView {
                                                 backgroundImage: CachedNetworkImageProvider(PROFILE_IMG),
                                               ),
                                               title: PanelTitle(
-                                                  title: authC.downlineList(newTokenC.keyword.value)[index][kdindex]['name'] != null
-                                                      ? authC.downlineList(newTokenC.keyword.value)[index][kdindex]['name']
-                                                      : authC.downlineList(newTokenC.keyword.value)[index][kdindex]['id']),
-                                              subtitle: Text("Upline: ${authC.downlineList(newTokenC.keyword.value)[index][kdindex]['uplineName']}"),
+                                                  title: authC.downlineList(newTokenC.keyword.value, true)[index][kdindex]['name'] != null
+                                                      ? authC.downlineList(newTokenC.keyword.value, true)[index][kdindex]['name']
+                                                      : authC.downlineList(newTokenC.keyword.value, true)[index][kdindex]['id']),
+                                              subtitle: Text("Upline: ${authC.downlineList(newTokenC.keyword.value, true)[index][kdindex]['uplineName']}"),
                                               trailing: Chip(
                                                 label: Text((authC.settings["kd1limit"] -
-                                                        (authC.downlineList(newTokenC.keyword.value)[index][kdindex]['kd1_token'] +
-                                                            authC.downlineList(newTokenC.keyword.value)[index][kdindex]['kd1_member']))
+                                                        (authC.downlineList(newTokenC.keyword.value, true)[index][kdindex]['kd1_token'] +
+                                                            authC.downlineList(newTokenC.keyword.value, true)[index][kdindex]['kd1_member']))
                                                     .toString()),
                                                 backgroundColor: Colors.orange.shade200,
                                               ),
                                             ),
                                           ),
-                                        )
+                                        ): SizedBox())
                                       : SizedBox()),
                             ),
                             sb15,

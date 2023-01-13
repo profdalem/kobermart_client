@@ -6,9 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kobermart_client/app/controllers/auth_controller.dart';
-import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/config.dart';
-import 'package:kobermart_client/firebase.dart';
 import 'package:kobermart_client/style.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -49,7 +47,6 @@ class RegistrationView extends GetView<RegistrationController> {
   @override
   Widget build(BuildContext context) {
     String tokenCode = "8812391239";
-
     if (Get.arguments != null) {
       tokenCode = Get.arguments["tokenCode"];
     }
@@ -65,7 +62,7 @@ class RegistrationView extends GetView<RegistrationController> {
           child: Column(
             children: [
               sb15,
-              Center(child: PanelTitle(title: "Token ${tokenCode}")),
+              Center(child: PanelTitle(title: "${tokenCode}")),
               sb15,
               Obx(
                 () => Container(
@@ -183,6 +180,9 @@ class PanelIdentitasDiri extends StatelessWidget {
               sb5,
               TextField(
                 controller: controller.name,
+                onSubmitted: (value) {
+                  controller.ftgl.requestFocus();
+                },
                 autofillHints: [AutofillHints.name, AutofillHints.name],
                 decoration: InputDecoration(
                   hintText: "Nama lengkap",
@@ -202,6 +202,7 @@ class PanelIdentitasDiri extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
+                    flex: 1,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -210,25 +211,28 @@ class PanelIdentitasDiri extends StatelessWidget {
                           symbol: "*",
                         ),
                         sb5,
-                        TextField(
-                          controller: controller.day,
-                          keyboardType: TextInputType.number,
-                          autofillHints: [AutofillHints.birthdayDay],
-                          decoration: InputDecoration(
-                            hintText: "cth: 11",
-                            contentPadding: EdgeInsets.all(10),
-                            isDense: true,
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: controller.dayError.value ? Colors.red : Colors.grey),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.blue),
-                            ),
-                          ),
-                          inputFormatters: <TextInputFormatter>[
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
-                        ),
+                        Obx(() => GestureDetector(
+                              child: TextField(
+                                focusNode: controller.ftgl,
+                                controller: controller.day,
+                                onSubmitted: (value) {},
+                                keyboardType: TextInputType.number,
+                                decoration: InputDecoration(
+                                  hintText: "cth: 11",
+                                  contentPadding: EdgeInsets.all(10),
+                                  isDense: true,
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(color: controller.dayError.value ? Colors.red : Colors.grey),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(color: Colors.blue),
+                                  ),
+                                ),
+                                inputFormatters: <TextInputFormatter>[
+                                  FilteringTextInputFormatter.digitsOnly,
+                                ],
+                              ),
+                            )),
                       ],
                     ),
                   ),
@@ -236,17 +240,19 @@ class PanelIdentitasDiri extends StatelessWidget {
                     width: 15,
                   ),
                   Expanded(
+                    flex: 2,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         FieldLabelText(
-                          title: "Bulan Lahir",
+                          title: "Bulan",
                           symbol: "*",
                         ),
                         sb5,
                         Container(
                           height: 40,
                           child: DropdownSearch<String>(
+                            key: controller.kbln,
                             popupProps: PopupProps.dialog(
                               fit: FlexFit.loose,
                               showSelectedItems: true,
@@ -307,6 +313,7 @@ class PanelIdentitasDiri extends StatelessWidget {
                                   controller.month.text = "01";
                               }
                               if (devMode) print(controller.month.text);
+                              controller.fthn.requestFocus();
                             },
                             selectedItem: "Januari",
                           ),
@@ -314,23 +321,22 @@ class PanelIdentitasDiri extends StatelessWidget {
                       ],
                     ),
                   ),
-                ],
-              ),
-              sb15,
-              // Tahun lahir dan jenis kelamin
-              Row(
-                children: [
+                  SizedBox(
+                    width: 15,
+                  ),
                   Expanded(
+                    flex: 1,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         FieldLabelText(
-                          title: "Tahun Lahir",
+                          title: "Tahun",
                           symbol: "*",
                         ),
                         sb5,
                         TextField(
                           controller: controller.year,
+                          focusNode: controller.fthn,
                           keyboardType: TextInputType.number,
                           autofillHints: [AutofillHints.birthdayYear],
                           decoration: InputDecoration(
@@ -351,44 +357,76 @@ class PanelIdentitasDiri extends StatelessWidget {
                       ],
                     ),
                   ),
-                  SizedBox(
-                    width: 15,
-                  ),
+                ],
+              ),
+              sb15,
+              // Tahun lahir dan jenis kelamin
+              Row(
+                children: [
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         FieldLabelText(
-                          title: "Jenis Kelamin",
+                          title: "Pilih Jenis Kelamin",
                           symbol: "*",
                         ),
                         sb5,
-                        Container(
-                          height: 40,
-                          child: DropdownSearch<String>(
-                            popupProps: PopupProps.dialog(
-                              fit: FlexFit.loose,
-                              showSelectedItems: true,
-                            ),
-                            items: [
-                              "Pria",
-                              "Wanita",
-                            ],
-                            onChanged: (value) {
-                              switch (value) {
-                                case "Pria":
-                                  controller.gender.value = "male";
-                                  break;
-                                case "Wanita":
-                                  controller.gender.value = "female";
-                                  break;
-                                default:
-                                  controller.gender.value = "male";
-                              }
-                            },
-                            selectedItem: "pilih",
-                          ),
-                        ),
+                        Obx(() => Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Expanded(
+                                    child: GestureDetector(
+                                  onTap: () {
+                                    controller.gender.value = "male";
+                                  },
+                                  child: Card(
+                                      color: controller.gender.value == "male" ? Colors.blue.shade50 : Colors.white,
+                                      child: Container(
+                                          height: 40,
+                                          child: Center(
+                                              child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                "Pria",
+                                                style: TextStyle(fontWeight: FontWeight.bold),
+                                              ),
+                                              SizedBox(width: 5,),
+                                              if(controller.gender.value == "male") Icon(
+                                                Icons.check_circle_rounded,
+                                                color: Colors.blue.shade300,
+                                              )
+                                            ],
+                                          )))),
+                                )),
+                                Expanded(
+                                    child: GestureDetector(
+                                  onTap: () {
+                                    controller.gender.value = "female";
+                                  },
+                                  child: Card(
+                                      color: controller.gender.value == "female" ? Colors.blue.shade50 : Colors.white,
+                                      child: Container(
+                                          height: 40,
+                                          child: Center(
+                                              child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                "Wanita",
+                                                style: TextStyle(fontWeight: FontWeight.bold),
+                                              ),
+                                              SizedBox(width: 5,),
+                                              if(controller.gender.value == "female") Icon(
+                                                Icons.check_circle_rounded,
+                                                color: Colors.blue.shade300,
+                                              )
+                                            ],
+                                          )))),
+                                )),
+                              ],
+                            )),
                       ],
                     ),
                   ),
@@ -625,6 +663,8 @@ class PanelKontak extends StatelessWidget {
               sb5,
               TextField(
                 controller: controller.whatsapp,
+                focusNode: controller.fwa,
+                onSubmitted: (value) => controller.femail.requestFocus(),
                 autofillHints: [AutofillHints.telephoneNumber],
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
@@ -650,6 +690,8 @@ class PanelKontak extends StatelessWidget {
               sb5,
               TextField(
                 controller: controller.email,
+                focusNode: controller.femail,
+                onSubmitted: (value) => controller.fbank.requestFocus(),
                 autofillHints: [AutofillHints.email],
                 decoration: InputDecoration(
                   hintText: "cth. nama@gmail.com",
@@ -697,6 +739,8 @@ class PanelRekening extends StatelessWidget {
             sb5,
             TextField(
               controller: controller.bank,
+              focusNode: controller.fbank,
+              onSubmitted: (value) => controller.frek.requestFocus(),
               decoration: InputDecoration(
                 hintText: "Nama Bank",
                 contentPadding: EdgeInsets.all(10),
@@ -708,9 +752,6 @@ class PanelRekening extends StatelessWidget {
                   borderSide: BorderSide(color: Colors.blue),
                 ),
               ),
-              inputFormatters: <TextInputFormatter>[
-                FilteringTextInputFormatter.digitsOnly,
-              ],
             ),
             sb15,
             FieldLabelText(
@@ -720,6 +761,8 @@ class PanelRekening extends StatelessWidget {
             sb5,
             TextField(
               controller: controller.rek,
+              focusNode: controller.frek,
+              onSubmitted: (value) => controller.fpwd.requestFocus(),
               keyboardType: TextInputType.number,
               autofillHints: [AutofillHints.creditCardNumber],
               decoration: InputDecoration(
@@ -759,7 +802,17 @@ class PanelKeamanan extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              PanelTitle(title: "Keamanan"),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  PanelTitle(title: "Keamanan"),
+                  GestureDetector(
+                      onTap: () {
+                        controller.obsecurePwd.value = !controller.obsecurePwd.value;
+                      },
+                      child: Text(controller.obsecurePwd.value? "Tampilkan": "Sembunyikan", style: TextStyle(color: Colors.blue, fontSize: 12),))
+                ],
+              ),
               sb10,
               FieldLabelText(
                 title: "Password",
@@ -768,8 +821,10 @@ class PanelKeamanan extends StatelessWidget {
               sb5,
               TextField(
                 controller: controller.password,
+                focusNode: controller.fpwd,
+                onSubmitted: (value) => controller.fpwdc.requestFocus(),
                 autofillHints: [AutofillHints.password],
-                obscureText: true,
+                obscureText: controller.obsecurePwd.value,
                 decoration: InputDecoration(
                   hintText: "Password anda",
                   contentPadding: EdgeInsets.all(10),
@@ -790,7 +845,8 @@ class PanelKeamanan extends StatelessWidget {
               sb5,
               TextField(
                 controller: controller.passwordConf,
-                obscureText: true,
+                focusNode: controller.fpwdc,
+                obscureText: controller.obsecurePwd.value,
                 decoration: InputDecoration(
                   hintText: "Ulangi Password anda",
                   contentPadding: EdgeInsets.all(10),
@@ -900,7 +956,7 @@ class PanelAlamatAPI extends StatelessWidget {
                       controller.kab.text = controller.kabList[0]["name"];
                     });
                   },
-                  selectedItem: controller.provList[0]["name"],
+                  selectedItem: "--pilih provinsi--",
                 ),
               ),
               if (controller.kabList.isNotEmpty) sb15,
@@ -937,7 +993,7 @@ class PanelAlamatAPI extends StatelessWidget {
                         controller.kec.text = controller.kecList[0]["name"];
                       });
                     },
-                    selectedItem: controller.kabList[0]["name"],
+                    selectedItem: "--pilih kabupaten--",
                   ),
                 ),
               if (controller.kecList.isNotEmpty) sb15,
@@ -972,7 +1028,7 @@ class PanelAlamatAPI extends StatelessWidget {
                         controller.desa.text = controller.desaList[0]["name"];
                       });
                     },
-                    selectedItem: controller.kecList[0]["name"],
+                    selectedItem: "--pilih kecamatan--",
                   ),
                 ),
               if (controller.desaList.isNotEmpty) sb15,
@@ -995,9 +1051,10 @@ class PanelAlamatAPI extends StatelessWidget {
                           controller.selectedDesa.value = e["name"];
                         }
                       });
+                      controller.fjalan.requestFocus();
                       if (devMode) print(controller.selectedDesa.value);
                     },
-                    selectedItem: controller.desaList[0]["name"],
+                    selectedItem: "--pilih desa--",
                   ),
                 ),
               sb15,
@@ -1008,6 +1065,8 @@ class PanelAlamatAPI extends StatelessWidget {
               sb5,
               TextField(
                 controller: controller.jalan,
+                onSubmitted: (value) => controller.fwa.requestFocus(),
+                focusNode: controller.fjalan,
                 autofillHints: [AutofillHints.streetAddressLine1, AutofillHints.fullStreetAddress],
                 decoration: InputDecoration(
                   hintText: "Nama jalan/banjar",

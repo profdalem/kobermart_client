@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:kobermart_client/app/controllers/auth_controller.dart';
 import 'package:kobermart_client/app/controllers/product_controller.dart';
-import 'package:kobermart_client/app/modules/home/controllers/home_controller.dart';
+import 'package:kobermart_client/app/helpers/general_helper.dart';
+import 'package:kobermart_client/firebase.dart';
 
 import '../../routes/app_pages.dart';
 import 'package:get/get.dart';
@@ -13,7 +14,6 @@ class DefaultAppBar extends StatelessWidget {
 
   final String pageTitle;
   final productC = Get.find<MainProductController>();
-  final homeC = Get.find<HomeController>();
   final authC = Get.find<AuthController>();
 
   @override
@@ -44,14 +44,18 @@ class DefaultAppBar extends StatelessWidget {
       actions: [
         IconButton(
             onPressed: () async {
-              productC.getAllProduct();
-              // productC.getAllCarts();
-              // print(homeC.downlines.length);
-              // homeC.getDownlines();
-              authC.subscribeMemberInfo.cancel();
-              authC.setSubscribeMembersInfo();
-
+              // productC.getAllProduct();
+              // authC.subscribeMemberInfo.cancel();
+              // authC.setSubscribeMembersInfo();
+              // print(await authC.internetCheck());
               // authC.checker();
+              // authC.getUpdatedDownlines("KBBJ2");
+              // serverSpeed("google.com");
+              // print(authC.downlineList("", false).length);
+              // authC.downlines.value = await getUpdatedDownlines(Auth.currentUser!.uid);
+              // print(authC.downlines);
+              // await getCashbackHistory("KBBJ1", DateTime(2021), DateTime.now());
+              authC.downlines.value = await getUpdatedDownlines(Auth.currentUser!.uid);
             },
             icon: Icon(Icons.refresh)),
         IconButton(

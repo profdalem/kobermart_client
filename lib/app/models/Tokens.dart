@@ -4,7 +4,7 @@ import 'package:kobermart_client/firebase.dart';
 class Tokens {
   late String id;
   late String tokenCode;
-  late String tokenReg;
+  late String refId;
   late String tokenCreator;
   late String upline;
   late bool tokenUsed;
@@ -18,7 +18,7 @@ class Tokens {
     dynamic docdata = doc.data();
     id = doc.id;
     tokenCode = docdata["tokenCode"];
-    tokenReg = docdata["tokenReg"];
+    refId = docdata["refId"];
     tokenCreator = docdata["tokenCreator"];
     upline = docdata["upline"];
     tokenUsed = docdata["tokenUsed"];
@@ -35,7 +35,7 @@ class Tokens {
     dynamic docdata = doc.data();
     id = doc.id;
     tokenCode = docdata["tokenCode"];
-    tokenReg = docdata["tokenReg"];
+    refId = docdata["refId"];
     tokenCreator = docdata["tokenCreator"];
     upline = docdata["upline"];
     tokenUsed = docdata["tokenUsed"];

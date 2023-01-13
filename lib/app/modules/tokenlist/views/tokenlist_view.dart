@@ -1,6 +1,7 @@
 // ignore_for_file: invalid_use_of_protected_member
 
 import 'package:badges/badges.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -22,7 +23,7 @@ class TokenlistView extends GetView<TokenlistController> {
           .where((e) =>
               e.tokenUsed == false &&
               (e.upline.toString().toLowerCase().contains(controller.keyword.value.toLowerCase()) ||
-                  e.tokenReg.toString().toLowerCase().contains(controller.keyword.value.toLowerCase())))
+                  e.tokenCode.toString().toLowerCase().contains(controller.keyword.value.toLowerCase())))
           .toList();
     }
 
@@ -93,13 +94,13 @@ class TokenlistView extends GetView<TokenlistController> {
                                                   if (!(getTokens(controller.keyword.value))[index].opened) {
                                                     await FirebaseFirestore.instance
                                                         .collection("members")
-                                                        .doc((getTokens(controller.keyword.value))[index].tokenCode)
-                                                        .set({"opened": true}, SetOptions(merge: true));
-                                                    Get.toNamed(Routes.TOKENDETAIL, arguments: {"data": (getTokens(controller.keyword.value))[index]});
+                                                        .doc((getTokens(controller.keyword.value))[index].refId)
+                                                        .set({"opened": true}, SetOptions(merge: true)); 
+                                                    Get.toNamed(Routes.TOKENDETAIL, arguments: {"tokenCode": (getTokens(controller.keyword.value))[index].id});
                                                   } else {
                                                     Get.toNamed(
                                                       Routes.TOKENDETAIL,
-                                                      arguments: {"data": (getTokens(controller.keyword.value))[index]},
+                                                      arguments: {"tokenCode": (getTokens(controller.keyword.value))[index].id},
                                                     );
                                                   }
                                                 },
@@ -118,7 +119,7 @@ class TokenlistView extends GetView<TokenlistController> {
                                                   ),
                                                 ),
                                                 title: Text(
-                                                  (getTokens(controller.keyword.value))[index].tokenReg,
+                                                  (getTokens(controller.keyword.value))[index].tokenCode,
                                                   style: TextStyle(
                                                       fontSize: 18,
                                                       fontWeight: !(getTokens(controller.keyword.value))[index].opened ? FontWeight.bold : FontWeight.normal),
@@ -131,7 +132,7 @@ class TokenlistView extends GetView<TokenlistController> {
                                                   ],
                                                 ),
                                                 trailing: ItemMenu(
-                                                  tokenCode: getTokens(controller.keyword.value)[index].tokenReg,
+                                                  tokenCode: getTokens(controller.keyword.value)[index].tokenCode,
                                                   tokenUsed: getTokens(controller.keyword.value)[index].tokenUsed,
                                                 ),
                                               ),
@@ -170,10 +171,9 @@ class TokenlistView extends GetView<TokenlistController> {
                                                   showBadge: false,
                                                   padding: EdgeInsets.all(8),
                                                   child: CircleAvatar(
-                                                    child: Icon(Icons.person),
-                                                    // backgroundImage:
-                                                    //     CachedNetworkImageProvider(
-                                                    //         "https://i.pravatar.cc/150?img=${index + 10}"),
+                                                    // child: Icon(Icons.person),
+                                                    backgroundImage:
+                                                        CachedNetworkImageProvider(getRegisteredTokens(controller.keyword.value)[index].imgrul),
                                                   ),
                                                 ),
                                                 title: Text(

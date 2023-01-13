@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:kobermart_client/app/helpers/general_helper.dart';
 import 'package:kobermart_client/config.dart';
 import 'package:kobermart_client/firebase.dart';
 import '../routes/app_pages.dart';
@@ -90,20 +91,7 @@ class AuthController extends GetxController {
     emailC = TextEditingController();
     passwordC = TextEditingController();
 
-    if (Auth.currentUser != null) {
-      userCredential.value = Auth.currentUser;
-      try {
-        await Members.doc(Auth.currentUser!.uid).get().then((value) {
-          level.value = value.data()!["level"];
-          imgurl.value = value.data()!["imgurl"];
-          refId.value = value.id;
-        });
-      } on FirebaseException catch (e) {
-        print(e.message);
-      }
-    } else {
-      isAuth.value = false;
-    }
+    Auth.signOut();
 
     if (box.read("rememberMe") == null) {
       box.write("rememberMe", true);
@@ -154,7 +142,7 @@ class AuthController extends GetxController {
   Future<void> logout() async {
     Auth.signOut().then((value) {
       isAuth.value = false;
-      refId.value = "";
+      resetData();
       Get.offAllNamed(Routes.LOGIN);
     });
   }
@@ -244,27 +232,14 @@ class AuthController extends GetxController {
         var data = event.data()!;
         print(data["balance"]);
         refId.value = event.id;
+        userCredential.value = Auth.currentUser;
+        uplineName.value = data["uplineName"];
         uplineName.value = data["uplineName"];
         kd1_member.value = data["kd1_member"];
         kd1_token.value = data["kd1_token"];
         cashback.value = data["cashback"];
         balance.value = data["balance"];
-        downlines.value = data["downlines"];
-
-        if (downlines.isNotEmpty) {
-          kd.value = downlines[0]["level"] - level.value;
-          downlines.forEach((element) {
-            if (kd.value < (element["level"] - level.value)) {
-              kd.value = element["level"] - level.value;
-            }
-
-            if (element["type"] == "member") {
-              anggota.value++;
-            }
-          });
-        } else {
-          kd.value = 0;
-        }
+        downlines.value = await getUpdatedDownlines(event.id);
       },
       onError: (error) {
         print(error);
@@ -272,14 +247,23 @@ class AuthController extends GetxController {
     );
   }
 
-  List downlineList(String keyword) {
+  List downlineList(String keyword, bool memberOnly) {
     List list = [];
     for (var i = 0; i < kd.value; i++) {
       list.add([]);
     }
     downlines.forEach((element) {
-      if (element["name"].toLowerCase().contains(keyword.trim().toLowerCase()) || element["uplineName"].toLowerCase().contains(keyword.trim().toLowerCase())) {
-        list[element["level"] - (level.value + 1)].add(element);
+      if (memberOnly) {
+        if (element["type"] == "member" &&
+            (element["name"].toLowerCase().contains(keyword.trim().toLowerCase()) ||
+                element["uplineName"].toLowerCase().contains(keyword.trim().toLowerCase()))) {
+          list[element["kd"] - 1].add(element);
+        }
+      } else {
+        if (element["name"].toLowerCase().contains(keyword.trim().toLowerCase()) ||
+            element["uplineName"].toLowerCase().contains(keyword.trim().toLowerCase())) {
+          list[element["kd"] - 1].add(element);
+        }
       }
     });
 
@@ -297,5 +281,21 @@ class AuthController extends GetxController {
     });
 
     return list;
+  }
+
+  void resetData() {
+    name.value = "";
+    refId.value = "";
+    balance.value = 0;
+    cashback.value = 0;
+    anggota.value = 0;
+    kd.value = 0;
+    level.value = 0;
+    kd1_member.value = 0;
+    kd1_token.value = 0;
+    uplineName.value = "";
+    fcmToken = "";
+    imgurl.value = "";
+    downlines.clear();
   }
 }

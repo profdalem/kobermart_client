@@ -1,10 +1,9 @@
 // ignore_for_file: unused_local_variable
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import '../../../../models/Transactions.dart';
 import '../../../../routes/app_pages.dart';
 import '../../../widgets/trx_status.dart';
 
@@ -14,7 +13,7 @@ class ItemTransaksiPostpaid extends StatelessWidget {
     required this.data,
   }) : super(key: key);
 
-  final data;
+  final Transaction data;
 
   @override
   Widget build(BuildContext context) {
@@ -25,23 +24,23 @@ class ItemTransaksiPostpaid extends StatelessWidget {
 
     String meterNo = "";
 
-    int nominal = data["nominal"];
+    int nominal = data.nominal;
     int status = 1;
-    var createdAt = Timestamp.fromMillisecondsSinceEpoch(data["createdAt"]["_seconds"] * 1000);
+    var createdAt = data.createdAt;
 
-    switch (data["additional"].toString().split("_")[0].toLowerCase()) {
+    switch (data.id.substring(3, 6).toLowerCase()) {
       case "pln":
         logo = "assets/icons/logo_pln.svg";
         product = "Tagihan Listrik";
-        name = data["data"]["transactionData"]["tr_name"];
-        meterNo = data["data"]["transactionData"]["hp"];
+        name = data.data["transactionData"]["tr_name"];
+        meterNo = data.data["transactionData"]["hp"];
         break;
       default:
         logo = "assets/icons/logo_pln.svg";
         product = "Produk";
     }
 
-    switch (data["data"]["transactionData"]["message"]) {
+    switch (data.data["transactionData"]["message"]) {
       case "PAYMENT SUCCESS":
         status = 4;
 
@@ -60,7 +59,7 @@ class ItemTransaksiPostpaid extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 10),
       child: TextButton(
         onPressed: () {
-          Get.toNamed(Routes.TRXDETAIL_POSTPAID, arguments: {"data": data, "createdAt": createdAt});
+          Get.toNamed(Routes.TRXDETAIL_POSTPAID, arguments: {"data": data});
         },
         style: ButtonStyle(
             shadowColor: MaterialStateProperty.all(Colors.grey.shade300),
@@ -102,7 +101,7 @@ class ItemTransaksiPostpaid extends StatelessWidget {
                         ],
                       ),
                       Text(
-                        "- Rp ${NumberFormat("#,##0", "id_ID").format(int.parse(nominal.toString()))}",
+                        "- Rp ${NumberFormat("#,##0", "id_ID").format(nominal)}",
                         style: TextStyle(color: Colors.red.shade400, fontWeight: FontWeight.bold, fontSize: 14),
                       ),
                       // TrxStatus(
@@ -119,7 +118,7 @@ class ItemTransaksiPostpaid extends StatelessWidget {
                       Container(
                         width: Get.width * 0.09,
                         child: Text(
-                          "${DateFormat.Hm().format(createdAt.toDate())}",
+                          "${DateFormat.Hm().format(createdAt)}",
                           style: TextStyle(color: Colors.grey, fontSize: 12),
                         ),
                       ),

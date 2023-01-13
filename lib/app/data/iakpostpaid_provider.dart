@@ -49,7 +49,9 @@ class IakpostpaidProvider extends GetConnect {
 
     return post(
       "${mainUrl}api/ppob/postpaid/payment/",
-      {trId, nominal},
+      {
+        "trId": trId,
+        "nominal": nominal,},
       headers: {
         "Authorization": "Bearer ${token}",
       },

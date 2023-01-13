@@ -44,7 +44,7 @@ class MenuView extends GetView<MenuController> {
                   Get.offAndToNamed(Routes.PROFILE);
                 },
                 leading: CircleAvatar(
-                  backgroundImage: authC.imgurl.isNotEmpty? CachedNetworkImageProvider(authC.imgurl.value): CachedNetworkImageProvider(PROFILE_IMG),
+                  backgroundImage: authC.imgurl.isNotEmpty ? CachedNetworkImageProvider(authC.imgurl.value) : CachedNetworkImageProvider(PROFILE_IMG),
                 ),
                 title: PanelTitle(title: name),
                 subtitle: Text("Referral ID: ${authC.refId.value}"),
@@ -84,7 +84,9 @@ class MenuView extends GetView<MenuController> {
               ),
               ListTile(
                 horizontalTitleGap: 0,
-                onTap: () {},
+                onTap: () {
+                  Get.toNamed(Routes.PROFILE);
+                },
                 leading: Icon(Icons.edit_note),
                 title: Text("Ubah Data Diri"),
               ),
@@ -164,10 +166,23 @@ class MenuView extends GetView<MenuController> {
               SizedBox(
                 height: 20,
               ),
-              Text(
-                "© Kober Bali Jaya ${DateFormat.y().format(DateTime.now())}",
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey),
+              GestureDetector(
+                onTap: () => controller.setVersion(),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "© Kober Bali Jaya ${DateFormat.y().format(DateTime.now())}",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                    Obx(() => Text(
+                          "v" + controller.appVersion.value,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.grey),
+                        )),
+                  ],
+                ),
               ),
               SizedBox(
                 height: 20,

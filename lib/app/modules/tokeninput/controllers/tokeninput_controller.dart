@@ -28,11 +28,10 @@ class TokeninputController extends GetxController {
     bool success = false;
     String id = "";
     String message = "Token tidak valid";
-    await Members.where("tokenReg", isEqualTo: tokenC.text).where("tokenUsed", isEqualTo: false).limit(1).get().then((value) {
-      print(value.size);
+    await Members.where("tokenCode", isEqualTo: tokenC.text).where("tokenUsed", isEqualTo: false).limit(1).get().then((value) {
       if (value.size > 0) {
         success = true;
-        id = value.docs[0].id;
+        id = value.docs[0]["tokenCode"];
         message = "Token valid";
       }
     }).catchError(((err) {

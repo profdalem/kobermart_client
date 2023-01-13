@@ -6,30 +6,28 @@ import 'package:kobermart_client/firebase.dart';
 class TokendetailController extends GetxController {
   final count = 0.obs;
   var tokenCode = "".obs;
+  var tokenId = "".obs;
   var creator = "".obs;
   var upline = "".obs;
   var uplineName = "".obs;
+  var uplineImgurl = "".obs;
   Rx<DateTime> createdAt = DateTime.now().obs;
   late Tokens data;
 
   @override
   Future<void> onInit() async {
-    if (Get.arguments["data"] != null) {
-      
-      data = Get.arguments["data"];
-      tokenCode.value = data.tokenReg;
-      creator.value = (await data.getCreatorData())["name"];
-      upline.value = data.uplineData["name"];
-      createdAt.value = data.tokenCreatedAt;
-    } else {
       await Members.doc(Get.arguments["tokenCode"]).get().then((doc) {
-        tokenCode.value = doc.data()!["tokenReg"];
+        tokenCode.value = doc.data()!["tokenCode"];
+        tokenId.value = doc.data()!["refId"];
         creator.value = doc.data()!["tokenCreator"];
         upline.value = doc.data()!["upline"];
         createdAt.value = (doc.data()!["tokenCreatedAt"] as Timestamp).toDate();
       });
-    }
-    uplineName.value = await Members.doc(upline.value).get().then((value) => value.data()!["name"]);
+      await Members.doc(upline.value).get().then((value) {
+        uplineName.value = value.data()!["name"];
+        uplineImgurl.value = value.data()!["imgurl"];
+      });
+    
     super.onInit();
   }
 

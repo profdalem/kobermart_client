@@ -39,12 +39,12 @@ class MemberhistoryView extends GetView<MemberhistoryController> {
           Expanded(
               child: StickyGroupedListView(
             elements: authC.sortedMemberList(controller.keyword.value),
-            groupBy: (dynamic element) => element["createdAt"]!.toDate().toLocal().toString().substring(0, 10),
+            groupBy: (dynamic element) => Timestamp.fromMillisecondsSinceEpoch(element["createdAt"]).toDate().toLocal().toString().substring(0, 10),
             itemComparator: (dynamic a, dynamic b) =>
-                (a["createdAt"] as Timestamp).millisecondsSinceEpoch - (b["createdAt"] as Timestamp).millisecondsSinceEpoch,
+                a["createdAt"] - b["createdAt"],
             order: StickyGroupedListOrder.DESC,
             groupSeparatorBuilder: (dynamic element) {
-              return DateTime.now().toString().substring(0, 10) == element["createdAt"].toDate().toLocal().toString().substring(0, 10)
+              return DateTime.now().toString().substring(0, 10) == Timestamp.fromMillisecondsSinceEpoch(element["createdAt"]).toDate().toLocal().toString().substring(0, 10)
                   ? const Padding(
                       padding: EdgeInsets.all(8.0),
                       child: Text("Hari ini", style: TextStyle(fontWeight: FontWeight.bold)),
@@ -52,7 +52,7 @@ class MemberhistoryView extends GetView<MemberhistoryController> {
                   : Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
-                        element["createdAt"].toDate().toLocal().toString().substring(0, 10),
+                        Timestamp.fromMillisecondsSinceEpoch(element["createdAt"]).toDate().toLocal().toString().substring(0, 10),
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     );
@@ -67,10 +67,10 @@ class MemberhistoryView extends GetView<MemberhistoryController> {
                       Get.toNamed(Routes.MEMBERPROFILE, arguments: {"id": element["id"], "name": element["name"]});
                     },
                     leading: CircleAvatar(
-                      backgroundImage: CachedNetworkImageProvider(PROFILE_IMG),
+                      backgroundImage: CachedNetworkImageProvider(element['imgurl']),
                     ),
                     title: PanelTitle(title: element['name'] != null ? element['name'] : element['id']),
-                    subtitle: Text("${DateFormat.Hm().format(element['createdAt'].toDate())} - ${element['uplineName']}"),
+                    subtitle: Text("${DateFormat.Hm().format(Timestamp.fromMillisecondsSinceEpoch(element["createdAt"]).toDate())} - ${element['uplineName']}"),
                   ),
                 ),
               );

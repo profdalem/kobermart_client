@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:kobermart_client/app/controllers/auth_controller.dart';
 import 'package:kobermart_client/app/controllers/product_controller.dart';
+import 'package:kobermart_client/app/helpers/general_helper.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/constants.dart';
 import 'package:kobermart_client/style.dart';
@@ -34,7 +35,10 @@ class HomeView extends GetView<HomeController> {
           ),
         ),
         body: RefreshIndicator(
-          onRefresh: () => productC.getAllProduct(),
+          onRefresh: () async {
+            await productC.getAllProduct();
+            authC.downlines.value = await getUpdatedDownlines(authC.refId.value);
+          },
           child: ListView(
             children: [
               Stack(
@@ -342,8 +346,8 @@ class HomeView extends GetView<HomeController> {
               // Produk Terkini
               Obx(
                 () => GridView.builder(
-                  gridDelegate:
-                      SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: Get.width > 360? 3: 2, childAspectRatio: 55 / 100, crossAxisSpacing: 10, mainAxisSpacing: 15),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: Get.width > 360 ? 2 : 2, childAspectRatio: 55 / 100, crossAxisSpacing: 10, mainAxisSpacing: 15),
                   physics: NeverScrollableScrollPhysics(),
                   padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
                   itemCount: getAllActiveProducts().length,
