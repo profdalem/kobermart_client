@@ -7,7 +7,7 @@ import 'package:kobermart_client/firebase.dart';
 
 import '../../routes/app_pages.dart';
 import 'package:get/get.dart';
-import 'package:badges/badges.dart';
+import 'package:badges/badges.dart' as badge;
 
 class DefaultAppBar extends StatelessWidget {
   DefaultAppBar({Key? key, required this.pageTitle}) : super(key: key);
@@ -55,7 +55,8 @@ class DefaultAppBar extends StatelessWidget {
               // authC.downlines.value = await getUpdatedDownlines(Auth.currentUser!.uid);
               // print(authC.downlines);
               // await getCashbackHistory("KBBJ1", DateTime(2021), DateTime.now());
-              authC.downlines.value = await getUpdatedDownlines(Auth.currentUser!.uid);
+              authC.downlines.value =
+                  await getUpdatedDownlines(Auth.currentUser!.uid);
             },
             icon: Icon(Icons.refresh)),
         IconButton(
@@ -64,12 +65,12 @@ class DefaultAppBar extends StatelessWidget {
             },
             icon: notifCount.isEqual(0)
                 ? Icon(Icons.notifications)
-                : Badge(
+                : badge.Badge(
+                    badgeStyle: badge.BadgeStyle(badgeColor: Color(0xFFE49542)),
                     badgeContent: Text(
                       notifCount.toString(),
                       style: TextStyle(color: Colors.white),
                     ),
-                    badgeColor: Color(0xFFE49542),
                     child: Icon(Icons.notifications),
                   )),
         // IconButton(

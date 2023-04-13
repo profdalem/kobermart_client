@@ -6,7 +6,6 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:kobermart_client/app/controllers/auth_controller.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
-import 'package:kobermart_client/constants.dart';
 import 'package:kobermart_client/style.dart';
 import 'package:sticky_grouped_list/sticky_grouped_list.dart';
 
@@ -39,20 +38,36 @@ class MemberhistoryView extends GetView<MemberhistoryController> {
           Expanded(
               child: StickyGroupedListView(
             elements: authC.sortedMemberList(controller.keyword.value),
-            groupBy: (dynamic element) => Timestamp.fromMillisecondsSinceEpoch(element["createdAt"]).toDate().toLocal().toString().substring(0, 10),
+            groupBy: (dynamic element) =>
+                Timestamp.fromMillisecondsSinceEpoch(element["createdAt"])
+                    .toDate()
+                    .toLocal()
+                    .toString()
+                    .substring(0, 10),
             itemComparator: (dynamic a, dynamic b) =>
                 a["createdAt"] - b["createdAt"],
             order: StickyGroupedListOrder.DESC,
             groupSeparatorBuilder: (dynamic element) {
-              return DateTime.now().toString().substring(0, 10) == Timestamp.fromMillisecondsSinceEpoch(element["createdAt"]).toDate().toLocal().toString().substring(0, 10)
+              return DateTime.now().toString().substring(0, 10) ==
+                      Timestamp.fromMillisecondsSinceEpoch(element["createdAt"])
+                          .toDate()
+                          .toLocal()
+                          .toString()
+                          .substring(0, 10)
                   ? const Padding(
                       padding: EdgeInsets.all(8.0),
-                      child: Text("Hari ini", style: TextStyle(fontWeight: FontWeight.bold)),
+                      child: Text("Hari ini",
+                          style: TextStyle(fontWeight: FontWeight.bold)),
                     )
                   : Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
-                        Timestamp.fromMillisecondsSinceEpoch(element["createdAt"]).toDate().toLocal().toString().substring(0, 10),
+                        Timestamp.fromMillisecondsSinceEpoch(
+                                element["createdAt"])
+                            .toDate()
+                            .toLocal()
+                            .toString()
+                            .substring(0, 10),
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     );
@@ -64,19 +79,26 @@ class MemberhistoryView extends GetView<MemberhistoryController> {
                   elevation: 1,
                   child: ListTile(
                     onTap: () {
-                      Get.toNamed(Routes.MEMBERPROFILE, arguments: {"id": element["id"], "name": element["name"]});
+                      Get.toNamed(Routes.MEMBERPROFILE, arguments: {
+                        "id": element["id"],
+                        "name": element["name"]
+                      });
                     },
                     leading: CircleAvatar(
-                      backgroundImage: CachedNetworkImageProvider(element['imgurl']),
+                      backgroundImage:
+                          CachedNetworkImageProvider(element['imgurl']),
                     ),
-                    title: PanelTitle(title: element['name'] != null ? element['name'] : element['id']),
-                    subtitle: Text("${DateFormat.Hm().format(Timestamp.fromMillisecondsSinceEpoch(element["createdAt"]).toDate())} - ${element['uplineName']}"),
+                    title: PanelTitle(
+                        title: element['name'] != null
+                            ? element['name']
+                            : element['id']),
+                    subtitle: Text(
+                        "${DateFormat.Hm().format(Timestamp.fromMillisecondsSinceEpoch(element["createdAt"]).toDate())} - ${element['uplineName']}"),
                   ),
                 ),
               );
             },
-          )
-              ),
+          )),
           sb15,
         ],
       ),
@@ -145,10 +167,17 @@ class CariButton extends StatelessWidget {
               color: Colors.black,
             ),
             focusedBorder: OutlineInputBorder(
-                gapPadding: 0, borderSide: BorderSide(color: Color(0xFFE4E4E4), style: BorderStyle.solid), borderRadius: BorderRadius.all(Radius.circular(25))),
+                gapPadding: 0,
+                borderSide: BorderSide(
+                    color: Color(0xFFE4E4E4), style: BorderStyle.solid),
+                borderRadius: BorderRadius.all(Radius.circular(25))),
             enabledBorder: OutlineInputBorder(
-                gapPadding: 0, borderSide: BorderSide(color: Color(0xFFE4E4E4), style: BorderStyle.solid), borderRadius: BorderRadius.all(Radius.circular(25))),
-            contentPadding: EdgeInsets.only(left: 16, right: 2, bottom: 3, top: 3)),
+                gapPadding: 0,
+                borderSide: BorderSide(
+                    color: Color(0xFFE4E4E4), style: BorderStyle.solid),
+                borderRadius: BorderRadius.all(Radius.circular(25))),
+            contentPadding:
+                EdgeInsets.only(left: 16, right: 2, bottom: 3, top: 3)),
         onChanged: (value) {
           controller.keyword.value = value.toString();
         },

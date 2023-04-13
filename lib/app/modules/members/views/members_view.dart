@@ -3,7 +3,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:kobermart_client/app/controllers/auth_controller.dart';
 import 'package:kobermart_client/app/helpers/general_helper.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
@@ -95,8 +94,11 @@ class MembersView extends StatelessWidget {
                         memberC.bottomSheetSearchMember(context, 0);
                       },
                       child: Container(
-                        padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                        decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(15)),
+                        padding:
+                            EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                        decoration: BoxDecoration(
+                            color: Colors.grey.shade300,
+                            borderRadius: BorderRadius.circular(15)),
                         child: Row(
                           children: [
                             Text(
@@ -116,7 +118,11 @@ class MembersView extends StatelessWidget {
               ),
               Obx(() => memberC.isLoading.value
                   ? Center(child: CircularProgressIndicator())
-                  : (memberC.authC.downlineList(memberC.keyword.value, false).isNotEmpty ? PanelAnggota() : Center(child: Text("Kosong")))),
+                  : (memberC.authC
+                          .downlineList(memberC.keyword.value, false)
+                          .isNotEmpty
+                      ? PanelAnggota()
+                      : Center(child: Text("Kosong")))),
 
               sb15
             ],
@@ -164,15 +170,17 @@ class PanelAnggota extends StatelessWidget {
                 authC.downlineList("", false).length,
                 (index) => Container(
                       padding: EdgeInsets.only(bottom: 10),
-                      decoration: BoxDecoration(border: Border.fromBorderSide(BorderSide(color: Colors.grey.shade100))),
+                      decoration: BoxDecoration(
+                          border: Border.fromBorderSide(
+                              BorderSide(color: Colors.grey.shade100))),
                       child: Column(children: [
                         GestureDetector(
                           onTap: () {
-                                        memberC.expandStatusList[index].isExpand
-                                            ? memberC.expandStatusList[index].closePanel()
-                                            : memberC.expandStatusList[index].openPanel();
-                                        memberC.expandStatusList.refresh();
-                                      },
+                            memberC.expandStatusList[index].isExpand
+                                ? memberC.expandStatusList[index].closePanel()
+                                : memberC.expandStatusList[index].openPanel();
+                            memberC.expandStatusList.refresh();
+                          },
                           child: Container(
                             height: 40,
                             color: Colors.white,
@@ -189,9 +197,17 @@ class PanelAnggota extends StatelessWidget {
                                       width: 10,
                                     ),
                                     Container(
-                                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                                      decoration: BoxDecoration(color: Colors.amber.shade700, borderRadius: BorderRadius.circular(15)),
-                                      child: Text('${authC.downlineList("", false)[index].length} terisi', style: TextStyle(fontSize: 12, color: Colors.white)),
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 2),
+                                      decoration: BoxDecoration(
+                                          color: Colors.amber.shade700,
+                                          borderRadius:
+                                              BorderRadius.circular(15)),
+                                      child: Text(
+                                          '${authC.downlineList("", false)[index].length} terisi',
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.white)),
                                     ),
                                     // SizedBox(
                                     //   width: 5,
@@ -208,7 +224,8 @@ class PanelAnggota extends StatelessWidget {
                                   children: [
                                     memberC.expandStatusList[index].isExpand
                                         ? Icon(Icons.keyboard_arrow_up_outlined)
-                                        : Icon(Icons.keyboard_arrow_down_outlined),
+                                        : Icon(
+                                            Icons.keyboard_arrow_down_outlined),
                                     SizedBox(
                                       width: 15,
                                     ),
@@ -229,11 +246,21 @@ class PanelAnggota extends StatelessWidget {
                               scrollDirection: Axis.horizontal,
                               children: [
                                 Row(
-                                  children: List.generate(authC.downlineList("", false)[index].length <= 10 ? authC.downlineList("", false)[index].length : 10,
-                                      (index2) {
+                                  children: List.generate(
+                                      authC
+                                                  .downlineList(
+                                                      "", false)[index]
+                                                  .length <=
+                                              10
+                                          ? authC
+                                              .downlineList("", false)[index]
+                                              .length
+                                          : 10, (index2) {
                                     Widget item;
                                     var tokenUsed = false;
-                                    if (authC.downlineList("", false)[index][index2]["type"] == "member") {
+                                    if (authC.downlineList("", false)[index]
+                                            [index2]["type"] ==
+                                        "member") {
                                       tokenUsed = true;
                                     }
 
@@ -244,55 +271,111 @@ class PanelAnggota extends StatelessWidget {
                                           child: TextButton(
                                             onPressed: () {
                                               if (tokenUsed) {
-                                                Get.toNamed(Routes.MEMBERPROFILE, arguments: {
-                                                  "id": authC.downlineList("", false)[index][index2]["id"],
-                                                  "name": authC.downlineList("", false)[index][index2]["name"],
-                                                });
+                                                Get.toNamed(
+                                                    Routes.MEMBERPROFILE,
+                                                    arguments: {
+                                                      "id": authC.downlineList(
+                                                              "", false)[index]
+                                                          [index2]["id"],
+                                                      "name":
+                                                          authC.downlineList("",
+                                                                  false)[index]
+                                                              [index2]["name"],
+                                                    });
                                               } else {
-                                                Get.toNamed(Routes.TOKENDETAIL, arguments: {"tokenCode": authC.downlineList("", false)[index][index2]["id"]});
+                                                Get.toNamed(Routes.TOKENDETAIL,
+                                                    arguments: {
+                                                      "tokenCode":
+                                                          authC.downlineList("",
+                                                                  false)[index]
+                                                              [index2]["id"]
+                                                    });
                                               }
                                             },
                                             child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
                                               children: [
                                                 Stack(
-                                                  alignment: Alignment.bottomCenter,
+                                                  alignment:
+                                                      Alignment.bottomCenter,
                                                   children: [
                                                     Padding(
-                                                      padding: const EdgeInsets.only(bottom: 5),
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              bottom: 5),
                                                       child: CircleAvatar(
                                                         radius: 30.0,
-                                                        backgroundColor: tokenUsed ? Colors.transparent : Colors.grey.shade200,
+                                                        backgroundColor:
+                                                            tokenUsed
+                                                                ? Colors
+                                                                    .transparent
+                                                                : Colors.grey
+                                                                    .shade200,
                                                         backgroundImage: tokenUsed
-                                                            ? CachedNetworkImageProvider(authC.downlineList("", false)[index][index2]["imgurl"])
+                                                            ? CachedNetworkImageProvider(
+                                                                authC.downlineList(
+                                                                            "",
+                                                                            false)[index]
+                                                                        [index2]
+                                                                    ["imgurl"])
                                                             : null,
-                                                        child: tokenUsed ? SizedBox() : Text("token"),
+                                                        child: tokenUsed
+                                                            ? SizedBox()
+                                                            : Text("token"),
                                                       ),
                                                     ),
                                                     if (tokenUsed)
                                                       Align(
-                                                        alignment: Alignment.bottomCenter,
+                                                        alignment: Alignment
+                                                            .bottomCenter,
                                                         child: Container(
                                                           decoration: BoxDecoration(
-                                                              color: Colors.amber.shade800,
-                                                              borderRadius: BorderRadius.all(Radius.circular(15)),
-                                                              boxShadow: [BoxShadow(blurRadius: 1, color: Colors.grey.shade500)]),
+                                                              color: Colors
+                                                                  .amber
+                                                                  .shade800,
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .all(Radius
+                                                                          .circular(15)),
+                                                              boxShadow: [
+                                                                BoxShadow(
+                                                                    blurRadius:
+                                                                        1,
+                                                                    color: Colors
+                                                                        .grey
+                                                                        .shade500)
+                                                              ]),
                                                           child: Padding(
-                                                            padding: EdgeInsets.symmetric(vertical: 2, horizontal: 5),
+                                                            padding: EdgeInsets
+                                                                .symmetric(
+                                                                    vertical: 2,
+                                                                    horizontal:
+                                                                        5),
                                                             child: RichText(
                                                               text: TextSpan(
-                                                                style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .white,
+                                                                    fontSize:
+                                                                        12,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold),
                                                                 children: [
                                                                   WidgetSpan(
                                                                     child: Icon(
-                                                                      Icons.person,
+                                                                      Icons
+                                                                          .person,
                                                                       size: 13,
-                                                                      color: Colors.white,
+                                                                      color: Colors
+                                                                          .white,
                                                                     ),
                                                                   ),
                                                                   TextSpan(
                                                                     text: (authC.downlineList("", false)[index][index2]["kd1_member"] +
-                                                                            authC.downlineList("", false)[index][index2]["kd1_token"])
+                                                                            authC.downlineList("",
+                                                                                false)[index][index2]["kd1_token"])
                                                                         .toString(),
                                                                   ),
                                                                 ],
@@ -306,12 +389,23 @@ class PanelAnggota extends StatelessWidget {
                                                 sb5,
                                                 Text(
                                                   tokenUsed
-                                                      ? capitalizeIt(authC.downlineList("", false)[index][index2]["name"])
-                                                      : authC.downlineList("", false)[index][index2]["id"],
-                                                  overflow: TextOverflow.ellipsis,
+                                                      ? capitalizeIt(
+                                                          authC.downlineList("",
+                                                                  false)[index]
+                                                              [index2]["name"])
+                                                      : authC.downlineList(
+                                                              "", false)[index]
+                                                          [index2]["id"],
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                   maxLines: 2,
                                                   textAlign: TextAlign.center,
-                                                  style: TextStyle(color: Colors.black, fontSize: Get.width * 0.25 * 0.12, height: 1),
+                                                  style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: Get.width *
+                                                          0.25 *
+                                                          0.12,
+                                                      height: 1),
                                                 ),
                                               ],
                                             ),
@@ -321,23 +415,30 @@ class PanelAnggota extends StatelessWidget {
                                     return item;
                                   }),
                                 ),
-                                if (authC.downlineList("", false)[index].length >= 10)
+                                if (authC
+                                        .downlineList("", false)[index]
+                                        .length >=
+                                    10)
                                   Container(
                                     width: Get.width * 0.25,
                                     child: Card(
                                         shadowColor: Colors.transparent,
                                         child: TextButton(
                                           onPressed: () {
-                                            memberC.bottomSheetSearchMember(context, index+1);
+                                            memberC.bottomSheetSearchMember(
+                                                context, index + 1);
                                           },
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
                                             children: [
                                               Padding(
-                                                padding: const EdgeInsets.only(bottom: 5),
+                                                padding: const EdgeInsets.only(
+                                                    bottom: 5),
                                                 child: CircleAvatar(
                                                   radius: 30.0,
-                                                  backgroundColor: Colors.transparent,
+                                                  backgroundColor:
+                                                      Colors.transparent,
                                                   backgroundImage: null,
                                                   child: Icon(
                                                     Icons.more_horiz,
@@ -351,7 +452,11 @@ class PanelAnggota extends StatelessWidget {
                                                 overflow: TextOverflow.ellipsis,
                                                 maxLines: 2,
                                                 textAlign: TextAlign.center,
-                                                style: TextStyle(color: Colors.grey, fontSize: Get.width * 0.25 * 0.12, height: 1),
+                                                style: TextStyle(
+                                                    color: Colors.grey,
+                                                    fontSize:
+                                                        Get.width * 0.25 * 0.12,
+                                                    height: 1),
                                               ),
                                             ],
                                           ),
@@ -465,7 +570,9 @@ class PanelKedalaman extends StatelessWidget {
                               visualDensity: VisualDensity.compact,
                               padding: EdgeInsets.all(0),
                               backgroundColor: Color(0xFFFF9800),
-                              label: Text('${item.members.length} terisi', style: TextStyle(fontSize: 12, color: Colors.white)),
+                              label: Text('${item.members.length} terisi',
+                                  style: TextStyle(
+                                      fontSize: 12, color: Colors.white)),
                             ),
                             SizedBox(
                               width: 10,
@@ -474,7 +581,10 @@ class PanelKedalaman extends StatelessWidget {
                               visualDensity: VisualDensity.compact,
                               padding: EdgeInsets.all(0),
                               backgroundColor: Colors.blue,
-                              label: Text('${slotSize - item.members.length} kosong', style: TextStyle(fontSize: 12, color: Colors.white)),
+                              label: Text(
+                                  '${slotSize - item.members.length} kosong',
+                                  style: TextStyle(
+                                      fontSize: 12, color: Colors.white)),
                             ),
                           ]),
                         );
@@ -496,52 +606,95 @@ class PanelKedalaman extends StatelessWidget {
                                     child: TextButton(
                                       onPressed: () {
                                         if (tokenUsed) {
-                                          Get.toNamed(Routes.MEMBERPROFILE, arguments: {
-                                            "id": item.members[index]["id"],
-                                            "name": item.members[index]["name"],
-                                          });
+                                          Get.toNamed(Routes.MEMBERPROFILE,
+                                              arguments: {
+                                                "id": item.members[index]["id"],
+                                                "name": item.members[index]
+                                                    ["name"],
+                                              });
                                         } else {
-                                          Get.toNamed(Routes.TOKENDETAIL, arguments: {"tokenCode": item.members[index]["id"]});
+                                          Get.toNamed(Routes.TOKENDETAIL,
+                                              arguments: {
+                                                "tokenCode": item.members[index]
+                                                    ["id"]
+                                              });
                                         }
                                       },
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
                                         children: [
                                           Stack(
                                             alignment: Alignment.bottomCenter,
                                             children: [
                                               Padding(
-                                                padding: const EdgeInsets.only(bottom: 5),
+                                                padding: const EdgeInsets.only(
+                                                    bottom: 5),
                                                 child: CircleAvatar(
                                                   radius: 30.0,
-                                                  backgroundColor: tokenUsed ? Colors.transparent : Colors.grey.shade200,
-                                                  backgroundImage: tokenUsed ? CachedNetworkImageProvider(PROFILE_IMG) : null,
-                                                  child: tokenUsed ? SizedBox() : Text("token"),
+                                                  backgroundColor: tokenUsed
+                                                      ? Colors.transparent
+                                                      : Colors.grey.shade200,
+                                                  backgroundImage: tokenUsed
+                                                      ? CachedNetworkImageProvider(
+                                                          PROFILE_IMG)
+                                                      : null,
+                                                  child: tokenUsed
+                                                      ? SizedBox()
+                                                      : Text("token"),
                                                 ),
                                               ),
                                               if (tokenUsed)
                                                 Align(
-                                                  alignment: Alignment.bottomCenter,
+                                                  alignment:
+                                                      Alignment.bottomCenter,
                                                   child: Container(
                                                     decoration: BoxDecoration(
-                                                        color: Colors.amber.shade800,
-                                                        borderRadius: BorderRadius.all(Radius.circular(15)),
-                                                        boxShadow: [BoxShadow(blurRadius: 1, color: Colors.grey.shade500)]),
+                                                        color: Colors
+                                                            .amber.shade800,
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                                Radius.circular(
+                                                                    15)),
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                              blurRadius: 1,
+                                                              color: Colors.grey
+                                                                  .shade500)
+                                                        ]),
                                                     child: Padding(
-                                                      padding: EdgeInsets.symmetric(vertical: 2, horizontal: 5),
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              vertical: 2,
+                                                              horizontal: 5),
                                                       child: RichText(
                                                         text: TextSpan(
-                                                          style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontSize: 12,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
                                                           children: [
                                                             WidgetSpan(
                                                               child: Icon(
                                                                 Icons.person,
                                                                 size: 13,
-                                                                color: Colors.white,
+                                                                color: Colors
+                                                                    .white,
                                                               ),
                                                             ),
                                                             TextSpan(
-                                                              text: (item.members[index]["kd1_member"] + item.members[index]["kd1_token"]).toString(),
+                                                              text: (item.members[
+                                                                              index]
+                                                                          [
+                                                                          "kd1_member"] +
+                                                                      item.members[
+                                                                              index]
+                                                                          [
+                                                                          "kd1_token"])
+                                                                  .toString(),
                                                             ),
                                                           ],
                                                         ),
@@ -553,11 +706,18 @@ class PanelKedalaman extends StatelessWidget {
                                           ),
                                           sb5,
                                           Text(
-                                            tokenUsed ? capitalizeIt(item.members[index]["name"]) : item.members[index]["id"],
+                                            tokenUsed
+                                                ? capitalizeIt(
+                                                    item.members[index]["name"])
+                                                : item.members[index]["id"],
                                             overflow: TextOverflow.ellipsis,
                                             maxLines: 2,
                                             textAlign: TextAlign.center,
-                                            style: TextStyle(color: Colors.black, fontSize: Get.width * 0.25 * 0.12, height: 1),
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize:
+                                                    Get.width * 0.25 * 0.12,
+                                                height: 1),
                                           ),
                                         ],
                                       ),

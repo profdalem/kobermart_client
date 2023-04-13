@@ -1,6 +1,6 @@
 // ignore_for_file: invalid_use_of_protected_member
 
-import 'package:badges/badges.dart';
+import 'package:badges/badges.dart' as badge;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -22,8 +22,14 @@ class TokenlistView extends GetView<TokenlistController> {
       return controller.datalist.value
           .where((e) =>
               e.tokenUsed == false &&
-              (e.upline.toString().toLowerCase().contains(controller.keyword.value.toLowerCase()) ||
-                  e.tokenCode.toString().toLowerCase().contains(controller.keyword.value.toLowerCase())))
+              (e.upline
+                      .toString()
+                      .toLowerCase()
+                      .contains(controller.keyword.value.toLowerCase()) ||
+                  e.tokenCode
+                      .toString()
+                      .toLowerCase()
+                      .contains(controller.keyword.value.toLowerCase())))
           .toList();
     }
 
@@ -31,8 +37,14 @@ class TokenlistView extends GetView<TokenlistController> {
       return controller.registeredDataList.value
           .where((e) =>
               e.tokenUsed == true &&
-              (e.tokenCode.toString().toLowerCase().contains(controller.keyword.value.toLowerCase()) ||
-                  e.upline.toString().toLowerCase().contains(controller.keyword.value.toLowerCase())))
+              (e.tokenCode
+                      .toString()
+                      .toLowerCase()
+                      .contains(controller.keyword.value.toLowerCase()) ||
+                  e.upline
+                      .toString()
+                      .toLowerCase()
+                      .contains(controller.keyword.value.toLowerCase())))
           .toList();
     }
 
@@ -79,61 +91,122 @@ class TokenlistView extends GetView<TokenlistController> {
                                   ),
                                 ),
                                 sb10,
-                                Obx(() => getTokens(controller.keyword.value).isEmpty
+                                Obx(() => getTokens(controller.keyword.value)
+                                        .isEmpty
                                     ? Center(child: Text("Kosong"))
                                     : Column(
                                         children: List.generate(
-                                          getTokens(controller.keyword.value).length,
+                                          getTokens(controller.keyword.value)
+                                              .length,
                                           (index) => Padding(
-                                            padding: const EdgeInsets.only(bottom: 5),
+                                            padding: const EdgeInsets.only(
+                                                bottom: 5),
                                             child: Card(
                                               elevation: 1,
                                               child: ListTile(
-                                                contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                                                contentPadding:
+                                                    EdgeInsets.symmetric(
+                                                        vertical: 0,
+                                                        horizontal: 15),
                                                 onTap: () async {
-                                                  if (!(getTokens(controller.keyword.value))[index].opened) {
-                                                    await FirebaseFirestore.instance
+                                                  if (!(getTokens(controller
+                                                          .keyword
+                                                          .value))[index]
+                                                      .opened) {
+                                                    await FirebaseFirestore
+                                                        .instance
                                                         .collection("members")
-                                                        .doc((getTokens(controller.keyword.value))[index].refId)
-                                                        .set({"opened": true}, SetOptions(merge: true)); 
-                                                    Get.toNamed(Routes.TOKENDETAIL, arguments: {"tokenCode": (getTokens(controller.keyword.value))[index].id});
+                                                        .doc((getTokens(
+                                                                    controller
+                                                                        .keyword
+                                                                        .value))[
+                                                                index]
+                                                            .refId)
+                                                        .set({
+                                                      "opened": true
+                                                    }, SetOptions(merge: true));
+                                                    Get.toNamed(
+                                                        Routes.TOKENDETAIL,
+                                                        arguments: {
+                                                          "tokenCode": (getTokens(
+                                                                  controller
+                                                                      .keyword
+                                                                      .value))[index]
+                                                              .id
+                                                        });
                                                   } else {
                                                     Get.toNamed(
                                                       Routes.TOKENDETAIL,
-                                                      arguments: {"tokenCode": (getTokens(controller.keyword.value))[index].id},
+                                                      arguments: {
+                                                        "tokenCode": (getTokens(
+                                                                    controller
+                                                                        .keyword
+                                                                        .value))[
+                                                                index]
+                                                            .id
+                                                      },
                                                     );
                                                   }
                                                 },
-                                                leading: Badge(
-                                                  badgeColor: Colors.amber,
-                                                  showBadge: !(getTokens(controller.keyword.value))[index].opened ? true : false,
-                                                  padding: EdgeInsets.all(8),
+                                                leading: badge.Badge(
+                                                  badgeStyle: badge.BadgeStyle(
+                                                      badgeColor: Colors.amber,
+                                                      padding:
+                                                          EdgeInsets.all(8)),
+                                                  showBadge: !(getTokens(
+                                                                  controller
+                                                                      .keyword
+                                                                      .value))[
+                                                              index]
+                                                          .opened
+                                                      ? true
+                                                      : false,
                                                   child: CircleAvatar(
                                                     child: Text(
                                                       "token",
-                                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                                      style: TextStyle(
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.bold),
                                                     ),
-                                                    backgroundColor: Colors.grey.shade200,
+                                                    backgroundColor:
+                                                        Colors.grey.shade200,
                                                     // backgroundImage: AssetImage(
                                                     //     "assets/images/user-placeholder.png"),
                                                   ),
                                                 ),
                                                 title: Text(
-                                                  (getTokens(controller.keyword.value))[index].tokenCode,
+                                                  (getTokens(controller.keyword
+                                                          .value))[index]
+                                                      .tokenCode,
                                                   style: TextStyle(
                                                       fontSize: 18,
-                                                      fontWeight: !(getTokens(controller.keyword.value))[index].opened ? FontWeight.bold : FontWeight.normal),
+                                                      fontWeight: !(getTokens(
+                                                                  controller
+                                                                      .keyword
+                                                                      .value))[index]
+                                                              .opened
+                                                          ? FontWeight.bold
+                                                          : FontWeight.normal),
                                                 ),
                                                 subtitle: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
                                                   children: [
                                                     // Text("16 Juni 2022 13.45 WITA"),
-                                                    Text("Upline: ${(getTokens(controller.keyword.value))[index].uplineData["name"]}"),
+                                                    Text(
+                                                        "Upline: ${(getTokens(controller.keyword.value))[index].uplineData["name"]}"),
                                                   ],
                                                 ),
                                                 trailing: ItemMenu(
-                                                  tokenCode: getTokens(controller.keyword.value)[index].tokenCode,
-                                                  tokenUsed: getTokens(controller.keyword.value)[index].tokenUsed,
+                                                  tokenCode: getTokens(
+                                                          controller.keyword
+                                                              .value)[index]
+                                                      .tokenCode,
+                                                  tokenUsed: getTokens(
+                                                          controller.keyword
+                                                              .value)[index]
+                                                      .tokenUsed,
                                                 ),
                                               ),
                                             ),
@@ -149,49 +222,88 @@ class TokenlistView extends GetView<TokenlistController> {
                                   ),
                                 ),
                                 sb10,
-                                Obx(() => getRegisteredTokens(controller.keyword.value).isEmpty
+                                Obx(() => getRegisteredTokens(
+                                            controller.keyword.value)
+                                        .isEmpty
                                     ? Center(child: Text("Kosong"))
                                     : Column(
                                         children: List.generate(
-                                          getRegisteredTokens(controller.keyword.value).length,
+                                          getRegisteredTokens(
+                                                  controller.keyword.value)
+                                              .length,
                                           (index) => Padding(
-                                            padding: const EdgeInsets.only(bottom: 5),
+                                            padding: const EdgeInsets.only(
+                                                bottom: 5),
                                             child: Card(
                                               elevation: 1,
                                               child: ListTile(
-                                                contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                                                contentPadding:
+                                                    EdgeInsets.symmetric(
+                                                        vertical: 0,
+                                                        horizontal: 15),
                                                 onTap: () {
-                                                  Get.toNamed(Routes.MEMBERPROFILE, arguments: {
-                                                    "name": getRegisteredTokens(controller.keyword.value)[index].name,
-                                                    "id": getRegisteredTokens(controller.keyword.value)[index].id
-                                                  });
+                                                  Get.toNamed(
+                                                      Routes.MEMBERPROFILE,
+                                                      arguments: {
+                                                        "name": getRegisteredTokens(
+                                                                    controller
+                                                                        .keyword
+                                                                        .value)[
+                                                                index]
+                                                            .name,
+                                                        "id": getRegisteredTokens(
+                                                                    controller
+                                                                        .keyword
+                                                                        .value)[
+                                                                index]
+                                                            .id
+                                                      });
                                                 },
-                                                leading: Badge(
-                                                  badgeColor: Colors.amber,
+                                                leading: badge.Badge(
+                                                  badgeStyle: badge.BadgeStyle(
+                                                      badgeColor: Colors.amber,
+                                                      padding:
+                                                          EdgeInsets.all(8)),
                                                   showBadge: false,
-                                                  padding: EdgeInsets.all(8),
                                                   child: CircleAvatar(
                                                     // child: Icon(Icons.person),
                                                     backgroundImage:
-                                                        CachedNetworkImageProvider(getRegisteredTokens(controller.keyword.value)[index].imgrul),
+                                                        CachedNetworkImageProvider(
+                                                            getRegisteredTokens(
+                                                                    controller
+                                                                        .keyword
+                                                                        .value)[index]
+                                                                .imgrul),
                                                   ),
                                                 ),
                                                 title: Text(
-                                                  getRegisteredTokens(controller.keyword.value)[index].name,
+                                                  getRegisteredTokens(controller
+                                                          .keyword.value)[index]
+                                                      .name,
                                                   style: TextStyle(
                                                     fontSize: 18,
                                                   ),
                                                 ),
                                                 subtitle: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
                                                   children: [
                                                     // Text("16 Juni 2022 13.45 WITA"),
-                                                    Text("Upline: ${getRegisteredTokens(controller.keyword.value)[index].uplineData["name"]}"),
+                                                    Text(
+                                                        "Upline: ${getRegisteredTokens(controller.keyword.value)[index].uplineData["name"]}"),
                                                   ],
                                                 ),
                                                 trailing: ItemMenu(
-                                                  tokenCode: getRegisteredTokens(controller.keyword.value)[index].tokenCode,
-                                                  tokenUsed: getRegisteredTokens(controller.keyword.value)[index].tokenUsed,
+                                                  tokenCode:
+                                                      getRegisteredTokens(
+                                                              controller.keyword
+                                                                  .value)[index]
+                                                          .tokenCode,
+                                                  tokenUsed:
+                                                      getRegisteredTokens(
+                                                              controller.keyword
+                                                                  .value)[index]
+                                                          .tokenUsed,
                                                 ),
                                               ),
                                             ),
@@ -211,7 +323,8 @@ class TokenlistView extends GetView<TokenlistController> {
 }
 
 class ItemMenu extends StatelessWidget {
-  ItemMenu({Key? key, required this.tokenCode, required this.tokenUsed}) : super(key: key);
+  ItemMenu({Key? key, required this.tokenCode, required this.tokenUsed})
+      : super(key: key);
 
   final String tokenCode;
   final bool tokenUsed;
@@ -225,7 +338,8 @@ class ItemMenu extends StatelessWidget {
       itemBuilder: (context) => <PopupMenuEntry<String>>[
         PopupMenuItem<String>(
           onTap: () {
-            Clipboard.setData(ClipboardData(text: tokenCode)).then((value) => Get.snackbar("Berhasil", "Token berhasil disalin"));
+            Clipboard.setData(ClipboardData(text: tokenCode)).then(
+                (value) => Get.snackbar("Berhasil", "Token berhasil disalin"));
           },
           value: "salin",
           child: ListTile(
@@ -291,10 +405,17 @@ class CariButton extends StatelessWidget {
               color: Colors.black,
             ),
             focusedBorder: OutlineInputBorder(
-                gapPadding: 0, borderSide: BorderSide(color: Color(0xFFE4E4E4), style: BorderStyle.solid), borderRadius: BorderRadius.all(Radius.circular(25))),
+                gapPadding: 0,
+                borderSide: BorderSide(
+                    color: Color(0xFFE4E4E4), style: BorderStyle.solid),
+                borderRadius: BorderRadius.all(Radius.circular(25))),
             enabledBorder: OutlineInputBorder(
-                gapPadding: 0, borderSide: BorderSide(color: Color(0xFFE4E4E4), style: BorderStyle.solid), borderRadius: BorderRadius.all(Radius.circular(25))),
-            contentPadding: EdgeInsets.only(left: 2, right: 2, bottom: 3, top: 3)),
+                gapPadding: 0,
+                borderSide: BorderSide(
+                    color: Color(0xFFE4E4E4), style: BorderStyle.solid),
+                borderRadius: BorderRadius.all(Radius.circular(25))),
+            contentPadding:
+                EdgeInsets.only(left: 2, right: 2, bottom: 3, top: 3)),
         onChanged: (value) {
           tokenlistC.keyword.value = value.toString();
         },

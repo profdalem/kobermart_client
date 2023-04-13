@@ -7,7 +7,7 @@ import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/config.dart';
 import 'package:kobermart_client/constants.dart';
 import 'package:kobermart_client/firebase.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+// import 'package:modal_bottom_sheet/modal_bottom_sheet.dart' as modalbottom;
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../../../style.dart';
@@ -18,7 +18,20 @@ class PpobPulsadataController extends GetxController {
   late dynamic getContact;
   RxList<dynamic> listPaketData = [].obs;
   RxList<dynamic> listPaketDataWithSellPrice = [].obs;
-  var listPulsa = [10000, 100000, 1000000, 150000, 20000, 200000, 25000, 30000, 300000, 5000, 50000, 500000].obs;
+  var listPulsa = [
+    10000,
+    100000,
+    1000000,
+    150000,
+    20000,
+    200000,
+    25000,
+    30000,
+    300000,
+    5000,
+    50000,
+    500000
+  ].obs;
 
   final authC = Get.find<AuthController>();
 
@@ -56,7 +69,9 @@ class PpobPulsadataController extends GetxController {
         if (value == PermissionStatus.granted) {
           print("contact");
           try {
-            await ContactsService.openDeviceContactPicker(androidLocalizedLabels: true).then((value) {
+            await ContactsService.openDeviceContactPicker(
+                    androidLocalizedLabels: true)
+                .then((value) {
               String result = "";
               if (value != null) {
                 if (value.phones != null) {
@@ -103,7 +118,8 @@ class PpobPulsadataController extends GetxController {
             print(e);
           }
         } else {
-          Get.snackbar("Ijin Ditolak", "Tidak dapat mengakses kontak karena tidak diijinkan");
+          Get.snackbar("Ijin Ditolak",
+              "Tidak dapat mengakses kontak karena tidak diijinkan");
         }
       });
     };
@@ -131,8 +147,8 @@ class PpobPulsadataController extends GetxController {
       }
     });
     listPaketData.listen((event) async {});
-    if(devMode) contactNumber.value = "085313924122";
-    if(devMode) phoneNumber.text = "085313924122";
+    if (devMode) contactNumber.value = "085313924122";
+    if (devMode) phoneNumber.text = "085313924122";
     super.onInit();
   }
 
@@ -157,19 +173,28 @@ class PpobPulsadataController extends GetxController {
         isLoading.value = true;
         listPaketDataWithSellPrice.clear();
         try {
-          await IakprepaidProvider().getPrepaidPricelist("data", opr).then((value) async {
-            listPaketData.value = value.body["data"]["pricelist"] as List<Object?>;
+          await IakprepaidProvider()
+              .getPrepaidPricelist("data", opr)
+              .then((value) async {
+            listPaketData.value =
+                value.body["data"]["pricelist"] as List<Object?>;
 
-            await PrepaidPricelist.doc("data").collection(opr).where("status", isEqualTo: "active").get().then((pricelists) {
+            await PrepaidPricelist.doc("data")
+                .collection(opr)
+                .where("status", isEqualTo: "active")
+                .get()
+                .then((pricelists) {
               listPaketData.forEach((element) {
                 pricelists.docs.forEach((item) {
                   if (item.id == element["product_code"]) {
-                    listPaketDataWithSellPrice.add({...element as Map, ...item.data()});
+                    listPaketDataWithSellPrice
+                        .add({...element as Map, ...item.data()});
                   }
                 });
               });
             });
-            listPaketDataWithSellPrice.sort((a, b) => a["sell_price"] - b["sell_price"]);
+            listPaketDataWithSellPrice
+                .sort((a, b) => a["sell_price"] - b["sell_price"]);
             currentPricelistData = opr;
           });
         } catch (e) {
@@ -188,7 +213,9 @@ class PpobPulsadataController extends GetxController {
       temp.sort((a, b) => a["product_price"] - b["product_price"]);
       return temp;
     } else {
-      temp = listPaketData.where((el) => el["product_description"] == paketDataOperator.value).toList();
+      temp = listPaketData
+          .where((el) => el["product_description"] == paketDataOperator.value)
+          .toList();
       temp.sort((a, b) => a["product_price"] - b["product_price"]);
       return temp;
     }
@@ -201,59 +228,63 @@ class PpobPulsadataController extends GetxController {
     pulsaOperator.value = "";
   }
 
-  void openBottomSheetModal(BuildContext context, dynamic content1, dynamic content2, dynamic action, bool isDismissible) {
-    if (FocusManager.instance.primaryFocus!.hasFocus) FocusManager.instance.primaryFocus?.unfocus();
-    showMaterialModalBottomSheet(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))),
-      isDismissible: isDismissible,
-      duration: Duration(milliseconds: 300),
-      context: context,
-      builder: (context) => SingleChildScrollView(
-        controller: ModalScrollController.of(context),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: content1,
-              ),
-              if (content1 != null)
-                Column(
-                  children: [
-                    sb10,
-                    Divider(thickness: 10, color: Colors.blueGrey.shade50),
-                    sb10,
-                  ],
-                ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: content2,
-              ),
-              sb15,
-              if (action != null)
+  void openBottomSheetModal(BuildContext context, dynamic content1,
+      dynamic content2, dynamic action, bool isDismissible) {
+    if (FocusManager.instance.primaryFocus!.hasFocus)
+      FocusManager.instance.primaryFocus?.unfocus();
+    Get.bottomSheet(
+      Container(
+        color: Colors.white,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Obx(
-                    () => isLoading.value
-                        ? Center(child: CircularProgressIndicator())
-                        : Row(
-                            children: [
-                              Expanded(
-                                  child: TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: Text("Ubah"))),
-                              Expanded(
-                                child: Container(height: 50, child: ElevatedButton(onPressed: action, child: Text("Konfirmasi"))),
-                              ),
-                            ],
-                          ),
-                  ),
+                  child: content1,
                 ),
-            ],
+                if (content1 != null)
+                  Column(
+                    children: [
+                      sb10,
+                      Divider(thickness: 10, color: Colors.blueGrey.shade50),
+                      sb10,
+                    ],
+                  ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: content2,
+                ),
+                sb15,
+                if (action != null)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Obx(
+                      () => isLoading.value
+                          ? Center(child: CircularProgressIndicator())
+                          : Row(
+                              children: [
+                                Expanded(
+                                    child: TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Text("Ubah"))),
+                                Expanded(
+                                  child: Container(
+                                      height: 50,
+                                      child: ElevatedButton(
+                                          onPressed: action,
+                                          child: Text("Konfirmasi"))),
+                                ),
+                              ],
+                            ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
@@ -569,9 +600,13 @@ class PpobPulsadataController extends GetxController {
             sb15,
           ],
         ), () {
-      setPrepaidTopupPaketData(filteredDataList(listPaketData)[index]["product_code"], filteredDataList(listPaketDataWithSellPrice)[index]["sell_price"] != null
-                                                          ? listPaketDataWithSellPrice[index]["sell_price"]
-                                                          : listPaketDataWithSellPrice[index]["product_price"] + marginData.value);
+      setPrepaidTopupPaketData(
+          filteredDataList(listPaketData)[index]["product_code"],
+          filteredDataList(listPaketDataWithSellPrice)[index]["sell_price"] !=
+                  null
+              ? listPaketDataWithSellPrice[index]["sell_price"]
+              : listPaketDataWithSellPrice[index]["product_price"] +
+                  marginData.value);
     }, false);
   }
 
@@ -615,7 +650,10 @@ class PpobPulsadataController extends GetxController {
               ],
             ),
             sb15,
-            Container(width: Get.width, child: TextButton(onPressed: () => Get.back(), child: Text("Tutup"))),
+            Container(
+                width: Get.width,
+                child: TextButton(
+                    onPressed: () => Get.back(), child: Text("Tutup"))),
           ],
         ),
         null,
@@ -734,22 +772,30 @@ class PpobPulsadataController extends GetxController {
             sb15,
           ],
         ), () {
-      setPrepaidTopupPulsa("pulsa" + nominal.toString(), nominal + marginData.value);
+      setPrepaidTopupPulsa(
+          "pulsa" + nominal.toString(), nominal + marginData.value);
     }, false);
   }
 
   void setPrepaidTopupPulsa(String code, int price) async {
     isLoading.value = true;
-    if (fieldError.isEmpty && contactNumber.isNotEmpty && contactNumber.value.length >= 10 && code.isNotEmpty) {
+    if (fieldError.isEmpty &&
+        contactNumber.isNotEmpty &&
+        contactNumber.value.length >= 10 &&
+        code.isNotEmpty) {
       if (price <= authC.balance.value) {
-        await IakprepaidProvider().setTopUp(contactNumber.value, "PREPUL", code, price, "pulsa").then((value) {
+        await IakprepaidProvider()
+            .setTopUp(contactNumber.value, "PREPUL", code, price, "pulsa")
+            .then((value) {
           print(value.body["success"]);
           if (value.body["success"]) {
             Get.offNamed(Routes.TRANSACTIONS, arguments: {"refresh": true});
             print(value.body);
           } else {
             Get.back();
-            Get.defaultDialog(title: "Terjadi kesalahan", content: Text("Mohon coba lagi nanti"));
+            Get.defaultDialog(
+                title: "Terjadi kesalahan",
+                content: Text("Mohon coba lagi nanti"));
           }
         }).catchError((err) {
           print(err);
@@ -766,8 +812,13 @@ class PpobPulsadataController extends GetxController {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    TextButton(onPressed: ()=> Get.back(), child: Text("Nanti")),
-                    ElevatedButton(onPressed: () => Get.offNamed(Routes.SELECTMETHOD, arguments: {"title": TOPUP}), child: Text("Top Up"))],
+                    TextButton(
+                        onPressed: () => Get.back(), child: Text("Nanti")),
+                    ElevatedButton(
+                        onPressed: () => Get.offNamed(Routes.SELECTMETHOD,
+                            arguments: {"title": TOPUP}),
+                        child: Text("Top Up"))
+                  ],
                 )
               ],
             ));
@@ -775,9 +826,12 @@ class PpobPulsadataController extends GetxController {
     } else {
       Get.back();
       if (phoneNumber.text.length < 10) {
-        Get.defaultDialog(title: "Peringatan", content: Text("Nomor minimal 10 angka"));
+        Get.defaultDialog(
+            title: "Peringatan", content: Text("Nomor minimal 10 angka"));
       } else {
-        Get.defaultDialog(title: "Peringatan", content: Text("Pilih nominal terlebih dahulu"));
+        Get.defaultDialog(
+            title: "Peringatan",
+            content: Text("Pilih nominal terlebih dahulu"));
       }
     }
     isLoading.value = false;
@@ -785,16 +839,23 @@ class PpobPulsadataController extends GetxController {
 
   void setPrepaidTopupPaketData(String code, int price) async {
     isLoading.value = true;
-    if (fieldError.isEmpty && contactNumber.isNotEmpty && contactNumber.value.length >= 10 && code.isNotEmpty) {
+    if (fieldError.isEmpty &&
+        contactNumber.isNotEmpty &&
+        contactNumber.value.length >= 10 &&
+        code.isNotEmpty) {
       if (price <= authC.balance.value) {
-        await IakprepaidProvider().setTopUp(contactNumber.value, "PREDAT", code, price, "data").then((value) {
+        await IakprepaidProvider()
+            .setTopUp(contactNumber.value, "PREDAT", code, price, "data")
+            .then((value) {
           print(value.body["success"]);
           if (value.body["success"]) {
             Get.offNamed(Routes.TRANSACTIONS, arguments: {"refresh": true});
             print(value.body);
           } else {
             Get.back();
-            Get.defaultDialog(title: "Terjadi kesalahan", content: Text("Mohon coba lagi nanti"));
+            Get.defaultDialog(
+                title: "Terjadi kesalahan",
+                content: Text("Mohon coba lagi nanti"));
           }
         }).catchError((err) {
           print(err);
@@ -811,8 +872,13 @@ class PpobPulsadataController extends GetxController {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    TextButton(onPressed: ()=> Get.back(), child: Text("Nanti")),
-                    ElevatedButton(onPressed: () => Get.offNamed(Routes.SELECTMETHOD, arguments: {"title": TOPUP}), child: Text("Top Up"))],
+                    TextButton(
+                        onPressed: () => Get.back(), child: Text("Nanti")),
+                    ElevatedButton(
+                        onPressed: () => Get.offNamed(Routes.SELECTMETHOD,
+                            arguments: {"title": TOPUP}),
+                        child: Text("Top Up"))
+                  ],
                 )
               ],
             ));
@@ -820,18 +886,21 @@ class PpobPulsadataController extends GetxController {
     } else {
       Get.back();
       if (phoneNumber.text.length < 10) {
-        Get.defaultDialog(title: "Peringatan", content: Text("Nomor minimal 10 angka"));
+        Get.defaultDialog(
+            title: "Peringatan", content: Text("Nomor minimal 10 angka"));
       } else {
-        Get.defaultDialog(title: "Peringatan", content: Text("Pilih nominal terlebih dahulu"));
+        Get.defaultDialog(
+            title: "Peringatan",
+            content: Text("Pilih nominal terlebih dahulu"));
       }
     }
     isLoading.value = false;
   }
-
 }
 
 class MySeparator extends StatelessWidget {
-  const MySeparator({Key? key, this.height = 1, this.color = Colors.black}) : super(key: key);
+  const MySeparator({Key? key, this.height = 1, this.color = Colors.black})
+      : super(key: key);
   final double height;
   final Color color;
 

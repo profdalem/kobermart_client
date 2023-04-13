@@ -5,7 +5,7 @@ import 'package:kobermart_client/app/controllers/auth_controller.dart';
 import 'package:kobermart_client/app/modules/widgets/sucess_transfer.dart';
 import 'package:kobermart_client/app/modules/widgets/sucess_withdrawal.dart';
 import 'package:kobermart_client/constants.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+// import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import '../../../../config.dart';
 import '../../../../style.dart';
@@ -35,117 +35,123 @@ class InputnumberController extends GetxController {
   }
 
   void openBottomSheetModal(context) {
-    showMaterialModalBottomSheet(
-      duration: Duration(milliseconds: 300),
-      context: context,
-      builder: (context) => SingleChildScrollView(
-        controller: ModalScrollController.of(context),
-        child: Padding(
-          padding: const EdgeInsets.all(15),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Detail Transaksi",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              sb10,
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Jenis",
-                    style: TextStyle(
-                      fontSize: 14,
+    Get.bottomSheet(
+      Container(
+        color: Colors.white,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(15),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Detail Transaksi",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                sb10,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Jenis",
+                      style: TextStyle(
+                        fontSize: 14,
+                      ),
                     ),
-                  ),
-                  Text(
-                    title.toString().capitalizeFirst!,
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-              if(title != TRANSFER) sb10,
-              if(title != TRANSFER) Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Metode",
-                    style: TextStyle(
-                      fontSize: 14,
+                    Text(
+                      title.toString().capitalizeFirst!,
+                      style:
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                     ),
-                  ),
-                  Text(
-                    method.toString().capitalizeFirst!,
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-              sb10,
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Nominal",
-                    style: TextStyle(
-                      fontSize: 14,
-                    ),
-                  ),
-                  Text(
-                    "Rp${NumberFormat("#,##0", "id_ID").format(int.parse(nominal.value))}",
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-              sb10,
-              Divider(),
-              sb10,
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Total Biaya",
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    "Rp${NumberFormat("#,##0", "id_ID").format(int.parse(nominal.value))}",
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-              sb15,
-              sb15,
-              Obx(() => isLoading.value
-                  ? Center(child: CircularProgressIndicator())
-                  : Row(
-                      children: [
-                        Expanded(
-                            child: TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: Text("Ubah"))),
-                        Expanded(
-                          child: Container(
-                              height: 50,
-                              child: ElevatedButton(
-                                  onPressed: () {
-                                    switch (title) {
-                                      case WITHDRAWAL:
-                                        setNewWithdraw();
-                                        break;
-                                        case TRANSFER:
-                                        setNewTransfer();
-                                        break;
-                                      default:
-                                        setNewTopUp();
-                                    }
-                                  },
-                                  child: Text("Konfirmasi"))),
+                  ],
+                ),
+                if (title != TRANSFER) sb10,
+                if (title != TRANSFER)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Metode",
+                        style: TextStyle(
+                          fontSize: 14,
                         ),
-                      ],
-                    ))
-            ],
+                      ),
+                      Text(
+                        method.toString().capitalizeFirst!,
+                        style: TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                sb10,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Nominal",
+                      style: TextStyle(
+                        fontSize: 14,
+                      ),
+                    ),
+                    Text(
+                      "Rp${NumberFormat("#,##0", "id_ID").format(int.parse(nominal.value))}",
+                      style:
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                sb10,
+                Divider(),
+                sb10,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Total Biaya",
+                      style:
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      "Rp${NumberFormat("#,##0", "id_ID").format(int.parse(nominal.value))}",
+                      style:
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                sb15,
+                sb15,
+                Obx(() => isLoading.value
+                    ? Center(child: CircularProgressIndicator())
+                    : Row(
+                        children: [
+                          Expanded(
+                              child: TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text("Ubah"))),
+                          Expanded(
+                            child: Container(
+                                height: 50,
+                                child: ElevatedButton(
+                                    onPressed: () {
+                                      switch (title) {
+                                        case WITHDRAWAL:
+                                          setNewWithdraw();
+                                          break;
+                                        case TRANSFER:
+                                          setNewTransfer();
+                                          break;
+                                        default:
+                                          setNewTopUp();
+                                      }
+                                    },
+                                    child: Text("Konfirmasi"))),
+                          ),
+                        ],
+                      ))
+              ],
+            ),
           ),
         ),
       ),
@@ -187,7 +193,9 @@ class InputnumberController extends GetxController {
           Get.snackbar("Peringatan", "Saldo anda tidak cukup");
           isLoading.value = false;
         } else {
-          await BalanceProvider().newWithdraw(nominal.value, method).then((value) {
+          await BalanceProvider()
+              .newWithdraw(nominal.value, method)
+              .then((value) {
             print(value.body);
             nominal.value = nominal.toString();
             Get.off(() => SuccessWithdrawalPage(), arguments: [nominal.value]);
@@ -209,16 +217,18 @@ class InputnumberController extends GetxController {
         Get.snackbar("Peringatan", "Minimal transfer Rp 10.000");
         isLoading.value = false;
       } else {
-        if(int.parse(nominal.value) > authC.balance.value){
+        if (int.parse(nominal.value) > authC.balance.value) {
           Get.snackbar("Peringatan", "Saldo anda kurang");
           isLoading.value = false;
         } else {
-          await BalanceProvider().newTransfer(recipient["id"], nominal.value).then((value) {
+          await BalanceProvider()
+              .newTransfer(recipient["id"], nominal.value)
+              .then((value) {
             print(value.body);
             nominal.value = nominal.toString();
             Get.off(() => SuccessTransferPage(), arguments: [nominal.value]);
           });
-        devLog("Transfer jalan");
+          devLog("Transfer jalan");
         }
       }
     }

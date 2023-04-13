@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
@@ -56,7 +55,8 @@ class MemberprofileView extends StatelessWidget {
                         height: Get.width * 0.3,
                         width: Get.width * 0.3,
                         child: CircleAvatar(
-                          backgroundImage: CachedNetworkImageProvider(profileC.imgurl.value),
+                          backgroundImage:
+                              CachedNetworkImageProvider(profileC.imgurl.value),
                         ),
                       ),
                       sb20,
@@ -79,29 +79,38 @@ class MemberprofileView extends StatelessWidget {
                                     "Bergabung sejak ${DateFormat.yMMMMd("id_ID").format(DateTime.fromMillisecondsSinceEpoch(profileC.memberCreatedAt.value.millisecondsSinceEpoch))}"),
                                 sb20,
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15),
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           PanelTitle(title: "Anggota"),
-                                          Text("${profileC.memberCount.value.toString()} orang"),
+                                          Text(
+                                              "${profileC.memberCount.value.toString()} orang"),
                                         ],
                                       ),
                                       Column(
-                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
                                         children: [
                                           PanelTitle(title: "Kedalaman"),
-                                          Text("KD${profileC.kdstatus.value.toString()}"),
+                                          Text(
+                                              "KD${profileC.kdstatus.value.toString()}"),
                                         ],
                                       ),
                                       Column(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
                                         children: [
                                           PanelTitle(title: "Status"),
-                                          profileC.active.value ? Text("Aktif") : Text("Non-aktif"),
+                                          profileC.active.value
+                                              ? Text("Aktif")
+                                              : Text("Non-aktif"),
                                         ],
                                       )
                                     ],
@@ -112,71 +121,93 @@ class MemberprofileView extends StatelessWidget {
                                   elevation: 1,
                                   child: Padding(
                                     padding: EdgeInsets.all(15),
-                                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                      PanelTitle(title: "ReferRal ID"),
-                                      Text(
-                                        profileC.refid.value,
-                                        style: TextStyle(fontSize: 18),
-                                      ),
-                                      sb15,
-                                      PanelTitle(title: "Email"),
-                                      GestureDetector(
-                                          onTap: () {
-                                            print("klik");
-                                          },
-                                          child: Text(
-                                            profileC.email.value,
-                                            style: TextStyle(color: Colors.blue, fontSize: 18),
-                                          )),
-                                      sb15,
-                                      PanelTitle(title: "Whatsapp"),
-                                      GestureDetector(
-                                          onTap: () {
-                                            print("klik");
-                                          },
-                                          child: Text(
-                                            profileC.whatsapp.value,
-                                            style: TextStyle(color: Colors.blue, fontSize: 18),
-                                          )),
-                                      sb15,
-                                      PanelTitle(title: "Tanggal lahir"),
-                                      Text(
-                                        DateFormat.yMMMMd("id_ID").format(DateTime.fromMillisecondsSinceEpoch(profileC.birthday.value.millisecondsSinceEpoch)),
-                                        style: TextStyle(fontSize: 18),
-                                      ),
-                                      sb15,
-                                      PanelTitle(title: "Alamat"),
-                                      Text(
-                                        profileC.address.value,
-                                        style: TextStyle(fontSize: 18),
-                                      ),
-                                      if (profileC.rek.value.isNotEmpty && profileC.bank.value.isNotEmpty) sb15,
-                                      if (profileC.rek.value.isNotEmpty && profileC.bank.value.isNotEmpty) PanelTitle(title: "Nomor Rekening"),
-                                      if (profileC.rek.value.isNotEmpty && profileC.bank.value.isNotEmpty)
-                                        Text(
-                                          "${profileC.rek.value} (${profileC.bank.value})",
-                                          style: TextStyle(fontSize: 18),
-                                        ),
-                                    ]),
+                                    child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          PanelTitle(title: "ReferRal ID"),
+                                          Text(
+                                            profileC.refid.value,
+                                            style: TextStyle(fontSize: 18),
+                                          ),
+                                          sb15,
+                                          PanelTitle(title: "Email"),
+                                          GestureDetector(
+                                              onTap: () {
+                                                print("klik");
+                                              },
+                                              child: Text(
+                                                profileC.email.value,
+                                                style: TextStyle(
+                                                    color: Colors.blue,
+                                                    fontSize: 18),
+                                              )),
+                                          sb15,
+                                          PanelTitle(title: "Whatsapp"),
+                                          GestureDetector(
+                                              onTap: () {
+                                                print("klik");
+                                              },
+                                              child: Text(
+                                                profileC.whatsapp.value,
+                                                style: TextStyle(
+                                                    color: Colors.blue,
+                                                    fontSize: 18),
+                                              )),
+                                          sb15,
+                                          PanelTitle(title: "Tanggal lahir"),
+                                          Text(
+                                            DateFormat.yMMMMd("id_ID").format(
+                                                DateTime.fromMillisecondsSinceEpoch(
+                                                    profileC.birthday.value
+                                                        .millisecondsSinceEpoch)),
+                                            style: TextStyle(fontSize: 18),
+                                          ),
+                                          sb15,
+                                          PanelTitle(title: "Alamat"),
+                                          Text(
+                                            profileC.address.value,
+                                            style: TextStyle(fontSize: 18),
+                                          ),
+                                          if (profileC.rek.value.isNotEmpty &&
+                                              profileC.bank.value.isNotEmpty)
+                                            sb15,
+                                          if (profileC.rek.value.isNotEmpty &&
+                                              profileC.bank.value.isNotEmpty)
+                                            PanelTitle(title: "Nomor Rekening"),
+                                          if (profileC.rek.value.isNotEmpty &&
+                                              profileC.bank.value.isNotEmpty)
+                                            Text(
+                                              "${profileC.rek.value} (${profileC.bank.value})",
+                                              style: TextStyle(fontSize: 18),
+                                            ),
+                                        ]),
                                   ),
                                 ),
                                 Card(
                                   elevation: 1,
                                   child: Padding(
                                     padding: EdgeInsets.all(15),
-                                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                      PanelTitle(title: "Upline"),
-                                      ListTile(
-                                        contentPadding: EdgeInsets.all(0),
-                                        leading: CircleAvatar(
-                                          backgroundImage: CachedNetworkImageProvider(profileC.uplineIgmurl.value),
-                                        ),
-                                        title: Text(profileC.uplineName.value),
-                                        onTap: () {
-                                          print("lihat anggota");
-                                        },
-                                      )
-                                    ]),
+                                    child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          PanelTitle(title: "Upline"),
+                                          ListTile(
+                                            contentPadding: EdgeInsets.all(0),
+                                            leading: CircleAvatar(
+                                              backgroundImage:
+                                                  CachedNetworkImageProvider(
+                                                      profileC
+                                                          .uplineIgmurl.value),
+                                            ),
+                                            title:
+                                                Text(profileC.uplineName.value),
+                                            onTap: () {
+                                              print("lihat anggota");
+                                            },
+                                          )
+                                        ]),
                                   ),
                                 ),
                                 Card(
@@ -184,17 +215,22 @@ class MemberprofileView extends StatelessWidget {
                                   child: Padding(
                                     padding: const EdgeInsets.all(15),
                                     child: Row(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Expanded(
                                           flex: 6,
                                           child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
                                               PanelTitle(title: "Kirim dana"),
-                                              Text("Saldo anda: Rp${NumberFormat("#,##0", "id_ID").format(authC.balance.value)}")
+                                              Text(
+                                                  "Saldo anda: Rp${NumberFormat("#,##0", "id_ID").format(authC.balance.value)}")
                                             ],
                                           ),
                                         ),
@@ -202,13 +238,17 @@ class MemberprofileView extends StatelessWidget {
                                             flex: 4,
                                             child: ElevatedButton(
                                                 onPressed: () {
-                                                  Get.toNamed(Routes.INPUTNUMBER, arguments: {
-                                                    "title": TRANSFER,
-                                                    "recipient": {
-                                                      "name": profileC.name.value,
-                                                      "id": Get.arguments["id"],
-                                                    }
-                                                  });
+                                                  Get.toNamed(
+                                                      Routes.INPUTNUMBER,
+                                                      arguments: {
+                                                        "title": TRANSFER,
+                                                        "recipient": {
+                                                          "name": profileC
+                                                              .name.value,
+                                                          "id": Get
+                                                              .arguments["id"],
+                                                        }
+                                                      });
                                                 },
                                                 child: Text("Transfer")))
                                       ],
@@ -220,17 +260,23 @@ class MemberprofileView extends StatelessWidget {
                                   child: Padding(
                                     padding: const EdgeInsets.all(15),
                                     child: Row(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Expanded(
                                           flex: 6,
                                           child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
-                                              PanelTitle(title: "Buat token disini"),
-                                              Text("Slot KD1 tersedia: ${(authC.settings["kd1limit"] - profileC.kd1count.value).toString()}")
+                                              PanelTitle(
+                                                  title: "Buat token disini"),
+                                              Text(
+                                                  "Slot KD1 tersedia: ${(authC.settings["kd1limit"] - profileC.kd1count.value).toString()}")
                                             ],
                                           ),
                                         ),
@@ -286,7 +332,7 @@ class PanelKedalaman extends StatelessWidget {
                     (DaftarKedalaman item) => ExpansionPanel(
                         canTapOnHeader: true,
                         headerBuilder: (context, isExpanded) {
-                          num slotSize = pow(10, (memberC.kd.indexOf(item) + 1));
+                          // num slotSize = pow(10, (memberC.kd.indexOf(item) + 1));
                           return ListTile(
                             title: Row(children: [
                               Text(
@@ -300,7 +346,9 @@ class PanelKedalaman extends StatelessWidget {
                                 visualDensity: VisualDensity.compact,
                                 padding: EdgeInsets.all(0),
                                 backgroundColor: Color(0xFFFF9800),
-                                label: Text('${item.members.length} terisi', style: TextStyle(fontSize: 12, color: Colors.white)),
+                                label: Text('${item.members.length} terisi',
+                                    style: TextStyle(
+                                        fontSize: 12, color: Colors.white)),
                               ),
                               // SizedBox(
                               //   width: 10,
@@ -331,52 +379,97 @@ class PanelKedalaman extends StatelessWidget {
                                       child: TextButton(
                                         onPressed: () {
                                           if (tokenUsed) {
-                                            Get.to(() => MemberprofileView(), arguments: {
-                                              "id": item.members[index]["id"],
-                                              "name": item.members[index]["name"],
-                                            });
+                                            Get.to(() => MemberprofileView(),
+                                                arguments: {
+                                                  "id": item.members[index]
+                                                      ["id"],
+                                                  "name": item.members[index]
+                                                      ["name"],
+                                                });
                                           } else {
-                                            Get.toNamed(Routes.TOKENDETAIL, arguments: {"data": item.members[index]});
+                                            Get.toNamed(Routes.TOKENDETAIL,
+                                                arguments: {
+                                                  "data": item.members[index]
+                                                });
                                           }
                                         },
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
                                           children: [
                                             Stack(
                                               alignment: Alignment.bottomCenter,
                                               children: [
                                                 Padding(
-                                                  padding: const EdgeInsets.only(bottom: 5),
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          bottom: 5),
                                                   child: CircleAvatar(
                                                     radius: 30.0,
-                                                    backgroundColor: tokenUsed ? Colors.transparent : Colors.grey.shade200,
-                                                    backgroundImage: tokenUsed ? CachedNetworkImageProvider(item.members[index]["imgurl"]) : null,
-                                                    child: tokenUsed ? SizedBox() : Text("token"),
+                                                    backgroundColor: tokenUsed
+                                                        ? Colors.transparent
+                                                        : Colors.grey.shade200,
+                                                    backgroundImage: tokenUsed
+                                                        ? CachedNetworkImageProvider(
+                                                            item.members[index]
+                                                                ["imgurl"])
+                                                        : null,
+                                                    child: tokenUsed
+                                                        ? SizedBox()
+                                                        : Text("token"),
                                                   ),
                                                 ),
                                                 if (tokenUsed)
                                                   Align(
-                                                    alignment: Alignment.bottomCenter,
+                                                    alignment:
+                                                        Alignment.bottomCenter,
                                                     child: Container(
                                                       decoration: BoxDecoration(
-                                                          color: Colors.amber.shade800,
-                                                          borderRadius: BorderRadius.all(Radius.circular(15)),
-                                                          boxShadow: [BoxShadow(blurRadius: 1, color: Colors.grey.shade500)]),
+                                                          color: Colors
+                                                              .amber.shade800,
+                                                          borderRadius:
+                                                              BorderRadius.all(
+                                                                  Radius
+                                                                      .circular(
+                                                                          15)),
+                                                          boxShadow: [
+                                                            BoxShadow(
+                                                                blurRadius: 1,
+                                                                color: Colors
+                                                                    .grey
+                                                                    .shade500)
+                                                          ]),
                                                       child: Padding(
-                                                        padding: EdgeInsets.symmetric(vertical: 2, horizontal: 5),
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                vertical: 2,
+                                                                horizontal: 5),
                                                         child: RichText(
                                                           text: TextSpan(
-                                                            style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize: 12,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
                                                             children: [
                                                               WidgetSpan(
                                                                 child: Icon(
                                                                   Icons.person,
                                                                   size: 13,
-                                                                  color: Colors.white,
+                                                                  color: Colors
+                                                                      .white,
                                                                 ),
                                                               ),
                                                               TextSpan(
-                                                                text: (item.members[index]["kd1_member"] + item.members[index]["kd1_token"]).toString(),
+                                                                text: (item.members[index]
+                                                                            [
+                                                                            "kd1_member"] +
+                                                                        item.members[index]
+                                                                            [
+                                                                            "kd1_token"])
+                                                                    .toString(),
                                                               ),
                                                             ],
                                                           ),
@@ -388,11 +481,18 @@ class PanelKedalaman extends StatelessWidget {
                                             ),
                                             sb5,
                                             Text(
-                                              tokenUsed ? capitalizeIt(item.members[index]["name"]) : item.members[index]["id"],
+                                              tokenUsed
+                                                  ? capitalizeIt(item
+                                                      .members[index]["name"])
+                                                  : item.members[index]["id"],
                                               overflow: TextOverflow.ellipsis,
                                               maxLines: 2,
                                               textAlign: TextAlign.center,
-                                              style: TextStyle(color: Colors.black, fontSize: Get.width * 0.25 * 0.12, height: 1),
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize:
+                                                      Get.width * 0.25 * 0.12,
+                                                  height: 1),
                                             ),
                                           ],
                                         ),

@@ -7,9 +7,9 @@ import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/constants.dart';
 import 'package:kobermart_client/style.dart';
 
-import '../controllers/menu_controller.dart';
+import '../controllers/menu_controller.dart' as menu;
 
-class MenuView extends GetView<MenuController> {
+class MenuView extends GetView<menu.MenuController> {
   MenuView({Key? key}) : super(key: key);
 
   @override
@@ -44,7 +44,9 @@ class MenuView extends GetView<MenuController> {
                   Get.offAndToNamed(Routes.PROFILE);
                 },
                 leading: CircleAvatar(
-                  backgroundImage: authC.imgurl.isNotEmpty ? CachedNetworkImageProvider(authC.imgurl.value) : CachedNetworkImageProvider(PROFILE_IMG),
+                  backgroundImage: authC.imgurl.isNotEmpty
+                      ? CachedNetworkImageProvider(authC.imgurl.value)
+                      : CachedNetworkImageProvider(PROFILE_IMG),
                 ),
                 title: PanelTitle(title: name),
                 subtitle: Text("Referral ID: ${authC.refId.value}"),
@@ -62,7 +64,10 @@ class MenuView extends GetView<MenuController> {
                 title: Text("Saldo Belanja"),
                 subtitle: Text(
                   "Rp ${NumberFormat("#,##0", "id_ID").format(authC.balance.value)}",
-                  style: TextStyle(color: Colors.blue.shade600, fontWeight: FontWeight.bold, fontSize: 16),
+                  style: TextStyle(
+                      color: Colors.blue.shade600,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16),
                 ),
               ),
               ListTile(
@@ -71,7 +76,10 @@ class MenuView extends GetView<MenuController> {
                 title: Text("Cashback"),
                 subtitle: Text(
                   "Rp ${NumberFormat("#,##0", "id_ID").format(authC.cashback.value)}",
-                  style: TextStyle(color: Colors.blue.shade600, fontWeight: FontWeight.bold, fontSize: 16),
+                  style: TextStyle(
+                      color: Colors.blue.shade600,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16),
                 ),
               ),
               ListTile(

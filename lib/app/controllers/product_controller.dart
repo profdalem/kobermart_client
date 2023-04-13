@@ -29,6 +29,12 @@ class MainProductController extends GetxController {
     try {
       await ProductsProvider().getProducts().then((value) {
         if (value.body != null) {
+          // Get.defaultDialog(
+          //     title: "",
+          //     content: Container(
+          //         height: Get.height * 0.8,
+          //         child:
+          //             SingleChildScrollView(child: Text(value.bodyString!))));
           if (value.body["success"]) {
             products.value = value.body["data"];
             products.refresh();

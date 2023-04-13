@@ -8,7 +8,7 @@ import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/config.dart';
 import 'package:kobermart_client/constants.dart';
 import 'package:kobermart_client/firebase.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+// import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import '../../../../style.dart';
 import '../../ppob_pulsadata/controllers/ppob_pulsadata_controller.dart';
@@ -44,9 +44,16 @@ class PpobPlnPostpaidController extends GetxController {
 
   Future<void> setHistoryList() async {
     historyList.clear();
-    await GlobalTrx.where("id", isEqualTo: authC.refId.value).where("type", isEqualTo: "postpaid").where("additional", isEqualTo: "pln").get().then((value) {
+    await GlobalTrx.where("id", isEqualTo: authC.refId.value)
+        .where("type", isEqualTo: "postpaid")
+        .where("additional", isEqualTo: "pln")
+        .get()
+        .then((value) {
       value.docs.forEach((item) {
-        historyList.add({"customerId": item.data()["data"]["customerData"]["customer_id"], "name": item.data()["data"]["customerData"]["name"]});
+        historyList.add({
+          "customerId": item.data()["data"]["customerData"]["customer_id"],
+          "name": item.data()["data"]["customerData"]["name"]
+        });
       });
     }).catchError((err) {
       print(err);
@@ -66,70 +73,98 @@ class PpobPlnPostpaidController extends GetxController {
       }
     }
     historyList.value = temp2;
-    if (devMode) historyList.add({"customerId": "530000000001", "name": "Success - 1 bill"});
-    if (devMode) historyList.add({"customerId": "530000000002", "name": "Success - 8 bills"});
-    if (devMode) historyList.add({"customerId": "530000000003", "name": "Inquiry - Time Out"});
-    if (devMode) historyList.add({"customerId": "530000000004", "name": "Inquiry - Invoice Has Been Paid"});
-    if (devMode) historyList.add({"customerId": "530000000005", "name": "Inquiry - Incorrect Destination Number"});
-    if (devMode) historyList.add({"customerId": "530000000006", "name": "Payment - Payment Failed"});
-    if (devMode) historyList.add({"customerId": "530000000007", "name": "Payment - Pending / transaction in process"});
-    if (devMode) historyList.add({"customerId": "530000000008", "name": "Payment - MISC Error / Biller System Error"});
+    if (devMode)
+      historyList
+          .add({"customerId": "530000000001", "name": "Success - 1 bill"});
+    if (devMode)
+      historyList
+          .add({"customerId": "530000000002", "name": "Success - 8 bills"});
+    if (devMode)
+      historyList
+          .add({"customerId": "530000000003", "name": "Inquiry - Time Out"});
+    if (devMode)
+      historyList.add({
+        "customerId": "530000000004",
+        "name": "Inquiry - Invoice Has Been Paid"
+      });
+    if (devMode)
+      historyList.add({
+        "customerId": "530000000005",
+        "name": "Inquiry - Incorrect Destination Number"
+      });
+    if (devMode)
+      historyList.add(
+          {"customerId": "530000000006", "name": "Payment - Payment Failed"});
+    if (devMode)
+      historyList.add({
+        "customerId": "530000000007",
+        "name": "Payment - Pending / transaction in process"
+      });
+    if (devMode)
+      historyList.add({
+        "customerId": "530000000008",
+        "name": "Payment - MISC Error / Biller System Error"
+      });
     if (devMode) print(historyList);
   }
 
-  void openBottomSheetModal(BuildContext context, dynamic content1, dynamic content2, dynamic action, bool isDismissible) {
-    if (FocusManager.instance.primaryFocus!.hasFocus) FocusManager.instance.primaryFocus?.unfocus();
-    showMaterialModalBottomSheet(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))),
-      isDismissible: isDismissible,
-      duration: Duration(milliseconds: 300),
-      context: context,
-      builder: (context) => SingleChildScrollView(
-        controller: ModalScrollController.of(context),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: content1,
-              ),
-              if (content1 != null)
-                Column(
-                  children: [
-                    sb10,
-                    Divider(thickness: 10, color: Colors.blueGrey.shade50),
-                    sb10,
-                  ],
-                ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: content2,
-              ),
-              sb15,
-              if (action != null)
+  void openBottomSheetModal(BuildContext context, dynamic content1,
+      dynamic content2, dynamic action, bool isDismissible) {
+    if (FocusManager.instance.primaryFocus!.hasFocus)
+      FocusManager.instance.primaryFocus?.unfocus();
+    Get.bottomSheet(
+      Container(
+        color: Colors.white,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Obx(
-                    () => isLoading.value
-                        ? Center(child: CircularProgressIndicator())
-                        : Row(
-                            children: [
-                              Expanded(
-                                  child: TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: Text("Ubah"))),
-                              Expanded(
-                                child: Container(height: 50, child: ElevatedButton(onPressed: action, child: Text("Konfirmasi"))),
-                              ),
-                            ],
-                          ),
-                  ),
+                  child: content1,
                 ),
-            ],
+                if (content1 != null)
+                  Column(
+                    children: [
+                      sb10,
+                      Divider(thickness: 10, color: Colors.blueGrey.shade50),
+                      sb10,
+                    ],
+                  ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: content2,
+                ),
+                sb15,
+                if (action != null)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Obx(
+                      () => isLoading.value
+                          ? Center(child: CircularProgressIndicator())
+                          : Row(
+                              children: [
+                                Expanded(
+                                    child: TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Text("Ubah"))),
+                                Expanded(
+                                  child: Container(
+                                      height: 50,
+                                      child: ElevatedButton(
+                                          onPressed: action,
+                                          child: Text("Konfirmasi"))),
+                                ),
+                              ],
+                            ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
@@ -141,9 +176,13 @@ class PpobPlnPostpaidController extends GetxController {
     Get.generalDialog(
         barrierDismissible: false,
         pageBuilder: (context, a, b) => Center(
-              child: CircularProgressIndicator(color: Colors.white, backgroundColor: Colors.blue),
+              child: CircularProgressIndicator(
+                  color: Colors.white, backgroundColor: Colors.blue),
             ));
-    await IakpostpaidProvider().setInquiryPlnA(customerId.value).timeout(Duration(seconds: 30)).then((value) {
+    await IakpostpaidProvider()
+        .setInquiryPlnA(customerId.value)
+        .timeout(Duration(seconds: 30))
+        .then((value) {
       isLoading.value = false;
       if (Get.isDialogOpen!) {
         Get.back();
@@ -196,8 +235,10 @@ class PpobPlnPostpaidController extends GetxController {
             false);
       } else {
         var period = [];
-        if (int.parse(value.body["data"]["desc"]["lembar_tagihan"].toString()) > 1) {
-          (value.body["data"]["desc"]["tagihan"]["detail"] as List).forEach((element) {
+        if (int.parse(value.body["data"]["desc"]["lembar_tagihan"].toString()) >
+            1) {
+          (value.body["data"]["desc"]["tagihan"]["detail"] as List)
+              .forEach((element) {
             period.add(getPeriod(element["periode"]));
           });
         } else {
@@ -312,7 +353,9 @@ class PpobPlnPostpaidController extends GetxController {
                     Expanded(
                       flex: 1,
                       child: Text(
-                        "Rp" + NumberFormat("#,##0", "id_ID").format(value.body["data"]["nominal"]),
+                        "Rp" +
+                            NumberFormat("#,##0", "id_ID")
+                                .format(value.body["data"]["nominal"]),
                         textAlign: TextAlign.end,
                         style: TextStyle(fontSize: 14),
                         maxLines: 2,
@@ -350,7 +393,8 @@ class PpobPlnPostpaidController extends GetxController {
                   children: [
                     Text(
                       "Total Pembayaran",
-                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                     ),
                     Text(
                       "Rp${NumberFormat("#,##0", "id_ID").format(value.body["data"]["price"])}",
@@ -363,7 +407,8 @@ class PpobPlnPostpaidController extends GetxController {
                 sb15,
               ],
             ), () {
-          setPostpaidPayment(value.body["data"]["tr_id"].toString(), int.parse(value.body["data"]["price"].toString()));
+          setPostpaidPayment(value.body["data"]["tr_id"].toString(),
+              int.parse(value.body["data"]["price"].toString()));
         }, false);
       }
     });
@@ -408,8 +453,12 @@ class PpobPlnPostpaidController extends GetxController {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    TextButton(onPressed: () => Get.back(), child: Text("Nanti")),
-                    ElevatedButton(onPressed: () => Get.offNamed(Routes.SELECTMETHOD, arguments: {"title": TOPUP}), child: Text("Top Up"))
+                    TextButton(
+                        onPressed: () => Get.back(), child: Text("Nanti")),
+                    ElevatedButton(
+                        onPressed: () => Get.offNamed(Routes.SELECTMETHOD,
+                            arguments: {"title": TOPUP}),
+                        child: Text("Top Up"))
                   ],
                 )
               ],
@@ -417,7 +466,8 @@ class PpobPlnPostpaidController extends GetxController {
       }
     } else {
       Get.back();
-      Get.defaultDialog(title: "Peringatan", content: Text("Nomor meter tidak boleh kosong"));
+      Get.defaultDialog(
+          title: "Peringatan", content: Text("Nomor meter tidak boleh kosong"));
     }
     isLoading.value = false;
   }

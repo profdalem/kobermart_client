@@ -8,7 +8,7 @@ import 'package:kobermart_client/app/helpers/general_helper.dart';
 import 'package:kobermart_client/app/routes/app_pages.dart';
 import 'package:kobermart_client/constants.dart';
 import 'package:kobermart_client/firebase.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+// import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import '../../../../style.dart';
 import '../../ppob_pulsadata/controllers/ppob_pulsadata_controller.dart';
@@ -54,9 +54,16 @@ class PpobPlnPrepaidController extends GetxController {
 
   Future<void> setHistoryList() async {
     historyList.clear();
-    await GlobalTrx.where("id", isEqualTo: authC.refId.value).where("type", isEqualTo: "prepaid").where("additional", isEqualTo: "pln").get().then((value) {
+    await GlobalTrx.where("id", isEqualTo: authC.refId.value)
+        .where("type", isEqualTo: "prepaid")
+        .where("additional", isEqualTo: "pln")
+        .get()
+        .then((value) {
       value.docs.forEach((item) {
-        historyList.add({"customerId": item.data()["data"]["customerData"]["customer_id"], "name": item.data()["data"]["customerData"]["name"]});
+        historyList.add({
+          "customerId": item.data()["data"]["customerData"]["customer_id"],
+          "name": item.data()["data"]["customerData"]["name"]
+        });
       });
     }).catchError((err) {
       print(err);
@@ -100,59 +107,63 @@ class PpobPlnPrepaidController extends GetxController {
     }
   }
 
-  void openBottomSheetModal(BuildContext context, dynamic content1, dynamic content2, dynamic action, bool isDismissible) {
-    if (FocusManager.instance.primaryFocus!.hasFocus) FocusManager.instance.primaryFocus?.unfocus();
-    showMaterialModalBottomSheet(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))),
-      isDismissible: isDismissible,
-      duration: Duration(milliseconds: 300),
-      context: context,
-      builder: (context) => SingleChildScrollView(
-        controller: ModalScrollController.of(context),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: content1,
-              ),
-              if (content1 != null)
-                Column(
-                  children: [
-                    sb10,
-                    Divider(thickness: 10, color: Colors.blueGrey.shade50),
-                    sb10,
-                  ],
-                ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: content2,
-              ),
-              sb15,
-              if (action != null)
+  void openBottomSheetModal(BuildContext context, dynamic content1,
+      dynamic content2, dynamic action, bool isDismissible) {
+    if (FocusManager.instance.primaryFocus!.hasFocus)
+      FocusManager.instance.primaryFocus?.unfocus();
+    Get.bottomSheet(
+      Container(
+        color: Colors.white,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Obx(
-                    () => isLoading.value
-                        ? Center(child: CircularProgressIndicator())
-                        : Row(
-                            children: [
-                              Expanded(
-                                  child: TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: Text("Ubah"))),
-                              Expanded(
-                                child: Container(height: 50, child: ElevatedButton(onPressed: action, child: Text("Konfirmasi"))),
-                              ),
-                            ],
-                          ),
-                  ),
+                  child: content1,
                 ),
-            ],
+                if (content1 != null)
+                  Column(
+                    children: [
+                      sb10,
+                      Divider(thickness: 10, color: Colors.blueGrey.shade50),
+                      sb10,
+                    ],
+                  ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: content2,
+                ),
+                sb15,
+                if (action != null)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Obx(
+                      () => isLoading.value
+                          ? Center(child: CircularProgressIndicator())
+                          : Row(
+                              children: [
+                                Expanded(
+                                    child: TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Text("Ubah"))),
+                                Expanded(
+                                  child: Container(
+                                      height: 50,
+                                      child: ElevatedButton(
+                                          onPressed: action,
+                                          child: Text("Konfirmasi"))),
+                                ),
+                              ],
+                            ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
@@ -164,9 +175,13 @@ class PpobPlnPrepaidController extends GetxController {
     Get.generalDialog(
         barrierDismissible: false,
         pageBuilder: (context, a, b) => Center(
-              child: CircularProgressIndicator(color: Colors.white, backgroundColor: Colors.blue),
+              child: CircularProgressIndicator(
+                  color: Colors.white, backgroundColor: Colors.blue),
             ));
-    await IakprepaidProvider().setPrepaidInquiryPln(customerId.value).timeout(Duration(seconds: 30)).then((value) {
+    await IakprepaidProvider()
+        .setPrepaidInquiryPln(customerId.value)
+        .timeout(Duration(seconds: 30))
+        .then((value) {
       isLoading.value = false;
       if (Get.isDialogOpen!) {
         Get.back();
@@ -339,7 +354,8 @@ class PpobPlnPrepaidController extends GetxController {
                     Expanded(
                       flex: 2,
                       child: Text(
-                        NumberFormat("#,##0", "id_ID").format(nominalOnly(productList[index]["productCode"])),
+                        NumberFormat("#,##0", "id_ID").format(
+                            nominalOnly(productList[index]["productCode"])),
                         textAlign: TextAlign.end,
                         style: TextStyle(fontSize: 14),
                         maxLines: 2,
@@ -377,7 +393,8 @@ class PpobPlnPrepaidController extends GetxController {
                   children: [
                     Text(
                       "Total Pembayaran",
-                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                     ),
                     Text(
                       "Rp${NumberFormat("#,##0", "id_ID").format(productList[index]["sell_price"])}",
@@ -390,7 +407,8 @@ class PpobPlnPrepaidController extends GetxController {
                 sb15,
               ],
             ), () {
-          setPrepaidTopupPln(productList[index]["productCode"], productList[index]["sell_price"]);
+          setPrepaidTopupPln(productList[index]["productCode"],
+              productList[index]["sell_price"]);
         }, false);
       }
     });
@@ -400,14 +418,18 @@ class PpobPlnPrepaidController extends GetxController {
     isLoading.value = true;
     if (fieldError.isEmpty && customerId.isNotEmpty && code.isNotEmpty) {
       if (price <= authC.balance.value) {
-        await IakprepaidProvider().setTopUp(customerId.value, "PREPLN", code, price, "pln").then((value) {
+        await IakprepaidProvider()
+            .setTopUp(customerId.value, "PREPLN", code, price, "pln")
+            .then((value) {
           print(value.body["success"]);
           if (value.body["success"]) {
             Get.offNamed(Routes.TRANSACTIONS, arguments: {"refresh": true});
             print(value.body);
           } else {
             Get.back();
-            Get.defaultDialog(title: "Terjadi kesalahan", content: Text("Mohon coba lagi nanti"));
+            Get.defaultDialog(
+                title: "Terjadi kesalahan",
+                content: Text("Mohon coba lagi nanti"));
           }
         }).catchError((err) {
           print(err);
@@ -424,8 +446,12 @@ class PpobPlnPrepaidController extends GetxController {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    TextButton(onPressed: () => Get.back(), child: Text("Nanti")),
-                    ElevatedButton(onPressed: () => Get.offNamed(Routes.SELECTMETHOD, arguments: {"title": TOPUP}), child: Text("Top Up"))
+                    TextButton(
+                        onPressed: () => Get.back(), child: Text("Nanti")),
+                    ElevatedButton(
+                        onPressed: () => Get.offNamed(Routes.SELECTMETHOD,
+                            arguments: {"title": TOPUP}),
+                        child: Text("Top Up"))
                   ],
                 )
               ],
@@ -433,7 +459,8 @@ class PpobPlnPrepaidController extends GetxController {
       }
     } else {
       Get.back();
-      Get.defaultDialog(title: "Peringatan", content: Text("Nomor meter tidak boleh kosong"));
+      Get.defaultDialog(
+          title: "Peringatan", content: Text("Nomor meter tidak boleh kosong"));
     }
     isLoading.value = false;
   }

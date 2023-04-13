@@ -9,7 +9,7 @@ import 'package:kobermart_client/app/helpers/general_helper.dart';
 import 'package:kobermart_client/config.dart';
 import 'package:kobermart_client/firebase.dart';
 import 'package:kobermart_client/style.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+// import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import '../../../routes/app_pages.dart';
 
@@ -55,99 +55,130 @@ class MembersController extends GetxController {
     isLoading.value = true;
     if (authC.downlines.isEmpty) {
       try {
-        kd = await generateItems(authC.downlineList(keyword.value, false).length, authC.downlineList(keyword.value, false)).obs;
+        kd = await generateItems(
+                authC.downlineList(keyword.value, false).length,
+                authC.downlineList(keyword.value, false))
+            .obs;
       } on FirebaseException catch (e) {
         print(e.message);
       }
     } else {
-      kd = await generateItems(authC.downlineList(keyword.value, false).length, authC.downlineList(keyword.value, false)).obs;
+      kd = await generateItems(authC.downlineList(keyword.value, false).length,
+              authC.downlineList(keyword.value, false))
+          .obs;
     }
     isLoading.value = false;
   }
 
   List<DaftarKedalaman> generateItems(int numberOfItems, List downlines) {
     return List.generate(numberOfItems, (int index) {
-      return DaftarKedalaman(header: "Kedalaman ${index}", isExpanded: true.obs, members: downlines[index]);
+      return DaftarKedalaman(
+          header: "Kedalaman ${index}",
+          isExpanded: true.obs,
+          members: downlines[index]);
     });
   }
 
   void bottomSheetSearchMember(BuildContext context, int kd) {
-    if (FocusManager.instance.primaryFocus!.hasFocus) FocusManager.instance.primaryFocus?.unfocus();
-    showMaterialModalBottomSheet(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))),
-      duration: Duration(milliseconds: 300),
-      context: context,
-      builder: (context) => SingleChildScrollView(
-        controller: ModalScrollController.of(context),
-        child: Container(
-          padding: EdgeInsets.only(left: 15, right: 15, bottom: 15, top: 10),
-          height: Get.height * 0.9,
-          child: Column(
-            children: [
-              Container(
-                height: 6,
-                width: 25,
-                decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(20)),
-              ),
-              sb15,
-              CariButton(),
-              sb15,
-              Obx(() => Expanded(
-                  child: getSearchResult(keyword.value, kd).length == 0
-                      ? Center(
-                          child: Text("Kosong"),
-                        )
-                      : GridView(
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4, childAspectRatio: 0.8, crossAxisSpacing: 10, mainAxisSpacing: 10),
-                          children: List.generate(
-                              getSearchResult(keyword.value, kd).length,
-                              (index) => GestureDetector(
-                                    onTap: () {
-                                      Get.back();
-                                      Get.toNamed(Routes.MEMBERPROFILE, arguments: {
-                                        "id": getSearchResult(keyword.value, kd)[index]["id"],
-                                        "name": getSearchResult(keyword.value, kd)[index]["name"],
-                                      });
-                                    },
-                                    child: Container(
-                                      padding: EdgeInsets.all(5),
-                                      color: Colors.grey.shade100,
-                                      width: double.infinity,
-                                      // alignment: Alignment.center,
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                        mainAxisAlignment: MainAxisAlignment.start,
-                                        children: [
-                                          sb5,
-                                          CircleAvatar(
-                                            backgroundImage: CachedNetworkImageProvider(getSearchResult(keyword.value, kd)[index]["imgurl"]),
-                                          ),
-                                          sb5,
-                                          Text(
-                                            getSearchResult(keyword.value, kd)[index]["name"],
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(fontSize: 12, height: 1.2),
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  )),
-                        ))),
-              Container(
-                width: double.infinity,
-                height: 45,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Get.back();
-                  },
-                  style: ButtonStyle(shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(30))))),
-                  child: Text("Tutup"),
+    if (FocusManager.instance.primaryFocus!.hasFocus)
+      FocusManager.instance.primaryFocus?.unfocus();
+    Get.bottomSheet(
+      Container(
+        color: Colors.white,
+        child: SingleChildScrollView(
+          child: Container(
+            padding: EdgeInsets.only(left: 15, right: 15, bottom: 15, top: 10),
+            height: Get.height * 0.9,
+            child: Column(
+              children: [
+                Container(
+                  height: 6,
+                  width: 25,
+                  decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(20)),
                 ),
-              ),
-            ],
+                sb15,
+                CariButton(),
+                sb15,
+                Obx(() => Expanded(
+                    child: getSearchResult(keyword.value, kd).length == 0
+                        ? Center(
+                            child: Text("Kosong"),
+                          )
+                        : GridView(
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 4,
+                                    childAspectRatio: 0.8,
+                                    crossAxisSpacing: 10,
+                                    mainAxisSpacing: 10),
+                            children: List.generate(
+                                getSearchResult(keyword.value, kd).length,
+                                (index) => GestureDetector(
+                                      onTap: () {
+                                        Get.back();
+                                        Get.toNamed(Routes.MEMBERPROFILE,
+                                            arguments: {
+                                              "id": getSearchResult(
+                                                      keyword.value, kd)[index]
+                                                  ["id"],
+                                              "name": getSearchResult(
+                                                      keyword.value, kd)[index]
+                                                  ["name"],
+                                            });
+                                      },
+                                      child: Container(
+                                        padding: EdgeInsets.all(5),
+                                        color: Colors.grey.shade100,
+                                        width: double.infinity,
+                                        // alignment: Alignment.center,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            sb5,
+                                            CircleAvatar(
+                                              backgroundImage:
+                                                  CachedNetworkImageProvider(
+                                                      getSearchResult(
+                                                          keyword.value,
+                                                          kd)[index]["imgurl"]),
+                                            ),
+                                            sb5,
+                                            Text(
+                                              getSearchResult(
+                                                      keyword.value, kd)[index]
+                                                  ["name"],
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                  fontSize: 12, height: 1.2),
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    )),
+                          ))),
+                Container(
+                  width: double.infinity,
+                  height: 45,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Get.back();
+                    },
+                    style: ButtonStyle(
+                        shape: MaterialStatePropertyAll(RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(30))))),
+                    child: Text("Tutup"),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -194,10 +225,17 @@ class CariButton extends StatelessWidget {
               color: Colors.black,
             ),
             focusedBorder: OutlineInputBorder(
-                gapPadding: 0, borderSide: BorderSide(color: Color(0xFFE4E4E4), style: BorderStyle.solid), borderRadius: BorderRadius.all(Radius.circular(25))),
+                gapPadding: 0,
+                borderSide: BorderSide(
+                    color: Color(0xFFE4E4E4), style: BorderStyle.solid),
+                borderRadius: BorderRadius.all(Radius.circular(25))),
             enabledBorder: OutlineInputBorder(
-                gapPadding: 0, borderSide: BorderSide(color: Color(0xFFE4E4E4), style: BorderStyle.solid), borderRadius: BorderRadius.all(Radius.circular(25))),
-            contentPadding: EdgeInsets.only(left: 16, right: 2, bottom: 3, top: 3)),
+                gapPadding: 0,
+                borderSide: BorderSide(
+                    color: Color(0xFFE4E4E4), style: BorderStyle.solid),
+                borderRadius: BorderRadius.all(Radius.circular(25))),
+            contentPadding:
+                EdgeInsets.only(left: 16, right: 2, bottom: 3, top: 3)),
         onChanged: (value) {
           controller.keyword.value = value;
         },
